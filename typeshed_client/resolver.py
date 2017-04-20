@@ -1,0 +1,74 @@
+"""Module responsible for resolving names to the module they come from."""
+
+import sys
+from typing import NamedTuple, Optional, Tuple, Union
+
+from . import finder
+from . import parser
+
+
+class ImportedInfo(NamedTuple):
+    source_module: parser.ModulePath
+    info: parser.NameInfo
+
+
+ResolvedName = Union[None, parser.ModulePath, ImportedInfo, parser.NameInfo]
+
+
+def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info[:2],
+                   platform: str = sys.platform) -> Optional[parser.NameDict]:
+    """Given a module name, returns a dictionary of names defined in that module."""
+    ast = finder.get_stub_ast(module_name, version=version)
+    if ast is None:
+        return None
+    return parser.parse_ast(ast, parser.Env(version, platform),
+                            parser.ModulePath(module_name.split('.')))
+
+
+class Resolver:
+    def __init__(self, version: Tuple[int, int] = sys.version_info[:2],
+                 platform: str = sys.platform) -> None:
+        self.env = parser.Env(version, platform)
+        self._module_cache = {}
+
+    def get_module(self, module_name: parser.ModulePath) -> 'Module':
+        if module_name not in self._module_cache:
+            names = get_stub_names('.'.join(module_name), self.env.version, self.env.platform)
+            if names is None:
+                names = {}
+            self._module_cache[module_name] = Module(names, self.env)
+        return self._module_cache[module_name]
+
+    def get_name(self, module_name: parser.ModulePath, name: str) -> ResolvedName:
+        module = self.get_module(module_name)
+        return module.get_name(name, self)
+
+
+class Module:
+    def __init__(self, names: parser.NameDict, env: parser.Env) -> None:
+        self.names = names
+        self.env = env
+        self._name_cache = {}
+
+    def get_name(self, name: str, resolver: Resolver) -> ResolvedName:
+        if name not in self._name_cache:
+            self._name_cache[name] = self._uncached_get_name(name, resolver)
+        return self._name_cache[name]
+
+    def _uncached_get_name(self, name: str, resolver: Resolver) -> ResolvedName:
+        if name not in self.names:
+            return None
+        info = self.names[name]
+        if not isinstance(info.ast, parser.ImportedName):
+            return info
+        # TODO prevent infinite recursion
+        import_info = info.ast
+        if import_info.name is not None:
+            info = resolver.get_name(import_info.module_name, import_info.name)
+            if isinstance(info, parser.NameInfo):
+                return ImportedInfo(import_info.module_name, info)
+            else:
+                # TODO: preserve export information
+                return info
+        else:
+            return import_info.module_name
