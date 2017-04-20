@@ -22,7 +22,7 @@ def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info
     if ast is None:
         return None
     return parser.parse_ast(ast, parser.Env(version, platform),
-                            parser.ModulePath(module_name.split('.')))
+                            parser.ModulePath(tuple(module_name.split('.'))))
 
 
 class Resolver:
@@ -42,6 +42,11 @@ class Resolver:
     def get_name(self, module_name: parser.ModulePath, name: str) -> ResolvedName:
         module = self.get_module(module_name)
         return module.get_name(name, self)
+
+    def get_fully_qualified_name(self, name: str) -> ResolvedName:
+        """Public API."""
+        *path, tail = name.split('.')
+        return self.get_name(parser.ModulePath(tuple(path)), tail)
 
 
 class Module:

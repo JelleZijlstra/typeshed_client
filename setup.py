@@ -26,7 +26,7 @@ with (current_dir / 'typeshed_client/__init__.py').open() as f:
 setup(
     name='typeshed_client',
     version=version,
-    description="A plugin for flake8 to enable linting .pyi files.",
+    description="A library for accessing stubs in typeshed.",
     keywords='typeshed typing annotations',
     author='Jelle Zijlstra',
     author_email='jelle.zijlstra@gmail.com',

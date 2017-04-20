@@ -110,7 +110,10 @@ class _NameExtractor(ast3.NodeVisitor):
                 yield NameInfo(name, False, ImportedName(ModulePath((name,))))
 
     def visit_ImportFrom(self, node: ast3.ImportFrom) -> Iterable[NameInfo]:
-        module = tuple(node.module.split('.'))
+        if node.module is None:
+            module = ()
+        else:
+            module = tuple(node.module.split('.'))
         if node.level == 0:
             source_module = ModulePath(module)
         else:
