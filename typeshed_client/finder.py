@@ -39,6 +39,8 @@ def get_stub_file_name(module_name: Sequence[str], search_path: Iterable[Path]) 
 
 
 def find_typeshed() -> Path:
+    # do we need more here? mypy has far more elaborate logic in mypy/build.py
+    # maybe typeshed_client could also bundle typeshed itself instead of relying on mypy
     return Path(sys.prefix) / 'lib/mypy/typeshed'
 
 
