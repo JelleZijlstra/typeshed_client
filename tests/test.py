@@ -104,5 +104,15 @@ class TestParser(unittest.TestCase):
         info = typeshed_client.get_stub_names('conditions', version=version, platform=platform)
         self.assertEqual(set(info.keys()), names | {'sys'})
 
+    def test_overloads(self) -> None:
+        names = typeshed_client.get_stub_names('overloads', version=(3, 5))
+        self.assertEqual(set(names.keys()), {'overload', 'overloaded'})
+        self.check_nameinfo(names, 'overloaded', typeshed_client.OverloadedName)
+        definitions = names['overloaded'].ast.definitions
+        self.assertEqual(len(definitions), 2)
+        for defn in definitions:
+            self.assertIsInstance(defn, ast3.FunctionDef)
+
+
 if __name__ == '__main__':
     unittest.main()

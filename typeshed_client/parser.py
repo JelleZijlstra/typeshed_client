@@ -19,10 +19,14 @@ class ImportedName(NamedTuple):
     name: Optional[str] = None
 
 
+class OverloadedName(NamedTuple):
+    definitions: List[ast3.AST]
+
+
 class NameInfo(NamedTuple):
     name: str
     is_exported: bool
-    ast: Union[ast3.AST, ImportedName]
+    ast: Union[ast3.AST, ImportedName, OverloadedName]
     child_nodes: Optional['NameDict'] = None
 
 
@@ -46,7 +50,23 @@ def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info
 def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
     visitor = _NameExtractor(env, module_name)
     names = visitor.visit(ast)
-    return {info.name: info for info in names}
+    name_dict: NameDict = {}
+    for info in names:
+        if info.name in name_dict:
+            if isinstance(info.ast, ImportedName) or info.child_nodes:
+                raise InvalidStub('Cannot overload a class or an imported name')
+            existing = name_dict[info.name]
+            if isinstance(existing.ast, ImportedName) or existing.child_nodes:
+                raise InvalidStub('Cannot overload a class or an imported name')
+            elif isinstance(existing.ast, OverloadedName):
+                existing.ast.definitions.append(info.ast)
+            else:
+                new_info = NameInfo(existing.name, existing.is_exported,
+                                    OverloadedName([existing.ast, info.ast]))
+                name_dict[info.name] = new_info
+        else:
+            name_dict[info.name] = info
+    return name_dict
 
 
 _CMP_OP_TO_FUNCTION = {
