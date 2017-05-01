@@ -26,6 +26,11 @@ class TestTypeshedClient(unittest.TestCase):
             self.assertEqual(typeshed_client.get_stub_file('shared', version=version),
                              TEST_TYPESHED / 'stdlib/2and3/shared.pyi')
 
+        self.assertEqual(typeshed_client.get_stub_file('thirdpart', version=(3, 5)),
+                         TEST_TYPESHED / 'third_party/3.5/thirdpart.pyi')
+        self.assertEqual(typeshed_client.get_stub_file('thirdpart', version=(3, 4)),
+                         TEST_TYPESHED / 'stdlib/3.4/thirdpart.pyi')
+
 
 if __name__ == '__main__':
     unittest.main()

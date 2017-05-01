@@ -12,9 +12,10 @@ def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Pat
     versions = [f'{pyversion[0]}.{minor}' for minor in reversed(range(pyversion[1] + 1))]
     # E.g. for Python 3.2, try 3.2/, 3.1/, 3.0/, 3/, 2and3/.
     for version in versions + [str(pyversion[0]), '2and3']:
-        stubdir = typeshed_dir / 'stdlib' / version
-        if stubdir.is_dir():
-            path.append(stubdir)
+        for lib_type in ('stdlib', 'third_party'):
+            stubdir = typeshed_dir / lib_type / version
+            if stubdir.is_dir():
+                path.append(stubdir)
     return tuple(path)
 
 
