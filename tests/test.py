@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typed_ast import ast3
 import typeshed_client
@@ -97,7 +98,8 @@ class TestParser(unittest.TestCase):
         self.check_conditions({'penguins', 'asyncio', 'new_stuff'}, version=(3, 4))
         self.check_conditions({'penguins', 'yield_from', 'new_stuff'}, version=(3, 3))
         self.check_conditions({'penguins', 'ages_long_past', 'new_stuff'}, version=(3, 2))
-        self.check_conditions({'penguins', 'ages_long_past', 'old_stuff'}, version=(2, 7))
+        self.check_conditions({'penguins', 'ages_long_past', 'old_stuff', 'more_old_stuff'},
+                              version=(2, 7))
 
     def check_conditions(self, names: Set[str], *, version: Tuple[int, int] = (3, 6),
                          platform: str = 'linux') -> None:
@@ -130,6 +132,26 @@ class TestResolver(unittest.TestCase):
         self.assertIsInstance(resolved.info.ast, ast3.AnnAssign)
 
         self.assertIsInstance(res.get_name(path, 'var'), typeshed_client.NameInfo)
+
+
+class IntegrationTest(unittest.TestCase):
+    """Tests that all files in typeshed are parsed without error."""
+    fake_env = typeshed_client.parser.Env((3, 6), 'linux')
+    fake_path = typeshed_client.ModulePath(('some', 'module'))
+
+    def test(self):
+        typeshed_root = typeshed_client.finder.find_typeshed()
+        for dirpath, _, filenames in os.walk(typeshed_root):
+            for filename in filenames:
+                path = Path(dirpath) / filename
+                if path.suffix != '.pyi':
+                    continue
+                with self.subTest(path=path):
+                    self.check_path(path)
+
+    def check_path(self, path: Path) -> None:
+        ast = typeshed_client.finder.parse_stub_file(path)
+        typeshed_client.parser.parse_ast(ast, self.fake_env, self.fake_path)
 
 
 if __name__ == '__main__':

@@ -1,11 +1,14 @@
 """This module is responsible for parsing a stub AST into a dictionary of names."""
 
+import logging
 from mypy_extensions import NoReturn
 import sys
 from typed_ast import ast3
 from typing import Any, Dict, Iterable, List, NamedTuple, NewType, Optional, Tuple, Union
 
 from . import finder
+
+log = logging.getLogger(__name__)
 
 
 class InvalidStub(Exception):
@@ -54,10 +57,11 @@ def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
     for info in names:
         if info.name in name_dict:
             if isinstance(info.ast, ImportedName) or info.child_nodes:
-                raise InvalidStub('Cannot overload a class or an imported name')
+                log.warning('Cannot overload a class or an imported name: %s', info)
+                continue
             existing = name_dict[info.name]
             if isinstance(existing.ast, ImportedName) or existing.child_nodes:
-                raise InvalidStub('Cannot overload a class or an imported name')
+                log.warning('Cannot overload a class or an imported name: %s', existing)
             elif isinstance(existing.ast, OverloadedName):
                 existing.ast.definitions.append(info.ast)
             else:
@@ -171,6 +175,9 @@ class _LiteralEvalVisitor(ast3.NodeVisitor):
 
     def visit_Str(self, node: ast3.Str) -> str:
         return node.s
+
+    def visit_Index(self, node: ast3.Index) -> int:
+        return self.visit(node.value)
 
     def visit_Tuple(self, node: ast3.Tuple) -> Tuple[Any, ...]:
         return tuple(self.visit(elt) for elt in node.elts)

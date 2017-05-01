@@ -22,3 +22,6 @@ if sys.version_info < (3, 0):
     old_stuff: int
 else:
     new_stuff: int
+
+if sys.version_info[0] == 2:
+    more_old_stuff: int
