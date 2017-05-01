@@ -7,7 +7,7 @@ TEST_TYPESHED = Path(__file__).parent / 'typeshed'
 
 
 @mock.patch('typeshed_client.finder.find_typeshed', lambda: TEST_TYPESHED)
-class TestTypeshedClient(unittest.TestCase):
+class TestFinder(unittest.TestCase):
     def test_get_stub_file(self) -> None:
         self.assertEqual(typeshed_client.get_stub_file('lib'), TEST_TYPESHED / 'stdlib/3.5/lib.pyi')
         self.assertEqual(typeshed_client.get_stub_file('lib', version=(3, 6)),
@@ -26,10 +26,15 @@ class TestTypeshedClient(unittest.TestCase):
             self.assertEqual(typeshed_client.get_stub_file('shared', version=version),
                              TEST_TYPESHED / 'stdlib/2and3/shared.pyi')
 
+    def test_third_party(self) -> None:
         self.assertEqual(typeshed_client.get_stub_file('thirdpart', version=(3, 5)),
                          TEST_TYPESHED / 'third_party/3.5/thirdpart.pyi')
         self.assertEqual(typeshed_client.get_stub_file('thirdpart', version=(3, 4)),
                          TEST_TYPESHED / 'stdlib/3.4/thirdpart.pyi')
+
+    def test_subdir(self) -> None:
+        self.assertEqual(typeshed_client.get_stub_file('subdir', version=(3, 5)),
+                         TEST_TYPESHED / 'stdlib/3/subdir/__init__.pyi')
 
 
 if __name__ == '__main__':
