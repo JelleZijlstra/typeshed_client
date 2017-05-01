@@ -1,9 +1,8 @@
 """Module responsible for resolving names to the module they come from."""
 
 import sys
-from typing import NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Tuple, Union
 
-from . import finder
 from . import parser
 
 
@@ -23,7 +22,8 @@ class Resolver:
 
     def get_module(self, module_name: parser.ModulePath) -> 'Module':
         if module_name not in self._module_cache:
-            names = parser.get_stub_names('.'.join(module_name), self.env.version, self.env.platform)
+            names = parser.get_stub_names('.'.join(module_name), self.env.version,
+                                          self.env.platform)
             if names is None:
                 names = {}
             self._module_cache[module_name] = Module(names, self.env)

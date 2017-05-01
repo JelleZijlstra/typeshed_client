@@ -114,5 +114,23 @@ class TestParser(unittest.TestCase):
             self.assertIsInstance(defn, ast3.FunctionDef)
 
 
+@mock.patch('typeshed_client.finder.find_typeshed', lambda: TEST_TYPESHED)
+class TestResolver(unittest.TestCase):
+    def test_simple(self) -> None:
+        res = typeshed_client.Resolver(version=(3, 5))
+        path = typeshed_client.ModulePath(('simple',))
+        other_path = typeshed_client.ModulePath(('other',))
+
+        self.assertIsNone(res.get_name(path, 'nosuchname'))
+        self.assertEqual(res.get_name(path, 'other'), other_path)
+
+        name_info = typeshed_client.NameInfo('exported', True, mock.ANY)
+        resolved = res.get_name(path, 'exported')
+        self.assertEqual(resolved, typeshed_client.ImportedInfo(other_path, name_info))
+        self.assertIsInstance(resolved.info.ast, ast3.AnnAssign)
+
+        self.assertIsInstance(res.get_name(path, 'var'), typeshed_client.NameInfo)
+
+
 if __name__ == '__main__':
     unittest.main()
