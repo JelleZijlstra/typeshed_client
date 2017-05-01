@@ -59,4 +59,5 @@ def get_stub_ast(module_name: str,
     if path is None:
         return None
     text = path.read_text()
-    return ast3.parse(text, filename=str(path), feature_version=version[1])
+    # Always parse stubs as Python 3.6
+    return ast3.parse(text, filename=str(path), feature_version=6)

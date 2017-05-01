@@ -15,16 +15,6 @@ class ImportedInfo(NamedTuple):
 ResolvedName = Union[None, parser.ModulePath, ImportedInfo, parser.NameInfo]
 
 
-def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info[:2],
-                   platform: str = sys.platform) -> Optional[parser.NameDict]:
-    """Given a module name, returns a dictionary of names defined in that module."""
-    ast = finder.get_stub_ast(module_name, version=version)
-    if ast is None:
-        return None
-    return parser.parse_ast(ast, parser.Env(version, platform),
-                            parser.ModulePath(tuple(module_name.split('.'))))
-
-
 class Resolver:
     def __init__(self, version: Tuple[int, int] = sys.version_info[:2],
                  platform: str = sys.platform) -> None:
@@ -33,7 +23,7 @@ class Resolver:
 
     def get_module(self, module_name: parser.ModulePath) -> 'Module':
         if module_name not in self._module_cache:
-            names = get_stub_names('.'.join(module_name), self.env.version, self.env.platform)
+            names = parser.get_stub_names('.'.join(module_name), self.env.version, self.env.platform)
             if names is None:
                 names = {}
             self._module_cache[module_name] = Module(names, self.env)

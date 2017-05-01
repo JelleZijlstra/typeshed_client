@@ -1,10 +1,11 @@
 """This module is responsible for parsing a stub AST into a dictionary of names."""
 
-# TODO install mypy_extensions
-#from mypy_extensions import NoReturn
-NoReturn = None
+from mypy_extensions import NoReturn
+import sys
 from typed_ast import ast3
 from typing import Any, Dict, Iterable, List, NamedTuple, NewType, Optional, Tuple, Union
+
+from . import finder
 
 
 class InvalidStub(Exception):
@@ -31,6 +32,15 @@ class Env(NamedTuple):
 
 
 NameDict = Dict[str, NameInfo]
+
+
+def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info[:2],
+                   platform: str = sys.platform) -> Optional[NameDict]:
+    """Given a module name, returns a dictionary of names defined in that module."""
+    ast = finder.get_stub_ast(module_name, version=version)
+    if ast is None:
+        return None
+    return parse_ast(ast, Env(version, platform), ModulePath(tuple(module_name.split('.'))))
 
 
 def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
@@ -74,20 +84,16 @@ class _NameExtractor(ast3.NodeVisitor):
         yield NameInfo(node.name, not node.name.startswith('_'), node, child_dict)
 
     def visit_Assign(self, node: ast3.Assign) -> Iterable[NameInfo]:
-        if len(node.targets) != 1:
-            raise InvalidStub(f'Assign should have only one target: {ast3.dump(node)}')
         for target in node.targets:
             if not isinstance(target, ast3.Name):
                 raise InvalidStub(f'Assignment should only be to a simple name: {ast3.dump(node)}')
             yield NameInfo(target.id, not target.id.startswith('_'), node)
 
     def visit_AnnAssign(self, node: ast3.AnnAssign) -> Iterable[NameInfo]:
-        if len(node.targets) != 1:
-            raise InvalidStub(f'AnnAssign should have only one target: {ast3.dump(node)}')
-        for target in node.targets:
-            if not isinstance(target, ast3.Name):
-                raise InvalidStub(f'Assignment should only be to a simple name: {ast3.dump(node)}')
-            yield NameInfo(target.id, not target.id.startswith('_'), node)
+        target = node.target
+        if not isinstance(target, ast3.Name):
+            raise InvalidStub(f'Assignment should only be to a simple name: {ast3.dump(node)}')
+        yield NameInfo(target.id, not target.id.startswith('_'), node)
 
     def visit_If(self, node: ast3.If) -> Iterable[NameInfo]:
         visitor = _LiteralEvalVisitor(self.env)
