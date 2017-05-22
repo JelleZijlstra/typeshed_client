@@ -42,8 +42,15 @@ class TestFinder(unittest.TestCase):
         self.assertEqual(get_stub_file('subdir', version=(3, 5)),
                          TEST_TYPESHED / 'stdlib/3/subdir/__init__.pyi')
 
+    def test_get_all_stub_files(self) -> None:
+        all_stubs = typeshed_client.get_all_stub_files(version=(2, 7), typeshed_dir=TEST_TYPESHED)
+        self.assertEqual(set(all_stubs), {
+            TEST_TYPESHED / 'stdlib/2/lib.pyi',
+            TEST_TYPESHED / 'stdlib/2and3/conditions.pyi',
+            TEST_TYPESHED / 'stdlib/2and3/shared.pyi',
+        })
 
-@mock.patch('typeshed_client.finder.find_typeshed', lambda: TEST_TYPESHED)
+
 class TestParser(unittest.TestCase):
     def test_get_stub_names(self) -> None:
         names = get_stub_names('simple', version=(3, 5))

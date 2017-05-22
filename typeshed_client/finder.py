@@ -1,8 +1,9 @@
 """This module is responsible for finding stub files."""
+import os
 from pathlib import Path
 import sys
 from typed_ast import ast3
-from typing import Iterable, Optional, Sequence, Tuple
+from typing import Iterable, Optional, Sequence, Set, Tuple
 
 
 def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path]:
@@ -68,3 +69,22 @@ def parse_stub_file(path: Path) -> ast3.AST:
     text = path.read_text()
     # Always parse stubs as Python 3.6
     return ast3.parse(text, filename=str(path), feature_version=6)
+
+
+def get_all_stub_files(version: Tuple[int, int] = sys.version_info[:2],
+                       typeshed_dir: Optional[Path] = None) -> Iterable[Path]:
+    """Returns paths to all stub files for a given Python version."""
+    if typeshed_dir is None:
+        typeshed_dir = find_typeshed()
+    seen: Set[str] = set()
+    for path in get_search_path(typeshed_dir, version):
+        for root, _, files in os.walk(path):
+            for file in files:
+                full_path = Path(root) / file
+                relative_path = full_path.relative_to(path)
+                if full_path.suffix != '.pyi':
+                    continue
+                if relative_path in seen:
+                    continue
+                yield full_path
+                seen.add(relative_path)
