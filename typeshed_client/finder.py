@@ -72,8 +72,12 @@ def parse_stub_file(path: Path) -> ast3.AST:
 
 
 def get_all_stub_files(version: Tuple[int, int] = sys.version_info[:2],
-                       typeshed_dir: Optional[Path] = None) -> Iterable[Path]:
-    """Returns paths to all stub files for a given Python version."""
+                       typeshed_dir: Optional[Path] = None) -> Iterable[Tuple[str, Path]]:
+    """Returns paths to all stub files for a given Python version.
+
+    Returns pairs of (module name, module path).
+
+    """
     if typeshed_dir is None:
         typeshed_dir = find_typeshed()
     seen: Set[str] = set()
@@ -86,5 +90,15 @@ def get_all_stub_files(version: Tuple[int, int] = sys.version_info[:2],
                     continue
                 if relative_path in seen:
                     continue
-                yield full_path
+                yield _path_to_module(relative_path), full_path
                 seen.add(relative_path)
+
+
+def _path_to_module(path: Path) -> str:
+    """Returns the module name corresponding to a file path."""
+    parts = path.parts
+    if parts[-1] == '__init__.pyi':
+        parts = parts[-1]
+    if parts[-1].endswith('.pyi'):
+        parts = parts[:-1] + (parts[-1].rstrip('.pyi'),)
+    return '.'.join(parts)
