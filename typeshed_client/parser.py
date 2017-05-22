@@ -2,6 +2,7 @@
 
 import logging
 from mypy_extensions import NoReturn
+from pathlib import Path
 import sys
 from typed_ast import ast3
 from typing import Any, Dict, Iterable, List, NamedTuple, NewType, Optional, Tuple, Union
@@ -42,9 +43,10 @@ NameDict = Dict[str, NameInfo]
 
 
 def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info[:2],
-                   platform: str = sys.platform) -> Optional[NameDict]:
+                   platform: str = sys.platform,
+                   typeshed_dir: Optional[Path] = None) -> Optional[NameDict]:
     """Given a module name, returns a dictionary of names defined in that module."""
-    ast = finder.get_stub_ast(module_name, version=version)
+    ast = finder.get_stub_ast(module_name, version=version, typeshed_dir=typeshed_dir)
     if ast is None:
         return None
     return parse_ast(ast, Env(version, platform), ModulePath(tuple(module_name.split('.'))))

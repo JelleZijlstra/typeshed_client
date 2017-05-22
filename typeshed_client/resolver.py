@@ -1,7 +1,8 @@
 """Module responsible for resolving names to the module they come from."""
 
+from pathlib import Path
 import sys
-from typing import NamedTuple, Tuple, Union
+from typing import NamedTuple, Optional, Tuple, Union
 
 from . import parser
 
@@ -16,14 +17,17 @@ ResolvedName = Union[None, parser.ModulePath, ImportedInfo, parser.NameInfo]
 
 class Resolver:
     def __init__(self, version: Tuple[int, int] = sys.version_info[:2],
-                 platform: str = sys.platform) -> None:
+                 platform: str = sys.platform,
+                 typeshed_dir: Optional[Path] = None) -> None:
         self.env = parser.Env(version, platform)
+        self._typeshed_dir = typeshed_dir
         self._module_cache = {}
 
     def get_module(self, module_name: parser.ModulePath) -> 'Module':
         if module_name not in self._module_cache:
-            names = parser.get_stub_names('.'.join(module_name), self.env.version,
-                                          self.env.platform)
+            names = parser.get_stub_names('.'.join(module_name), version=self.env.version,
+                                          platform=self.env.platform,
+                                          typeshed_dir=self._typeshed_dir)
             if names is None:
                 names = {}
             self._module_cache[module_name] = Module(names, self.env)

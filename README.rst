@@ -31,7 +31,8 @@ given a module name.
 Functions provided:
 
 - ``typeshed_client.get_stub_file(module_name: str,
-  version: Tuple[int, int] = sys.version_info[:2]) -> Optional[Path]``: Returns
+  version: Tuple[int, int] = sys.version_info[:2],
+  typeshed_dir: Optional[Path] = None) -> Optional[Path]``: Returns
   the path to a module's stub in typeshed. For example,
   ``get_stub_file('typing', version=(2, 7))`` may return
   ``Path('/path/to/typeshed/stdlib/2/typing.pyi')``. If there is no stub for the
@@ -46,7 +47,8 @@ Collecting names from stubs
 
 - ``typeshed_client.get_stub_names(module_name: str,
   version: Tuple[int, int] = sys.version_info[:2],
-  platform: str = sys.platform) -> Optional[NameDict]`` collects the names
+  platform: str = sys.platform,
+  typeshed_dir: Optional[Path] = None) -> Optional[NameDict]`` collects the names
   defined in a module, using the given Python version and platform. It
   returns a ``NameDict``, a dictionary mapping object names defined in the module
   to ``NameInfo`` records.

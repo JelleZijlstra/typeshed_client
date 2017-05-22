@@ -45,17 +45,20 @@ def find_typeshed() -> Path:
     return Path(sys.prefix) / 'lib/mypy/typeshed'
 
 
-def get_stub_file(module_name: str,
-                  version: Tuple[int, int] = sys.version_info[:2]) -> Optional[Path]:
+def get_stub_file(module_name: str, *,
+                  version: Tuple[int, int] = sys.version_info[:2],
+                  typeshed_dir: Optional[Path] = None) -> Optional[Path]:
     """Returns the path to the stub file for this module, if any."""
-    typeshed_dir = find_typeshed()
+    if typeshed_dir is None:
+        typeshed_dir = find_typeshed()
     search_path = get_search_path(typeshed_dir, version)
     return get_stub_file_name(tuple(module_name.split('.')), search_path)
 
 
-def get_stub_ast(module_name: str,
-                 version: Tuple[int, int] = sys.version_info[:2]) -> Optional[ast3.AST]:
-    path = get_stub_file(module_name, version=version)
+def get_stub_ast(module_name: str, *,
+                 version: Tuple[int, int] = sys.version_info[:2],
+                 typeshed_dir: Optional[Path] = None) -> Optional[ast3.AST]:
+    path = get_stub_file(module_name, version=version, typeshed_dir=typeshed_dir)
     if path is None:
         return None
     return parse_stub_file(path)
