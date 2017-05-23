@@ -82,6 +82,5 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Future work
 -----------
 
-- Handle star imports correctly.
 - Fall back to builtins correctly in the resolver.
 - Maybe provide ways to map AST nodes in annotations to runtime type objects.
