@@ -37,6 +37,7 @@ class NameInfo(NamedTuple):
 class Env(NamedTuple):
     version: Tuple[int, int]
     platform: str
+    typeshed_dir: Path
 
 
 NameDict = Dict[str, NameInfo]
@@ -46,10 +47,13 @@ def get_stub_names(module_name: str, version: Tuple[int, int] = sys.version_info
                    platform: str = sys.platform,
                    typeshed_dir: Optional[Path] = None) -> Optional[NameDict]:
     """Given a module name, returns a dictionary of names defined in that module."""
+    if typeshed_dir is None:
+        typeshed_dir = finder.find_typeshed()
     ast = finder.get_stub_ast(module_name, version=version, typeshed_dir=typeshed_dir)
     if ast is None:
         return None
-    return parse_ast(ast, Env(version, platform), ModulePath(tuple(module_name.split('.'))))
+    return parse_ast(ast, Env(version, platform, typeshed_dir),
+                     ModulePath(tuple(module_name.split('.'))))
 
 
 def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
@@ -155,6 +159,17 @@ class _NameExtractor(ast3.NodeVisitor):
             if alias.asname is not None:
                 is_exported = not alias.asname.startswith('_')
                 yield NameInfo(alias.asname, is_exported, ImportedName(source_module, alias.name))
+            elif alias.name == '*':
+                name_dict = get_stub_names('.'.join(source_module), version=self.env.version,
+                                           platform=self.env.platform,
+                                           typeshed_dir=self.env.typeshed_dir)
+                if name_dict is None:
+                    log.warning(f'could not import {source_module} in {self.module_name} with '
+                                f'{self.env}')
+                    continue
+                for name, info in name_dict.items():
+                    if info.is_exported:
+                        yield NameInfo(name, True, ImportedName(source_module, name))
             else:
                 yield NameInfo(alias.name, False, ImportedName(source_module, alias.name))
 

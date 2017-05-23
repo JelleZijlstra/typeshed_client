@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 from typing import NamedTuple, Optional, Tuple, Union
 
+from . import finder
 from . import parser
 
 
@@ -19,7 +20,9 @@ class Resolver:
     def __init__(self, version: Tuple[int, int] = sys.version_info[:2],
                  platform: str = sys.platform,
                  typeshed_dir: Optional[Path] = None) -> None:
-        self.env = parser.Env(version, platform)
+        if typeshed_dir is None:
+            typeshed_dir = finder.find_typeshed()
+        self.env = parser.Env(version, platform, typeshed_dir)
         self._typeshed_dir = typeshed_dir
         self._module_cache = {}
 

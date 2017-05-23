@@ -92,6 +92,13 @@ class TestParser(unittest.TestCase):
         self.check_nameinfo(cls_names, 'attr', ast3.AnnAssign)
         self.check_nameinfo(cls_names, 'method', ast3.FunctionDef)
 
+    def test_starimport(self) -> None:
+        names = get_stub_names('starimport', version=(3, 5))
+        self.assertEqual(set(names.keys()), {'public'})
+        self.check_nameinfo(names, 'public', typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(('imported',))
+        self.assertEqual(names['public'].ast, typeshed_client.ImportedName(path, 'public'))
+
     def check_nameinfo(self, names: typeshed_client.NameDict, name: str, ast_type: Type[Any], *,
                        is_exported: bool = True, has_child_nodes: bool = False) -> None:
         info = names[name]
@@ -149,7 +156,7 @@ class TestResolver(unittest.TestCase):
 
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error."""
-    fake_env = typeshed_client.parser.Env((3, 6), 'linux')
+    fake_env = typeshed_client.parser.Env((3, 6), 'linux', typeshed_client.finder.find_typeshed())
     fake_path = typeshed_client.ModulePath(('some', 'module'))
 
     def test(self):
