@@ -3,12 +3,12 @@ import os
 from pathlib import Path
 import sys
 from typed_ast import ast3
-from typing import Iterable, Optional, Sequence, Set, Tuple
+from typing import Iterable, List, Optional, Sequence, Set, Tuple
 
 
-def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path]:
+def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
-    path = []  # type: List[str]
+    path: List[Path] = []
 
     versions = [f'{pyversion[0]}.{minor}' for minor in reversed(range(pyversion[1] + 1))]
     # E.g. for Python 3.2, try 3.2/, 3.1/, 3.0/, 3/, 2and3/.
@@ -80,9 +80,10 @@ def get_all_stub_files(version: Tuple[int, int] = sys.version_info[:2],
     """
     if typeshed_dir is None:
         typeshed_dir = find_typeshed()
-    seen: Set[str] = set()
+    seen: Set[Path] = set()
     for path in get_search_path(typeshed_dir, version):
-        for root, _, files in os.walk(path):
+        # submitting PR to typeshed to fix os.walk
+        for root, _, files in os.walk(path):  # type: ignore
             for file in files:
                 full_path = Path(root) / file
                 relative_path = full_path.relative_to(path)

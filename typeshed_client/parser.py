@@ -142,6 +142,7 @@ class _NameExtractor(ast3.NodeVisitor):
                 yield NameInfo(name, False, ImportedName(ModulePath((name,))))
 
     def visit_ImportFrom(self, node: ast3.ImportFrom) -> Iterable[NameInfo]:
+        module: Tuple[str, ...]
         if node.module is None:
             module = ()
         else:
@@ -173,7 +174,7 @@ class _LiteralEvalVisitor(ast3.NodeVisitor):
     def __init__(self, env: Env) -> None:
         self.env = env
 
-    def visit_Num(self, node: ast3.Num) -> int:
+    def visit_Num(self, node: ast3.Num) -> Union[int, float]:
         return node.n
 
     def visit_Str(self, node: ast3.Str) -> str:
