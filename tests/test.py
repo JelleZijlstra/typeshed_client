@@ -56,7 +56,8 @@ class TestParser(unittest.TestCase):
         names = get_stub_names('simple', version=(3, 5))
         self.assertEqual(set(names.keys()), {
             'var', 'old_var', 'func', 'async_func', 'Cls', '_private',
-            'exported', 'unexported', 'other', 'multiple', 'assignment', 'new_name'
+            'exported', 'unexported', 'other', 'multiple', 'assignment', 'new_name',
+            '_made_private',
         })
 
         # Simple assignments
@@ -76,6 +77,9 @@ class TestParser(unittest.TestCase):
         self.assertEqual(names['unexported'].ast, typeshed_client.ImportedName(path, 'unexported'))
         self.check_nameinfo(names, 'new_name', typeshed_client.ImportedName)
         self.assertEqual(names['new_name'].ast, typeshed_client.ImportedName(path, 'renamed'))
+        self.check_nameinfo(names, '_made_private', typeshed_client.ImportedName, is_exported=False)
+        self.assertEqual(names['_made_private'].ast,
+                         typeshed_client.ImportedName(path, 'made_private'))
 
         # Functions
         self.check_nameinfo(names, 'func', ast3.FunctionDef)

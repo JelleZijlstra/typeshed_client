@@ -152,7 +152,8 @@ class _NameExtractor(ast3.NodeVisitor):
             source_module = ModulePath(self.module_name[:-node.level] + module)
         for alias in node.names:
             if alias.asname is not None:
-                yield NameInfo(alias.asname, True, ImportedName(source_module, alias.name))
+                is_exported = not alias.asname.startswith('_')
+                yield NameInfo(alias.asname, is_exported, ImportedName(source_module, alias.name))
             else:
                 yield NameInfo(alias.name, False, ImportedName(source_module, alias.name))
 
