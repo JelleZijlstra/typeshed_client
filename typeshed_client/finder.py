@@ -23,21 +23,29 @@ def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Pat
 def get_stub_file_name(module_name: Sequence[str], search_path: Iterable[Path]) -> Optional[Path]:
     *dirs, tail = module_name
     for stubdir in search_path:
-        for dirname in dirs:
-            subdir = stubdir / dirname
-            if subdir.is_dir():
-                stubdir = subdir
-            else:
-                break
-
-        filename = stubdir / f'{tail}.pyi'
-        if filename.exists():
+        filename = _find_file_in_stub_dir(dirs, tail, stubdir)
+        if filename is not None:
             return filename
-        init_name = stubdir / tail / '__init__.pyi'
-        if init_name.exists():
-            return init_name
     else:
         return None
+
+
+def _find_file_in_stub_dir(package_path: Sequence[str], module_name: str,
+                           stubdir: str) -> Optional[Path]:
+    for dirname in package_path:
+        subdir = stubdir / dirname
+        if subdir.is_dir():
+            stubdir = subdir
+        else:
+            return None
+
+    filename = stubdir / f'{module_name}.pyi'
+    if filename.exists():
+        return filename
+    init_name = stubdir / module_name / '__init__.pyi'
+    if init_name.exists():
+        return init_name
+    return None
 
 
 def find_typeshed() -> Path:

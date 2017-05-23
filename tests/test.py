@@ -28,6 +28,10 @@ class TestFinder(unittest.TestCase):
                          TEST_TYPESHED / 'stdlib/3/lib.pyi')
         self.assertEqual(get_stub_file('lib', version=(2, 7)),
                          TEST_TYPESHED / 'stdlib/2/lib.pyi')
+        self.assertEqual(get_stub_file('subdir.overloads', version=(3, 6)),
+                         TEST_TYPESHED / 'stdlib/3/subdir/overloads.pyi')
+        self.assertEqual(get_stub_file('overloads', version=(3, 6)),
+                         TEST_TYPESHED / 'stdlib/3/overloads.pyi')
         for version in ((2, 7), (3, 3), (3, 4), (3, 5), (3, 6)):
             self.assertEqual(get_stub_file('shared', version=version),
                              TEST_TYPESHED / 'stdlib/2and3/shared.pyi')
