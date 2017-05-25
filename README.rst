@@ -79,6 +79,20 @@ class. For example, given a ``resolver = typeshed_client.Resolver()``, you can
 call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 ``NameInfo`` containing the AST node defining ``collections.Set`` in typeshed.
 
+Changelog
+---------
+
+Version 0.2 (May 25, 2017)
+
+- Support using a custom typeshed directory
+- Add ``get_all_stub_files()``
+- Handle ``from module import *``
+- Bug fixes
+
+Version 0.1 (May 4, 2017)
+
+- Initial release
+
 Future work
 -----------
 
