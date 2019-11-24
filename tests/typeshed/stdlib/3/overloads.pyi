@@ -1,5 +1,4 @@
 from typing import overload
-
 @overload
 def overloaded(x: int) -> None: ...
 @overload

@@ -1,5 +1,10 @@
 import other
-from other import unexported, exported as exported, renamed as new_name, made_private as _made_private
+from other import (
+    unexported,
+    exported as exported,
+    renamed as new_name,
+    made_private as _made_private,
+)
 
 _private: int
 

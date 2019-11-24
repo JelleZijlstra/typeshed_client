@@ -1,8 +1,8 @@
 import sys
 
-if sys.platform == 'win32':
+if sys.platform == "win32":
     windows: int
-elif sys.platform == 'darwin':
+elif sys.platform == "darwin":
     apples: int
 else:
     penguins: int
