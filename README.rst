@@ -82,6 +82,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 0.3 (November 23, 2019)
+
+- Update location of typeshed for newer mypy versions
+
 Version 0.2 (May 25, 2017)
 
 - Support using a custom typeshed directory
