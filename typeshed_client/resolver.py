@@ -17,20 +17,26 @@ ResolvedName = Union[None, parser.ModulePath, ImportedInfo, parser.NameInfo]
 
 
 class Resolver:
-    def __init__(self, version: Tuple[int, int] = sys.version_info[:2],
-                 platform: str = sys.platform,
-                 typeshed_dir: Optional[Path] = None) -> None:
+    def __init__(
+        self,
+        version: Tuple[int, int] = sys.version_info[:2],
+        platform: str = sys.platform,
+        typeshed_dir: Optional[Path] = None,
+    ) -> None:
         if typeshed_dir is None:
             typeshed_dir = finder.find_typeshed()
         self.env = parser.Env(version, platform, typeshed_dir)
         self._typeshed_dir = typeshed_dir
         self._module_cache = {}
 
-    def get_module(self, module_name: parser.ModulePath) -> 'Module':
+    def get_module(self, module_name: parser.ModulePath) -> "Module":
         if module_name not in self._module_cache:
-            names = parser.get_stub_names('.'.join(module_name), version=self.env.version,
-                                          platform=self.env.platform,
-                                          typeshed_dir=self._typeshed_dir)
+            names = parser.get_stub_names(
+                ".".join(module_name),
+                version=self.env.version,
+                platform=self.env.platform,
+                typeshed_dir=self._typeshed_dir,
+            )
             if names is None:
                 names = {}
             self._module_cache[module_name] = Module(names, self.env)
@@ -42,7 +48,7 @@ class Resolver:
 
     def get_fully_qualified_name(self, name: str) -> ResolvedName:
         """Public API."""
-        *path, tail = name.split('.')
+        *path, tail = name.split(".")
         return self.get_name(parser.ModulePath(tuple(path)), tail)
 
 
