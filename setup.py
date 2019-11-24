@@ -33,7 +33,7 @@ setup(
     url='https://github.com/JelleZijlstra/typeshed_client',
     license='MIT',
     packages=['typeshed_client'],
-    install_requires=['mypy >= 0.501', 'mypy_extensions >= 0.1.0', 'typed_ast >= 1.0.3'],
+    install_requires=['mypy >= 0.740', 'mypy_extensions >= 0.1.0', 'typed_ast >= 1.0.3', 'importlib_resources'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
