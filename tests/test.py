@@ -165,6 +165,7 @@ class IntegrationTest(unittest.TestCase):
 
     def test(self):
         typeshed_root = typeshed_client.finder.find_typeshed()
+        self.assertTrue(typeshed_root.is_dir())
         for dirpath, _, filenames in os.walk(typeshed_root):
             for filename in filenames:
                 path = Path(dirpath) / filename

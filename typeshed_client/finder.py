@@ -1,4 +1,5 @@
 """This module is responsible for finding stub files."""
+import importlib_resources
 import os
 from pathlib import Path
 import sys
@@ -51,7 +52,8 @@ def _find_file_in_stub_dir(package_path: Sequence[str], module_name: str,
 def find_typeshed() -> Path:
     # do we need more here? mypy has far more elaborate logic in mypy/build.py
     # maybe typeshed_client could also bundle typeshed itself instead of relying on mypy
-    return Path(sys.prefix) / 'lib/mypy/typeshed'
+    with importlib_resources.path("mypy", "typeshed") as path:
+        return path
 
 
 def get_stub_file(module_name: str, *,
