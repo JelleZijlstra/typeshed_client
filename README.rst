@@ -82,6 +82,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 0.4 (December 2, 2019)
+
+- Performance improvement
+- Code quality improvements
+
 Version 0.3 (November 23, 2019)
 
 - Update location of typeshed for newer mypy versions

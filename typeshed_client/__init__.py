@@ -18,4 +18,4 @@ from .parser import (
 from .resolver import ImportedInfo, Resolver
 
 
-__version__ = "0.3"
+__version__ = "0.4"
