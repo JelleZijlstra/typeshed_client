@@ -1,4 +1,5 @@
 """This module is responsible for finding stub files."""
+from functools import lru_cache
 import importlib_resources
 import os
 from pathlib import Path
@@ -7,6 +8,7 @@ from typed_ast import ast3
 from typing import Iterable, List, Optional, Sequence, Set, Tuple
 
 
+@lru_cache()
 def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
     path: List[Path] = []
