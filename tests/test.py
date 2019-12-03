@@ -162,7 +162,7 @@ class TestParser(unittest.TestCase):
         ast_type: Type[Any],
         *,
         is_exported: bool = True,
-        has_child_nodes: bool = False
+        has_child_nodes: bool = False,
     ) -> None:
         info = names[name]
         self.assertEqual(info.name, name)
@@ -202,7 +202,7 @@ class TestParser(unittest.TestCase):
         names: Set[str],
         *,
         version: Tuple[int, int] = (3, 6),
-        platform: str = "linux"
+        platform: str = "linux",
     ) -> None:
         info = get_stub_names("conditions", version=version, platform=platform)
         self.assertEqual(set(info.keys()), names | {"sys"})

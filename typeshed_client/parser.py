@@ -42,7 +42,8 @@ class NameInfo(NamedTuple):
     name: str
     is_exported: bool
     ast: Union[ast3.AST, ImportedName, OverloadedName]
-    child_nodes: Optional["NameDict"] = None
+    # should be Optional[NameDict] but that needs a recursive type
+    child_nodes: Optional[Dict[str, Any]] = None
 
 
 class Env(NamedTuple):

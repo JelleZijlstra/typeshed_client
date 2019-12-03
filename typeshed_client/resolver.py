@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import sys
-from typing import NamedTuple, Optional, Tuple, Union
+from typing import Dict, NamedTuple, Optional, Tuple, Union
 
 from . import finder
 from . import parser
@@ -27,7 +27,7 @@ class Resolver:
             typeshed_dir = finder.find_typeshed()
         self.env = parser.Env(version, platform, typeshed_dir)
         self._typeshed_dir = typeshed_dir
-        self._module_cache = {}
+        self._module_cache: Dict[parser.ModulePath, Module] = {}
 
     def get_module(self, module_name: parser.ModulePath) -> "Module":
         if module_name not in self._module_cache:
@@ -56,7 +56,7 @@ class Module:
     def __init__(self, names: parser.NameDict, env: parser.Env) -> None:
         self.names = names
         self.env = env
-        self._name_cache = {}
+        self._name_cache: Dict[str, ResolvedName] = {}
 
     def get_name(self, name: str, resolver: Resolver) -> ResolvedName:
         if name not in self._name_cache:
@@ -72,11 +72,11 @@ class Module:
         # TODO prevent infinite recursion
         import_info = info.ast
         if import_info.name is not None:
-            info = resolver.get_name(import_info.module_name, import_info.name)
-            if isinstance(info, parser.NameInfo):
-                return ImportedInfo(import_info.module_name, info)
+            resolved = resolver.get_name(import_info.module_name, import_info.name)
+            if isinstance(resolved, parser.NameInfo):
+                return ImportedInfo(import_info.module_name, resolved)
             else:
                 # TODO: preserve export information
-                return info
+                return resolved
         else:
             return import_info.module_name

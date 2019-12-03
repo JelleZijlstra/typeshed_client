@@ -38,7 +38,7 @@ def get_stub_file_name(
 
 
 def _find_file_in_stub_dir(
-    package_path: Sequence[str], module_name: str, stubdir: str
+    package_path: Sequence[str], module_name: str, stubdir: Path
 ) -> Optional[Path]:
     for dirname in package_path:
         subdir = stubdir / dirname
