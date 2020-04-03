@@ -82,6 +82,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 0.4.1 (April 3, 2020)
+
+- Fix for newer versions of ``importlib_resources``
+
 Version 0.4 (December 2, 2019)
 
 - Performance improvement
