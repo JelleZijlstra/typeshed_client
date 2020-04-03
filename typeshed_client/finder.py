@@ -59,8 +59,7 @@ def _find_file_in_stub_dir(
 def find_typeshed() -> Path:
     # do we need more here? mypy has far more elaborate logic in mypy/build.py
     # maybe typeshed_client could also bundle typeshed itself instead of relying on mypy
-    with importlib_resources.path("mypy", "typeshed") as path:
-        return path
+    return importlib_resources.files("mypy") / "typeshed"
 
 
 def get_stub_file(
