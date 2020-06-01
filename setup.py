@@ -37,7 +37,7 @@ setup(
         "mypy >= 0.740",
         "mypy_extensions >= 0.1.0",
         "typed_ast >= 1.0.3",
-        "importlib_resources",
+        "importlib_resources >= 1.4.0",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
