@@ -74,6 +74,10 @@ class TestFinder(unittest.TestCase):
                 ("lib", TEST_TYPESHED / "stdlib/2/lib.pyi"),
                 ("conditions", TEST_TYPESHED / "stdlib/2and3/conditions.pyi"),
                 ("shared", TEST_TYPESHED / "stdlib/2and3/shared.pyi"),
+                (
+                    "top_level_assert",
+                    TEST_TYPESHED / "stdlib/2and3/top_level_assert.pyi",
+                ),
             },
         )
 
@@ -206,6 +210,12 @@ class TestParser(unittest.TestCase):
     ) -> None:
         info = get_stub_names("conditions", version=version, platform=platform)
         self.assertEqual(set(info.keys()), names | {"sys"})
+
+    def test_top_level_assert(self):
+        info = get_stub_names("top_level_assert", version=(3, 6), platform="flat")
+        self.assertEqual(set(info.keys()), set())
+        info = get_stub_names("top_level_assert", version=(3, 6), platform="linux")
+        self.assertEqual(set(info.keys()), {"x", "sys"})
 
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", version=(3, 5))

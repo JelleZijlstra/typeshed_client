@@ -76,8 +76,11 @@ def get_stub_names(
 
 def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
     visitor = _NameExtractor(env, module_name)
-    names = visitor.visit(ast)
     name_dict: NameDict = {}
+    try:
+        names = visitor.visit(ast)
+    except _AssertFailed:
+        return name_dict
     for info in names:
         if info.name in name_dict:
             if isinstance(info.ast, ImportedName) or info.child_nodes:
@@ -160,6 +163,14 @@ class _NameExtractor(ast3.NodeVisitor):
         else:
             for stmt in node.orelse:
                 yield from self.visit(stmt)
+
+    def visit_Assert(self, node: ast3.Assert) -> Iterable[NameInfo]:
+        visitor = _LiteralEvalVisitor(self.env)
+        value = visitor.visit(node.test)
+        if value:
+            return []
+        else:
+            raise _AssertFailed
 
     def visit_Import(self, node: ast3.Import) -> Iterable[NameInfo]:
         for alias in node.names:
@@ -282,3 +293,7 @@ class _LiteralEvalVisitor(ast3.NodeVisitor):
 
     def generic_visit(self, node: ast3.AST) -> NoReturn:
         raise InvalidStub(f"Cannot evaluate node {ast3.dump(node)}")
+
+
+class _AssertFailed(Exception):
+    """Raised when a top-level assert in a stub fails."""
