@@ -1,90 +1,76 @@
-from functools import partial
-import os
 from pathlib import Path
 from typed_ast import ast3
 import typeshed_client
-from typing import Any, Set, Tuple, Type
+from typeshed_client.finder import (
+    get_search_context,
+    PythonVersion,
+    get_stub_file,
+    SearchContext,
+)
+from typeshed_client.parser import get_stub_names
+from typing import Any, Set, Type, Optional
 from unittest import mock
 import unittest
 
 TEST_TYPESHED = Path(__file__).parent / "typeshed"
+PACKAGES = Path(__file__).parent / "site-packages"
 
-get_stub_file = partial(typeshed_client.get_stub_file, typeshed_dir=TEST_TYPESHED)
-get_stub_names = partial(typeshed_client.get_stub_names, typeshed_dir=TEST_TYPESHED)
+
+def get_context(version: PythonVersion, platform: str = "linux") -> SearchContext:
+    return get_search_context(
+        version=version,
+        typeshed=TEST_TYPESHED,
+        search_path=[PACKAGES],
+        platform=platform,
+    )
 
 
 class TestFinder(unittest.TestCase):
+    def check(
+        self, name: str, version: PythonVersion, expected: Optional[Path]
+    ) -> None:
+        ctx = get_context(version)
+        self.assertEqual(get_stub_file(name, search_context=ctx), expected)
+
     def test_get_stub_file(self) -> None:
-        self.assertEqual(get_stub_file("lib"), TEST_TYPESHED / "stdlib/3.5/lib.pyi")
-        self.assertEqual(
-            get_stub_file("lib", version=(3, 6)), TEST_TYPESHED / "stdlib/3.5/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("lib", version=(3, 5)), TEST_TYPESHED / "stdlib/3.5/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("lib", version=(3, 4)), TEST_TYPESHED / "stdlib/3.4/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("lib", version=(3, 3)), TEST_TYPESHED / "stdlib/3.3/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("lib", version=(3, 2)), TEST_TYPESHED / "stdlib/3/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("lib", version=(2, 7)), TEST_TYPESHED / "stdlib/2/lib.pyi"
-        )
-        self.assertEqual(
-            get_stub_file("subdir.overloads", version=(3, 6)),
-            TEST_TYPESHED / "stdlib/3/subdir/overloads.pyi",
-        )
-        self.assertEqual(
-            get_stub_file("overloads", version=(3, 6)),
-            TEST_TYPESHED / "stdlib/3/overloads.pyi",
-        )
-        for version in ((2, 7), (3, 3), (3, 4), (3, 5), (3, 6)):
-            self.assertEqual(
-                get_stub_file("shared", version=version),
-                TEST_TYPESHED / "stdlib/2and3/shared.pyi",
-            )
+        self.check("lib", (3, 6), TEST_TYPESHED / "lib.pyi")
+        self.check("lib", (3, 5), TEST_TYPESHED / "lib.pyi")
+        self.check("lib", (2, 7), TEST_TYPESHED / "@python2/lib.pyi")
+
+        self.check("py2only", (3, 5), None)
+        self.check("py2only", (2, 7), TEST_TYPESHED / "@python2/py2only.pyi")
+
+        self.check("new37", (3, 6), None)
+        self.check("new37", (3, 7), TEST_TYPESHED / "new37.pyi")
+
+        self.check("subdir", (3, 6), TEST_TYPESHED / "subdir/__init__.pyi")
+        self.check("subdir.overloads", (3, 7), TEST_TYPESHED / "subdir/overloads.pyi")
 
     def test_third_party(self) -> None:
-        self.assertEqual(
-            get_stub_file("thirdpart", version=(3, 5)),
-            TEST_TYPESHED / "third_party/3.5/thirdpart.pyi",
-        )
-        self.assertEqual(
-            get_stub_file("thirdpart", version=(3, 4)),
-            TEST_TYPESHED / "stdlib/3.4/thirdpart.pyi",
-        )
-
-    def test_subdir(self) -> None:
-        self.assertEqual(
-            get_stub_file("subdir", version=(3, 5)),
-            TEST_TYPESHED / "stdlib/3/subdir/__init__.pyi",
-        )
+        self.check("thirdparty", (3, 6), PACKAGES / "thirdparty-stubs/__init__.pyi")
+        self.check("nostubs", (3, 6), PACKAGES / "nostubs/__init__.pyi")
 
     def test_get_all_stub_files(self) -> None:
-        all_stubs = typeshed_client.get_all_stub_files(
-            version=(2, 7), typeshed_dir=TEST_TYPESHED
-        )
+        all_stubs = typeshed_client.get_all_stub_files(get_context((2, 7)))
         self.assertEqual(
             set(all_stubs),
             {
-                ("lib", TEST_TYPESHED / "stdlib/2/lib.pyi"),
-                ("conditions", TEST_TYPESHED / "stdlib/2and3/conditions.pyi"),
-                ("shared", TEST_TYPESHED / "stdlib/2and3/shared.pyi"),
-                (
-                    "top_level_assert",
-                    TEST_TYPESHED / "stdlib/2and3/top_level_assert.pyi",
-                ),
+                ("thirdparty", PACKAGES / "thirdparty-stubs/__init__.pyi"),
+                ("nostubs", PACKAGES / "nostubs/__init__.pyi"),
+                ("subdir", TEST_TYPESHED / "subdir/__init__.pyi"),
+                ("subdir.overloads", TEST_TYPESHED / "subdir/overloads.pyi"),
+                ("py2only", TEST_TYPESHED / "@python2/py2only.pyi"),
+                ("lib", TEST_TYPESHED / "@python2/lib.pyi"),
+                ("conditions", TEST_TYPESHED / "conditions.pyi"),
+                ("top_level_assert", TEST_TYPESHED / "top_level_assert.pyi"),
             },
         )
 
 
 class TestParser(unittest.TestCase):
     def test_get_stub_names(self) -> None:
-        names = get_stub_names("simple", version=(3, 5))
+        ctx = get_context((3, 5))
+        names = get_stub_names("simple", search_context=ctx)
         self.assertEqual(
             set(names.keys()),
             {
@@ -151,7 +137,8 @@ class TestParser(unittest.TestCase):
         self.check_nameinfo(cls_names, "method", ast3.FunctionDef)
 
     def test_starimport(self) -> None:
-        names = get_stub_names("starimport", version=(3, 5))
+        ctx = get_context((3, 5))
+        names = get_stub_names("starimport", search_context=ctx)
         self.assertEqual(set(names.keys()), {"public"})
         self.check_nameinfo(names, "public", typeshed_client.ImportedName)
         path = typeshed_client.ModulePath(("imported",))
@@ -205,20 +192,23 @@ class TestParser(unittest.TestCase):
         self,
         names: Set[str],
         *,
-        version: Tuple[int, int] = (3, 6),
+        version: PythonVersion = (3, 6),
         platform: str = "linux",
     ) -> None:
-        info = get_stub_names("conditions", version=version, platform=platform)
+        ctx = get_context(version, platform)
+        info = get_stub_names("conditions", search_context=ctx)
         self.assertEqual(set(info.keys()), names | {"sys"})
 
     def test_top_level_assert(self):
-        info = get_stub_names("top_level_assert", version=(3, 6), platform="flat")
+        ctx = get_context((3, 6), "flat")
+        info = get_stub_names("top_level_assert", search_context=ctx)
         self.assertEqual(set(info.keys()), set())
-        info = get_stub_names("top_level_assert", version=(3, 6), platform="linux")
+        ctx = get_context((3, 6), "linux")
+        info = get_stub_names("top_level_assert", search_context=ctx)
         self.assertEqual(set(info.keys()), {"x", "sys"})
 
     def test_overloads(self) -> None:
-        names = get_stub_names("overloads", version=(3, 5))
+        names = get_stub_names("overloads", search_context=get_context((3, 5)))
         self.assertEqual(set(names.keys()), {"overload", "overloaded"})
         self.check_nameinfo(names, "overloaded", typeshed_client.OverloadedName)
         definitions = names["overloaded"].ast.definitions
@@ -229,7 +219,7 @@ class TestParser(unittest.TestCase):
 
 class TestResolver(unittest.TestCase):
     def test_simple(self) -> None:
-        res = typeshed_client.Resolver(version=(3, 5), typeshed_dir=TEST_TYPESHED)
+        res = typeshed_client.Resolver(get_context((3, 5)))
         path = typeshed_client.ModulePath(("simple",))
         other_path = typeshed_client.ModulePath(("other",))
 
@@ -247,25 +237,14 @@ class TestResolver(unittest.TestCase):
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error."""
 
-    fake_env = typeshed_client.parser.Env(
-        (3, 6), "linux", typeshed_client.finder.find_typeshed()
-    )
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
     def test(self):
-        typeshed_root = typeshed_client.finder.find_typeshed()
-        self.assertTrue(typeshed_root.is_dir())
-        for dirpath, _, filenames in os.walk(typeshed_root):
-            for filename in filenames:
-                path = Path(dirpath) / filename
-                if path.suffix != ".pyi":
-                    continue
-                with self.subTest(path=path):
-                    self.check_path(path)
-
-    def check_path(self, path: Path) -> None:
-        ast = typeshed_client.finder.parse_stub_file(path)
-        typeshed_client.parser.parse_ast(ast, self.fake_env, self.fake_path)
+        ctx = get_search_context()
+        for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
+            with self.subTest(path=module_name):
+                ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+                typeshed_client.parser.parse_ast(ast, ctx, self.fake_path)
 
 
 if __name__ == "__main__":

@@ -1,61 +1,50 @@
 """Module responsible for resolving names to the module they come from."""
 
-from pathlib import Path
-import sys
-from typing import Dict, NamedTuple, Optional, Tuple, Union
+from typing import Dict, NamedTuple, Optional, Union
 
-from . import finder
+from .finder import SearchContext, get_search_context, ModulePath
 from . import parser
 
 
 class ImportedInfo(NamedTuple):
-    source_module: parser.ModulePath
+    source_module: ModulePath
     info: parser.NameInfo
 
 
-ResolvedName = Union[None, parser.ModulePath, ImportedInfo, parser.NameInfo]
+ResolvedName = Union[None, ModulePath, ImportedInfo, parser.NameInfo]
 
 
 class Resolver:
-    def __init__(
-        self,
-        version: Tuple[int, int] = sys.version_info[:2],
-        platform: str = sys.platform,
-        typeshed_dir: Optional[Path] = None,
-    ) -> None:
-        if typeshed_dir is None:
-            typeshed_dir = finder.find_typeshed()
-        self.env = parser.Env(version, platform, typeshed_dir)
-        self._typeshed_dir = typeshed_dir
-        self._module_cache: Dict[parser.ModulePath, Module] = {}
+    def __init__(self, search_context: Optional[SearchContext] = None) -> None:
+        if search_context is None:
+            search_context = get_search_context()
+        self.ctx = search_context
+        self._module_cache: Dict[ModulePath, Module] = {}
 
-    def get_module(self, module_name: parser.ModulePath) -> "Module":
+    def get_module(self, module_name: ModulePath) -> "Module":
         if module_name not in self._module_cache:
             names = parser.get_stub_names(
-                ".".join(module_name),
-                version=self.env.version,
-                platform=self.env.platform,
-                typeshed_dir=self._typeshed_dir,
+                ".".join(module_name), search_context=self.ctx
             )
             if names is None:
                 names = {}
-            self._module_cache[module_name] = Module(names, self.env)
+            self._module_cache[module_name] = Module(names, self.ctx)
         return self._module_cache[module_name]
 
-    def get_name(self, module_name: parser.ModulePath, name: str) -> ResolvedName:
+    def get_name(self, module_name: ModulePath, name: str) -> ResolvedName:
         module = self.get_module(module_name)
         return module.get_name(name, self)
 
     def get_fully_qualified_name(self, name: str) -> ResolvedName:
         """Public API."""
         *path, tail = name.split(".")
-        return self.get_name(parser.ModulePath(tuple(path)), tail)
+        return self.get_name(ModulePath(tuple(path)), tail)
 
 
 class Module:
-    def __init__(self, names: parser.NameDict, env: parser.Env) -> None:
+    def __init__(self, names: parser.NameDict, ctx: SearchContext) -> None:
         self.names = names
-        self.env = env
+        self.ctx = ctx
         self._name_cache: Dict[str, ResolvedName] = {}
 
     def get_name(self, name: str, resolver: Resolver) -> ResolvedName:

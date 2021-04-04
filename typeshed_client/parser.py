@@ -2,31 +2,17 @@
 
 import logging
 from mypy_extensions import NoReturn
-from pathlib import Path
-import sys
 from typed_ast import ast3
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    NewType,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
 
 from . import finder
+from .finder import get_search_context, SearchContext, ModulePath
 
 log = logging.getLogger(__name__)
 
 
 class InvalidStub(Exception):
     pass
-
-
-ModulePath = NewType("ModulePath", Tuple[str, ...])
 
 
 class ImportedName(NamedTuple):
@@ -46,36 +32,25 @@ class NameInfo(NamedTuple):
     child_nodes: Optional[Dict[str, Any]] = None
 
 
-class Env(NamedTuple):
-    version: Tuple[int, int]
-    platform: str
-    typeshed_dir: Path
-
-
 NameDict = Dict[str, NameInfo]
 
 
 def get_stub_names(
-    module_name: str,
-    version: Tuple[int, int] = sys.version_info[:2],
-    platform: str = sys.platform,
-    typeshed_dir: Optional[Path] = None,
+    module_name: str, *, search_context: Optional[SearchContext] = None
 ) -> Optional[NameDict]:
     """Given a module name, returns a dictionary of names defined in that module."""
-    if typeshed_dir is None:
-        typeshed_dir = finder.find_typeshed()
-    ast = finder.get_stub_ast(module_name, version=version, typeshed_dir=typeshed_dir)
+    if search_context is None:
+        search_context = get_search_context()
+    ast = finder.get_stub_ast(module_name, search_context=search_context)
     if ast is None:
         return None
-    return parse_ast(
-        ast,
-        Env(version, platform, typeshed_dir),
-        ModulePath(tuple(module_name.split("."))),
-    )
+    return parse_ast(ast, search_context, ModulePath(tuple(module_name.split("."))))
 
 
-def parse_ast(ast: ast3.AST, env: Env, module_name: ModulePath) -> NameDict:
-    visitor = _NameExtractor(env, module_name)
+def parse_ast(
+    ast: ast3.AST, search_context: SearchContext, module_name: ModulePath
+) -> NameDict:
+    visitor = _NameExtractor(search_context, module_name)
     name_dict: NameDict = {}
     try:
         names = visitor.visit(ast)
@@ -120,8 +95,8 @@ _CMP_OP_TO_FUNCTION = {
 class _NameExtractor(ast3.NodeVisitor):
     """Extract names from a stub module."""
 
-    def __init__(self, env: Env, module_name: ModulePath) -> None:
-        self.env = env
+    def __init__(self, ctx: SearchContext, module_name: ModulePath) -> None:
+        self.ctx = ctx
         self.module_name = module_name
 
     def visit_Module(self, node: ast3.Module) -> List[NameInfo]:
@@ -155,7 +130,7 @@ class _NameExtractor(ast3.NodeVisitor):
         yield NameInfo(target.id, not target.id.startswith("_"), node)
 
     def visit_If(self, node: ast3.If) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.env)
+        visitor = _LiteralEvalVisitor(self.ctx)
         value = visitor.visit(node.test)
         if value:
             for stmt in node.body:
@@ -165,7 +140,7 @@ class _NameExtractor(ast3.NodeVisitor):
                 yield from self.visit(stmt)
 
     def visit_Assert(self, node: ast3.Assert) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.env)
+        visitor = _LiteralEvalVisitor(self.ctx)
         value = visitor.visit(node.test)
         if value:
             return []
@@ -203,15 +178,12 @@ class _NameExtractor(ast3.NodeVisitor):
                 )
             elif alias.name == "*":
                 name_dict = get_stub_names(
-                    ".".join(source_module),
-                    version=self.env.version,
-                    platform=self.env.platform,
-                    typeshed_dir=self.env.typeshed_dir,
+                    ".".join(source_module), search_context=self.ctx
                 )
                 if name_dict is None:
                     log.warning(
                         f"could not import {source_module} in {self.module_name} with "
-                        f"{self.env}"
+                        f"{self.ctx}"
                     )
                     continue
                 for name, info in name_dict.items():
@@ -235,8 +207,8 @@ class _NameExtractor(ast3.NodeVisitor):
 
 
 class _LiteralEvalVisitor(ast3.NodeVisitor):
-    def __init__(self, env: Env) -> None:
-        self.env = env
+    def __init__(self, ctx: SearchContext) -> None:
+        self.ctx = ctx
 
     def visit_Num(self, node: ast3.Num) -> Union[int, float]:
         return node.n
@@ -285,9 +257,9 @@ class _LiteralEvalVisitor(ast3.NodeVisitor):
                 f"Attribute access must be on the sys module: {ast3.dump(node)}"
             )
         if node.attr == "platform":
-            return self.env.platform
+            return self.ctx.platform
         elif node.attr == "version_info":
-            return self.env.version
+            return self.ctx.version
         else:
             raise InvalidStub(f"Invalid attribute on {ast3.dump(node)}")
 
