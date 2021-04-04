@@ -1,9 +1,0 @@
-sudo: false
-language: python
-python: 3.6
-before_script:
-- pip install tox
-script: tox
-notifications:
-  on_success: change
-  on_failure: always

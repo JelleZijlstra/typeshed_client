@@ -19,8 +19,8 @@ Projects for which ``typeshed_client`` could be useful include:
 Installation
 ------------
 
-``typeshed_client`` works only on Python 3.6. To install it, run
-``python3.6 -m pip install typeshed_client``.
+``typeshed_client`` works on Python 3.6 and higher. To install it, run
+``python3 -m pip install typeshed_client``.
 
 Finding stubs
 -------------
