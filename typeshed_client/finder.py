@@ -39,6 +39,21 @@ def get_search_context(
     version: Optional[PythonVersion] = None,
     platform: str = sys.platform,
 ) -> SearchContext:
+    """Return a context for finding stubs. This context can be passed to other
+    functions in this file.
+
+    Arguments:
+    - typeshed: Path to typeshed. If this is not given, typeshed_client's own
+      bundled copy of typeshed is used.
+    - search_path: Sequence of directories in which to search for stubs. If this
+      is not given, ``sys.path`` is used.
+    - python_executable: Path to a Python executable that should be used to
+      find the search_path. The default is to use ``sys.executable``.
+    - version: Version of Python to use, as a two-tuple like (3, 9).
+    - platform: Value to use for sys.platform in stubs, defaulting to the current
+      process's value.
+
+    """
     if version is None:
         version = sys.version_info[:2]
     if search_path is None:

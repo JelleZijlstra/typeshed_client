@@ -1,8 +1,6 @@
-This project aims to provide a standardized way of retrieving information from
-`typeshed <https://www.github.com/python/typeshed>`_.
-
-It's still a work in progress, and I need to do more work identifying use cases
-and coming up with a good API.
+This project provides a way to retrieve information from
+`typeshed <https://www.github.com/python/typeshed>`_ and from
+`PEP 561 <https://www.python.org/dev/peps/pep-0561/>`_ stub packages.
 
 Example use cases:
 
@@ -30,12 +28,15 @@ given a module name.
 
 Functions provided:
 
-- ``typeshed_client.get_stub_file(module_name: str,
-  version: Tuple[int, int] = sys.version_info[:2],
-  typeshed_dir: Optional[Path] = None) -> Optional[Path]``: Returns
+- ``get_search_context(*, typeshed: Optional[Path] = None,
+  search_path: Optional[Sequence[Path]] = None, python_executable: Optional[str] = None,
+  version: Optional[PythonVersion] = None, platform: str = sys.platform) -> SearchContext``:
+  Returns a ``SearchContext``
+- ``typeshed_client.get_stub_file(module_name: str, *,
+  search_context: Optional[SearchContext] = None) -> Optional[Path]``: Returns
   the path to a module's stub in typeshed. For example,
-  ``get_stub_file('typing', version=(2, 7))`` may return
-  ``Path('/path/to/typeshed/stdlib/2/typing.pyi')``. If there is no stub for the
+  ``get_stub_file('typing', search_context=get_search_context(version=(2, 7)))`` may return
+  ``Path('/path/to/typeshed/stdlib/@python2/typing.pyi')``. If there is no stub for the
   module, returns None.
 - ``typeshed_client.get_stub_ast`` has the same interface, but returns an AST
   object (parsed using `typed_ast <https://www.github.com/python/typed_ast>`_).
@@ -45,10 +46,8 @@ Collecting names from stubs
 
 ``typeshed_client.parser`` collects the names defined in a stub. It provides:
 
-- ``typeshed_client.get_stub_names(module_name: str,
-  version: Tuple[int, int] = sys.version_info[:2],
-  platform: str = sys.platform,
-  typeshed_dir: Optional[Path] = None) -> Optional[NameDict]`` collects the names
+- ``typeshed_client.get_stub_names(module_name: str, *,
+  search_context: Optional[SearchContext] = None) -> Optional[NameDict]`` collects the names
   defined in a module, using the given Python version and platform. It
   returns a ``NameDict``, a dictionary mapping object names defined in the module
   to ``NameInfo`` records.
@@ -60,7 +59,7 @@ Collecting names from stubs
         name: str
         is_exported: bool
         ast: Union[ast3.AST, ImportedName, OverloadedName]
-        child_nodes: Optional['NameDict'] = None
+        child_nodes: Optional[NameDict] = None
 
   ``name`` is the object's name. ``is_exported`` indicates whether the name is a
   part of the stub's public interface. ``ast`` is the AST node defining the name,
@@ -82,6 +81,12 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.0.0rc1 (April 11, 2021)
+
+- Support new typeshed layout
+- Support PEP 561 packages
+- Bundle typeshed directly instead of relying on mypy
+
 Version 0.4 (December 2, 2019)
 
 - Performance improvement
@@ -101,9 +106,3 @@ Version 0.2 (May 25, 2017)
 Version 0.1 (May 4, 2017)
 
 - Initial release
-
-Future work
------------
-
-- Fall back to builtins correctly in the resolver.
-- Maybe provide ways to map AST nodes in annotations to runtime type objects.
