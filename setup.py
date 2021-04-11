@@ -2,15 +2,7 @@ import ast
 import os
 from pathlib import Path
 import re
-import sys
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-
-assert sys.version_info >= (3, 6, 0), "typeshed_client requires Python 3.6+"
+from setuptools import setup
 
 
 current_dir = Path(__file__).parent.resolve()
@@ -39,16 +31,17 @@ setup(
     name="typeshed_client",
     version=version,
     description="A library for accessing stubs in typeshed.",
+    long_description=Path("README.rst").read_text(),
     keywords="typeshed typing annotations",
     author="Jelle Zijlstra",
     author_email="jelle.zijlstra@gmail.com",
     url="https://github.com/JelleZijlstra/typeshed_client",
+    project_urls={
+        "Bug Tracker": "https://github.com/JelleZijlstra/typeshed_client/issues"
+    },
     license="MIT",
     packages=["typeshed_client"],
-    install_requires=[
-        "typed_ast >= 1.0.3",
-        "importlib_resources >= 1.4.0",
-    ],
+    install_requires=["typed_ast >= 1.0.3", "importlib_resources >= 1.4.0"],
     package_data={"typeshed_client": list(find_bundled_files())},
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -63,4 +56,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Software Development",
     ],
+    python_requires=">=3.6",
 )
