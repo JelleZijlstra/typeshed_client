@@ -76,7 +76,7 @@ def get_search_context(
 def get_stub_file(
     module_name: str, *, search_context: Optional[SearchContext] = None
 ) -> Optional[Path]:
-    """Returns the path to the stub file for this module, if any."""
+    """Return the path to the stub file for this module, if any."""
     if search_context is None:
         search_context = get_search_context()
     return get_stub_file_name(tuple(module_name.split(".")), search_context)
@@ -85,6 +85,7 @@ def get_stub_file(
 def get_stub_ast(
     module_name: str, *, search_context: Optional[SearchContext] = None
 ) -> Optional[ast3.AST]:
+    """Return the AST for the stub for the given module name."""
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
         return None
@@ -94,9 +95,9 @@ def get_stub_ast(
 def get_all_stub_files(
     search_context: Optional[SearchContext] = None,
 ) -> Iterable[Tuple[str, Path]]:
-    """Returns paths to all stub files for a given Python version.
+    """Return paths to all stub files for a given Python version.
 
-    Returns pairs of (module name, module path).
+    Return pairs of (module name, module path).
 
     """
     if search_context is None:

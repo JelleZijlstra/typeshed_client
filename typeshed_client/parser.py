@@ -38,7 +38,7 @@ NameDict = Dict[str, NameInfo]
 def get_stub_names(
     module_name: str, *, search_context: Optional[SearchContext] = None
 ) -> Optional[NameDict]:
-    """Given a module name, returns a dictionary of names defined in that module."""
+    """Given a module name, return a dictionary of names defined in that module."""
     if search_context is None:
         search_context = get_search_context()
     ast = finder.get_stub_ast(module_name, search_context=search_context)
