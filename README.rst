@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.0.0 (April 11, 2021)
+
+- Improve docstrings
+
 Version 1.0.0rc1 (April 11, 2021)
 
 - Support new typeshed layout
