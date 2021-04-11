@@ -16,9 +16,10 @@ def update_bundled() -> None:
         shutil.rmtree(bundled_ts_dir)
     with tempfile.TemporaryDirectory() as temp_dir_str:
         temp_dir = Path(temp_dir_str)
-        subprocess.check_call([
-            "git", "clone", "https://github.com/python/typeshed.git", "--depth", "1"
-        ], cwd=temp_dir)
+        subprocess.check_call(
+            ["git", "clone", "https://github.com/python/typeshed.git", "--depth", "1"],
+            cwd=temp_dir,
+        )
         shutil.copytree(temp_dir / "typeshed" / "stdlib", bundled_ts_dir)
     subprocess.check_call(["git", "add", str(bundled_ts_dir)])
 
