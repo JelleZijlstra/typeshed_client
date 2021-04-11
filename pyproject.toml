@@ -1,0 +1,12 @@
+[tool.black]
+target_version = ['py36', 'py37', 'py38']
+include = '\.py$'
+
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+)/
+'''
