@@ -2,4 +2,5 @@ __pycache__/
 .tox/
 .mypy_cache/
 dist/
+build/
 typeshed_client.egg-info/
