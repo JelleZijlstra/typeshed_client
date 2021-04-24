@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.0.1 (April 24, 2021)
+
+- Update bundled typeshed
+
 Version 1.0.0 (April 11, 2021)
 
 - Improve docstrings
