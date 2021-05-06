@@ -81,6 +81,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.0.2 (May 5, 2021)
+
+- Handle version ranges in typeshed VERSIONS file
+- Update bundled typeshed
+
 Version 1.0.1 (April 24, 2021)
 
 - Update bundled typeshed
