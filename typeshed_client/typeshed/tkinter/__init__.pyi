@@ -348,10 +348,7 @@ class Misc:
     # binds do. The default value of func is not str.
     @overload
     def bind(
-        self,
-        sequence: Optional[str] = ...,
-        func: Optional[Callable[[Event[Misc]], Any]] = ...,
-        add: Optional[bool] = ...,
+        self, sequence: Optional[str] = ..., func: Optional[Callable[[Event[Misc]], Any]] = ..., add: Optional[bool] = ...
     ) -> str: ...
     @overload
     def bind(self, sequence: Optional[str], func: str, add: Optional[bool] = ...) -> None: ...
@@ -361,10 +358,7 @@ class Misc:
     # callbacks will get, so those are Misc.
     @overload
     def bind_all(
-        self,
-        sequence: Optional[str] = ...,
-        func: Optional[Callable[[Event[Misc]], Any]] = ...,
-        add: Optional[bool] = ...,
+        self, sequence: Optional[str] = ..., func: Optional[Callable[[Event[Misc]], Any]] = ..., add: Optional[bool] = ...
     ) -> str: ...
     @overload
     def bind_all(self, sequence: Optional[str], func: str, add: Optional[bool] = ...) -> None: ...
@@ -840,10 +834,7 @@ class Widget(BaseWidget, Pack, Place, Grid):
     # widgets don't.
     @overload
     def bind(
-        self: _W,
-        sequence: Optional[str] = ...,
-        func: Optional[Callable[[Event[_W]], Any]] = ...,
-        add: Optional[bool] = ...,
+        self: _W, sequence: Optional[str] = ..., func: Optional[Callable[[Event[_W]], Any]] = ..., add: Optional[bool] = ...
     ) -> str: ...
     @overload
     def bind(self, sequence: Optional[str], func: str, add: Optional[bool] = ...) -> None: ...
@@ -1297,7 +1288,9 @@ class Canvas(Widget, XView, YView):
     lower: Any
     def move(self, *args): ...
     if sys.version_info >= (3, 8):
-        def moveto(self, tagOrId: Union[str, _CanvasItemId], x: str = ..., y: str = ...) -> None: ...
+        def moveto(
+            self, tagOrId: Union[str, _CanvasItemId], x: Union[Literal[""], float] = ..., y: Union[Literal[""], float] = ...
+        ) -> None: ...
     def postscript(self, cnf=..., **kw): ...
     def tag_raise(self, *args): ...
     lift: Any
@@ -2682,11 +2675,7 @@ class Text(Widget, XView, YView):
     # tag_bind stuff is very similar to Canvas
     @overload
     def tag_bind(
-        self,
-        tagName: str,
-        sequence: Optional[str],
-        func: Optional[Callable[[Event[Text]], Any]],
-        add: Optional[bool] = ...,
+        self, tagName: str, sequence: Optional[str], func: Optional[Callable[[Event[Text]], Any]], add: Optional[bool] = ...
     ) -> str: ...
     @overload
     def tag_bind(self, tagName: str, sequence: Optional[str], func: str, add: Optional[bool] = ...) -> None: ...
