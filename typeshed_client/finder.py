@@ -137,7 +137,12 @@ def get_all_stub_files(
                 module_name = entry.name[: -len(".pyi")]
             else:
                 continue
-            if search_context.version < versions[module_name]:
+            version = versions[module_name]
+            if search_context.version < version.min:
+                continue
+            if version.max is not None and search_context.version > version.max:
+                continue
+            if typeshed_dir.name != "@python2" and version.in_python2:
                 continue
             if entry.is_dir():
                 seen = yield from _get_all_stub_files_from_directory(
@@ -223,33 +228,58 @@ def get_stub_file_name(
 
     # 5. typeshed
     versions = get_typeshed_versions(search_context.typeshed)
-    if (
-        top_level_name not in versions
-        or search_context.version < versions[top_level_name]
-    ):
+    if top_level_name not in versions:
+        return None
+    version = versions[top_level_name]
+    if search_context.version < version.min:
+        return None
+    if version.max is not None and search_context.version > version.max:
         return None
 
     if search_context.version[0] == 2:
         python2_dir = search_context.typeshed / "@python2"
         stub = _find_stub_in_dir(python2_dir, module_name)
-        if stub is not None:
+        if stub is not None or version.in_python2:
             return stub
 
     return _find_stub_in_dir(search_context.typeshed, module_name)
 
 
+class _VersionData(NamedTuple):
+    min: PythonVersion
+    max: Optional[PythonVersion]
+    # whether it is present in @python2
+    in_python2: bool
+
+
 @lru_cache()
-def get_typeshed_versions(typeshed: Path) -> Dict[str, PythonVersion]:
+def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
     versions = {}
+    python2_files = set(os.listdir(typeshed / "@python2"))
     with (typeshed / "VERSIONS").open() as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
             module, version = line.split(": ")
-            major, minor = version.split(".")
-            versions[module] = (int(major), int(minor))
+            if "-" in version:
+                min_version_str, max_version_str = version.split("-")
+            else:
+                min_version_str = version
+                max_version_str = None
+            if max_version_str:
+                max_version = _parse_version(max_version_str)
+            else:
+                max_version = None
+            min_version = _parse_version(min_version_str)
+            python2_only = module in python2_files or module + ".pyi" in python2_files
+            versions[module] = _VersionData(min_version, max_version, python2_only)
     return versions
+
+
+def _parse_version(version: str) -> PythonVersion:
+    major, minor = version.split(".")
+    return (int(major), int(minor))
 
 
 def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Optional[Path]:

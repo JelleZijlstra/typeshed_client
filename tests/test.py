@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 from typed_ast import ast3
 import typeshed_client
 from typeshed_client.finder import (
@@ -45,6 +46,8 @@ class TestFinder(unittest.TestCase):
 
         self.check("subdir", (3, 6), TEST_TYPESHED / "subdir/__init__.pyi")
         self.check("subdir.overloads", (3, 7), TEST_TYPESHED / "subdir/overloads.pyi")
+        self.check("subdir", (2, 7), TEST_TYPESHED / "@python2/subdir.pyi")
+        self.check("subdir.overloads", (2, 7), None)
 
     def test_third_party(self) -> None:
         self.check("thirdparty", (3, 6), PACKAGES / "thirdparty-stubs/__init__.pyi")
@@ -57,8 +60,7 @@ class TestFinder(unittest.TestCase):
             {
                 ("thirdparty", PACKAGES / "thirdparty-stubs/__init__.pyi"),
                 ("nostubs", PACKAGES / "nostubs/__init__.pyi"),
-                ("subdir", TEST_TYPESHED / "subdir/__init__.pyi"),
-                ("subdir.overloads", TEST_TYPESHED / "subdir/overloads.pyi"),
+                ("subdir", TEST_TYPESHED / "@python2/subdir.pyi"),
                 ("py2only", TEST_TYPESHED / "@python2/py2only.pyi"),
                 ("lib", TEST_TYPESHED / "@python2/lib.pyi"),
                 ("conditions", TEST_TYPESHED / "conditions.pyi"),
