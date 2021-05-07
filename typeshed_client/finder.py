@@ -255,7 +255,10 @@ class _VersionData(NamedTuple):
 @lru_cache()
 def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
     versions = {}
-    python2_files = set(os.listdir(typeshed / "@python2"))
+    try:
+        python2_files = set(os.listdir(typeshed / "@python2"))
+    except FileNotFoundError:
+        python2_files = set()
     with (typeshed / "VERSIONS").open() as f:
         for line in f:
             line = line.strip()
