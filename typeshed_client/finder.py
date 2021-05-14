@@ -261,8 +261,8 @@ def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
         python2_files = set()
     with (typeshed / "VERSIONS").open() as f:
         for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
+            line = line.split("#")[0].strip()
+            if not line:
                 continue
             module, version = line.split(": ")
             if "-" in version:
