@@ -1,6 +1,6 @@
 # comment on a line by itself
 
-top_level_assert: 2.7. # inline comment
+top_level_assert: 2.7  # inline comment: 3.6
 lib: 2.7
 conditions: 2.7
 new37: 3.7
