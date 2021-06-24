@@ -81,6 +81,12 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.1.0 (June 24, 2021)
+
+- Update bundled typeshed
+- Handle missing `@python2` directory
+- Allow comments in VERSIONS file
+
 Version 1.0.2 (May 5, 2021)
 
 - Handle version ranges in typeshed VERSIONS file
