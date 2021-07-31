@@ -59,11 +59,15 @@ def parse_ast(
     for info in names:
         if info.name in name_dict:
             if isinstance(info.ast, ImportedName) or info.child_nodes:
-                log.warning("Cannot overload a class or an imported name: %s", info)
+                log.warning(
+                    "Name is already imported in %s: %s", ".".join(module_name), info
+                )
                 continue
             existing = name_dict[info.name]
             if isinstance(existing.ast, ImportedName) or existing.child_nodes:
-                log.warning("Cannot overload a class or an imported name: %s", existing)
+                log.warning(
+                    "Name is already present in %s: %s", ".".join(module_name), existing
+                )
             elif isinstance(existing.ast, OverloadedName):
                 existing.ast.definitions.append(info.ast)
             else:
