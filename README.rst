@@ -81,6 +81,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.1.1 (July 31, 2021)
+
+- Update bundled typeshed
+- Improve error message when encountering a duplicate name
+
 Version 1.1.0 (June 24, 2021)
 
 - Update bundled typeshed
