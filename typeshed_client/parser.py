@@ -60,11 +60,24 @@ def parse_ast(
         if info.name in name_dict:
             if isinstance(info.ast, ImportedName) or info.child_nodes:
                 log.warning(
-                    "Name is already imported in %s: %s", ".".join(module_name), info
+                    "Imported name is already present in %s: %s",
+                    ".".join(module_name),
+                    info,
+                )
+                continue
+            elif info.child_nodes:
+                log.warning(
+                    "Name is already present in %s: %s", ".".join(module_name), info
                 )
                 continue
             existing = name_dict[info.name]
-            if isinstance(existing.ast, ImportedName) or existing.child_nodes:
+            if isinstance(existing.ast, ImportedName):
+                log.warning(
+                    "Name is already imported in %s: %s",
+                    ".".join(module_name),
+                    existing,
+                )
+            elif existing.child_nodes:
                 log.warning(
                     "Name is already present in %s: %s", ".".join(module_name), existing
                 )
