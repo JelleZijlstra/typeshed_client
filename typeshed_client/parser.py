@@ -2,7 +2,17 @@
 
 import logging
 from typed_ast import ast3
-from typing import Any, Dict, Iterable, List, NamedTuple, NoReturn, Optional, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    NoReturn,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from . import finder
 from .finder import get_search_context, SearchContext, ModulePath
