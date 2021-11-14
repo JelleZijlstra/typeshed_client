@@ -1,9 +1,8 @@
 """This module is responsible for parsing a stub AST into a dictionary of names."""
 
 import logging
-from mypy_extensions import NoReturn
 from typed_ast import ast3
-from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, NamedTuple, NoReturn, Optional, Tuple, Union
 
 from . import finder
 from .finder import get_search_context, SearchContext, ModulePath
