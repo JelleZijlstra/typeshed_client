@@ -81,6 +81,12 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.1.3 (November 14, 2021)
+
+- Update bundled typeshed
+- Declare support for Python 3.10
+- Fix undeclared dependency on ``mypy_extensions``
+
 Version 1.1.2 (November 5, 2021)
 
 - Update bundled typeshed
