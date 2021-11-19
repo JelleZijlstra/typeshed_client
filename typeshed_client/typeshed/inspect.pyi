@@ -21,12 +21,7 @@ from types import (
 )
 
 if sys.version_info >= (3, 7):
-    from types import (
-        ClassMethodDescriptorType,
-        WrapperDescriptorType,
-        MemberDescriptorType,
-        MethodDescriptorType,
-    )
+    from types import ClassMethodDescriptorType, WrapperDescriptorType, MemberDescriptorType, MethodDescriptorType
 
 from typing import Any, ClassVar, NamedTuple, Protocol, Tuple, Type, TypeVar, Union
 from typing_extensions import Literal, TypeGuard
@@ -44,14 +39,7 @@ class BlockFinder:
     indecorator: bool
     decoratorhasargs: bool
     last: int
-    def tokeneater(
-        self,
-        type: int,
-        token: str,
-        srowcol: tuple[int, int],
-        erowcol: tuple[int, int],
-        line: str,
-    ) -> None: ...
+    def tokeneater(self, type: int, token: str, srowcol: tuple[int, int], erowcol: tuple[int, int], line: str) -> None: ...
 
 CO_OPTIMIZED: int
 CO_NEWLOCALS: int
@@ -65,9 +53,7 @@ CO_ITERABLE_COROUTINE: int
 CO_ASYNC_GENERATOR: int
 TPFLAGS_IS_ABSTRACT: int
 
-def getmembers(
-    object: object, predicate: Callable[[Any], bool] | None = ...
-) -> list[tuple[str, Any]]: ...
+def getmembers(object: object, predicate: Callable[[Any], bool] | None = ...) -> list[tuple[str, Any]]: ...
 def getmodulename(path: str) -> str | None: ...
 def ismodule(object: object) -> TypeGuard[ModuleType]: ...
 def isclass(object: object) -> TypeGuard[Type[Any]]: ...
@@ -110,9 +96,7 @@ def isbuiltin(object: object) -> TypeGuard[BuiltinFunctionType]: ...
 if sys.version_info < (3, 7):
     def isroutine(
         object: object,
-    ) -> TypeGuard[
-        FunctionType | LambdaType | MethodType | BuiltinFunctionType | BuiltinMethodType
-    ]: ...
+    ) -> TypeGuard[FunctionType | LambdaType | MethodType | BuiltinFunctionType | BuiltinMethodType]: ...
     def ismethoddescriptor(object: object) -> bool: ...
     def ismemberdescriptor(object: object) -> bool: ...
 
@@ -134,23 +118,12 @@ else:
 
 def isabstract(object: object) -> bool: ...
 def isgetsetdescriptor(object: object) -> TypeGuard[GetSetDescriptorType]: ...
-def isdatadescriptor(
-    object: object,
-) -> TypeGuard[_SupportsSet[Any, Any] | _SupportsDelete[Any]]: ...
+def isdatadescriptor(object: object) -> TypeGuard[_SupportsSet[Any, Any] | _SupportsDelete[Any]]: ...
 
 #
 # Retrieving source code
 #
-_SourceObjectType = Union[
-    ModuleType,
-    Type[Any],
-    MethodType,
-    FunctionType,
-    TracebackType,
-    FrameType,
-    CodeType,
-    Callable[..., Any],
-]
+_SourceObjectType = Union[ModuleType, Type[Any], MethodType, FunctionType, TracebackType, FrameType, CodeType, Callable[..., Any]]
 
 def findsource(object: _SourceObjectType) -> tuple[list[str], int]: ...
 def getabsfile(object: _SourceObjectType, _filename: str | None = ...) -> str: ...
@@ -179,20 +152,14 @@ if sys.version_info >= (3, 10):
     ) -> Signature: ...
 
 else:
-    def signature(
-        obj: Callable[..., Any], *, follow_wrapped: bool = ...
-    ) -> Signature: ...
+    def signature(obj: Callable[..., Any], *, follow_wrapped: bool = ...) -> Signature: ...
 
 class _void: ...
 class _empty: ...
 
 class Signature:
     def __init__(
-        self,
-        parameters: Sequence[Parameter] | None = ...,
-        *,
-        return_annotation: Any = ...,
-        __validate_parameters__: bool = ...,
+        self, parameters: Sequence[Parameter] | None = ..., *, return_annotation: Any = ..., __validate_parameters__: bool = ...
     ) -> None: ...
     empty = _empty
     @property
@@ -203,10 +170,7 @@ class Signature:
     def bind(self, *args: Any, **kwargs: Any) -> BoundArguments: ...
     def bind_partial(self, *args: Any, **kwargs: Any) -> BoundArguments: ...
     def replace(
-        self: Self,
-        *,
-        parameters: Sequence[Parameter] | Type[_void] | None = ...,
-        return_annotation: Any = ...,
+        self: Self, *, parameters: Sequence[Parameter] | Type[_void] | None = ..., return_annotation: Any = ...
     ) -> Self: ...
     if sys.version_info >= (3, 10):
         @classmethod
@@ -221,9 +185,7 @@ class Signature:
         ) -> Signature: ...
     else:
         @classmethod
-        def from_callable(
-            cls, obj: Callable[..., Any], *, follow_wrapped: bool = ...
-        ) -> Signature: ...
+        def from_callable(cls, obj: Callable[..., Any], *, follow_wrapped: bool = ...) -> Signature: ...
 
 if sys.version_info >= (3, 10):
     def get_annotations(
@@ -246,14 +208,7 @@ class _ParameterKind(enum.IntEnum):
         description: str
 
 class Parameter:
-    def __init__(
-        self,
-        name: str,
-        kind: _ParameterKind,
-        *,
-        default: Any = ...,
-        annotation: Any = ...,
-    ) -> None: ...
+    def __init__(self, name: str, kind: _ParameterKind, *, default: Any = ..., annotation: Any = ...) -> None: ...
     empty = _empty
     name: str
     default: Any
@@ -279,9 +234,7 @@ class BoundArguments:
     args: Tuple[Any, ...]
     kwargs: dict[str, Any]
     signature: Signature
-    def __init__(
-        self, signature: Signature, arguments: OrderedDict[str, Any]
-    ) -> None: ...
+    def __init__(self, signature: Signature, arguments: OrderedDict[str, Any]) -> None: ...
     def apply_defaults(self) -> None: ...
 
 #
@@ -292,9 +245,7 @@ class BoundArguments:
 # seem to be supporting this at the moment:
 # _ClassTreeItem = list[_ClassTreeItem] | Tuple[type, Tuple[type, ...]]
 def getclasstree(classes: list[type], unique: bool = ...) -> list[Any]: ...
-def walktree(
-    classes: list[type], children: dict[Type[Any], list[type]], parent: Type[Any] | None
-) -> list[Any]: ...
+def walktree(classes: list[type], children: dict[Type[Any], list[type]], parent: Type[Any] | None) -> list[Any]: ...
 
 class ArgSpec(NamedTuple):
     args: list[str]
@@ -356,9 +307,7 @@ def formatargvalues(
     formatvalue: Callable[[Any], str] | None = ...,
 ) -> str: ...
 def getmro(cls: type) -> Tuple[type, ...]: ...
-def getcallargs(
-    __func: Callable[..., Any], *args: Any, **kwds: Any
-) -> dict[str, Any]: ...
+def getcallargs(__func: Callable[..., Any], *args: Any, **kwds: Any) -> dict[str, Any]: ...
 
 class ClosureVars(NamedTuple):
     nonlocals: Mapping[str, Any]
@@ -367,9 +316,7 @@ class ClosureVars(NamedTuple):
     unbound: Set[str]
 
 def getclosurevars(func: Callable[..., Any]) -> ClosureVars: ...
-def unwrap(
-    func: Callable[..., Any], *, stop: Callable[[Any], Any] | None = ...
-) -> Any: ...
+def unwrap(func: Callable[..., Any], *, stop: Callable[[Any], Any] | None = ...) -> Any: ...
 
 #
 # The interpreter stack

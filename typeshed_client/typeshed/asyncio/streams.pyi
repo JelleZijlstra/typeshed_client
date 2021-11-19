@@ -5,9 +5,7 @@ from typing import Any, AsyncIterator, Awaitable, Callable, Iterable, Optional
 from . import events, protocols, transports
 from .base_events import Server
 
-_ClientConnectedCallback = Callable[
-    [StreamReader, StreamWriter], Optional[Awaitable[None]]
-]
+_ClientConnectedCallback = Callable[[StreamReader, StreamWriter], Optional[Awaitable[None]]]
 
 if sys.version_info < (3, 8):
     class IncompleteReadError(EOFError):
@@ -44,11 +42,7 @@ if sys.platform != "win32":
     else:
         _PathType = str
     async def open_unix_connection(
-        path: _PathType | None = ...,
-        *,
-        loop: events.AbstractEventLoop | None = ...,
-        limit: int = ...,
-        **kwds: Any,
+        path: _PathType | None = ..., *, loop: events.AbstractEventLoop | None = ..., limit: int = ..., **kwds: Any
     ) -> tuple[StreamReader, StreamWriter]: ...
     async def start_unix_server(
         client_connected_cb: _ClientConnectedCallback,
@@ -96,9 +90,7 @@ class StreamWriter:
     async def drain(self) -> None: ...
 
 class StreamReader:
-    def __init__(
-        self, limit: int = ..., loop: events.AbstractEventLoop | None = ...
-    ) -> None: ...
+    def __init__(self, limit: int = ..., loop: events.AbstractEventLoop | None = ...) -> None: ...
     def exception(self) -> Exception: ...
     def set_exception(self, exc: Exception) -> None: ...
     def set_transport(self, transport: transports.BaseTransport) -> None: ...

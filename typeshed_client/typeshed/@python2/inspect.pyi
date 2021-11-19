@@ -1,24 +1,5 @@
-from types import (
-    CodeType,
-    FrameType,
-    FunctionType,
-    MethodType,
-    ModuleType,
-    TracebackType,
-)
-from typing import (
-    Any,
-    AnyStr,
-    Callable,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
-    Union,
-)
+from types import CodeType, FrameType, FunctionType, MethodType, ModuleType, TracebackType
+from typing import Any, AnyStr, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 # Types and members
 class EndOfBlock(Exception): ...
@@ -30,12 +11,7 @@ class BlockFinder:
     passline: bool
     last: int
     def tokeneater(
-        self,
-        type: int,
-        token: AnyStr,
-        srow_scol: Tuple[int, int],
-        erow_ecol: Tuple[int, int],
-        line: AnyStr,
+        self, type: int, token: AnyStr, srow_scol: Tuple[int, int], erow_ecol: Tuple[int, int], line: AnyStr
     ) -> None: ...
 
 CO_GENERATOR: int
@@ -53,9 +29,7 @@ class ModuleInfo(NamedTuple):
     mode: str
     module_type: int
 
-def getmembers(
-    object: object, predicate: Callable[[Any], bool] | None = ...
-) -> List[Tuple[str, Any]]: ...
+def getmembers(object: object, predicate: Callable[[Any], bool] | None = ...) -> List[Tuple[str, Any]]: ...
 def getmoduleinfo(path: str | unicode) -> ModuleInfo | None: ...
 def getmodulename(path: AnyStr) -> AnyStr | None: ...
 def ismodule(object: object) -> bool: ...
@@ -76,16 +50,7 @@ def isgetsetdescriptor(object: object) -> bool: ...
 def ismemberdescriptor(object: object) -> bool: ...
 
 # Retrieving source code
-_SourceObjectType = Union[
-    ModuleType,
-    Type[Any],
-    MethodType,
-    FunctionType,
-    TracebackType,
-    FrameType,
-    CodeType,
-    Callable[..., Any],
-]
+_SourceObjectType = Union[ModuleType, Type[Any], MethodType, FunctionType, TracebackType, FrameType, CodeType, Callable[..., Any]]
 
 def findsource(object: _SourceObjectType) -> Tuple[List[str], int]: ...
 def getabsfile(object: _SourceObjectType) -> str: ...
@@ -101,9 +66,7 @@ def cleandoc(doc: AnyStr) -> AnyStr: ...
 def indentsize(line: str | unicode) -> int: ...
 
 # Classes and functions
-def getclasstree(
-    classes: List[type], unique: bool = ...
-) -> List[Tuple[type, Tuple[type, ...]] | List[Any]]: ...
+def getclasstree(classes: List[type], unique: bool = ...) -> List[Tuple[type, Tuple[type, ...]] | List[Any]]: ...
 
 class ArgSpec(NamedTuple):
     args: List[str]
@@ -126,26 +89,10 @@ def getargs(co: CodeType) -> Arguments: ...
 def getargspec(func: object) -> ArgSpec: ...
 def getargvalues(frame: FrameType) -> ArgInfo: ...
 def formatargspec(
-    args,
-    varargs=...,
-    varkw=...,
-    defaults=...,
-    formatarg=...,
-    formatvarargs=...,
-    formatvarkw=...,
-    formatvalue=...,
-    join=...,
+    args, varargs=..., varkw=..., defaults=..., formatarg=..., formatvarargs=..., formatvarkw=..., formatvalue=..., join=...
 ) -> str: ...
 def formatargvalues(
-    args,
-    varargs=...,
-    varkw=...,
-    defaults=...,
-    formatarg=...,
-    formatvarargs=...,
-    formatvarkw=...,
-    formatvalue=...,
-    join=...,
+    args, varargs=..., varkw=..., defaults=..., formatarg=..., formatvarargs=..., formatvarkw=..., formatvalue=..., join=...
 ) -> str: ...
 def getmro(cls: type) -> Tuple[type, ...]: ...
 def getcallargs(func, *args, **kwds) -> Dict[str, Any]: ...
@@ -163,9 +110,7 @@ _FrameInfo = Tuple[FrameType, str, int, str, Optional[List[str]], Optional[int]]
 
 def getouterframes(frame: FrameType, context: int = ...) -> List[_FrameInfo]: ...
 def getframeinfo(frame: FrameType | TracebackType, context: int = ...) -> Traceback: ...
-def getinnerframes(
-    traceback: TracebackType, context: int = ...
-) -> List[_FrameInfo]: ...
+def getinnerframes(traceback: TracebackType, context: int = ...) -> List[_FrameInfo]: ...
 def getlineno(frame: FrameType) -> int: ...
 def currentframe(depth: int = ...) -> FrameType: ...
 def stack(context: int = ...) -> List[_FrameInfo]: ...

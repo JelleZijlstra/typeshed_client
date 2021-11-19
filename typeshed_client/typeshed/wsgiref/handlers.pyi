@@ -3,18 +3,10 @@ from types import TracebackType
 from typing import IO, Callable, MutableMapping, Optional, Tuple, Type
 
 from .headers import Headers
-from .types import (
-    ErrorStream,
-    InputStream,
-    StartResponse,
-    WSGIApplication,
-    WSGIEnvironment,
-)
+from .types import ErrorStream, InputStream, StartResponse, WSGIApplication, WSGIEnvironment
 from .util import FileWrapper
 
-_exc_info = Tuple[
-    Optional[Type[BaseException]], Optional[BaseException], Optional[TracebackType]
-]
+_exc_info = Tuple[Optional[Type[BaseException]], Optional[BaseException], Optional[TracebackType]]
 
 def format_date_time(timestamp: float | None) -> str: ...  # undocumented
 def read_environ() -> dict[str, str]: ...
@@ -45,10 +37,7 @@ class BaseHandler:
     def set_content_length(self) -> None: ...
     def cleanup_headers(self) -> None: ...
     def start_response(
-        self,
-        status: str,
-        headers: list[tuple[str, str]],
-        exc_info: _exc_info | None = ...,
+        self, status: str, headers: list[tuple[str, str]], exc_info: _exc_info | None = ...
     ) -> Callable[[bytes], None]: ...
     def send_preamble(self) -> None: ...
     def write(self, data: bytes) -> None: ...
@@ -60,9 +49,7 @@ class BaseHandler:
     def client_is_modern(self) -> bool: ...
     def log_exception(self, exc_info: _exc_info) -> None: ...
     def handle_error(self) -> None: ...
-    def error_output(
-        self, environ: WSGIEnvironment, start_response: StartResponse
-    ) -> list[bytes]: ...
+    def error_output(self, environ: WSGIEnvironment, start_response: StartResponse) -> list[bytes]: ...
     @abstractmethod
     def _write(self, data: bytes) -> None: ...
     @abstractmethod

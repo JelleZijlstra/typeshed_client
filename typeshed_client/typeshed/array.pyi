@@ -1,14 +1,5 @@
 import sys
-from typing import (
-    Any,
-    BinaryIO,
-    Generic,
-    Iterable,
-    MutableSequence,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, BinaryIO, Generic, Iterable, MutableSequence, TypeVar, Union, overload
 from typing_extensions import Literal
 
 _IntTypeCode = Literal["b", "B", "h", "H", "i", "I", "l", "L", "q", "Q"]
@@ -24,27 +15,13 @@ class array(MutableSequence[_T], Generic[_T]):
     typecode: _TypeCode
     itemsize: int
     @overload
-    def __init__(
-        self: array[int],
-        typecode: _IntTypeCode,
-        __initializer: bytes | Iterable[_T] = ...,
-    ) -> None: ...
+    def __init__(self: array[int], typecode: _IntTypeCode, __initializer: bytes | Iterable[_T] = ...) -> None: ...
     @overload
-    def __init__(
-        self: array[float],
-        typecode: _FloatTypeCode,
-        __initializer: bytes | Iterable[_T] = ...,
-    ) -> None: ...
+    def __init__(self: array[float], typecode: _FloatTypeCode, __initializer: bytes | Iterable[_T] = ...) -> None: ...
     @overload
-    def __init__(
-        self: array[str],
-        typecode: _UnicodeTypeCode,
-        __initializer: bytes | Iterable[_T] = ...,
-    ) -> None: ...
+    def __init__(self: array[str], typecode: _UnicodeTypeCode, __initializer: bytes | Iterable[_T] = ...) -> None: ...
     @overload
-    def __init__(
-        self, typecode: str, __initializer: bytes | Iterable[_T] = ...
-    ) -> None: ...
+    def __init__(self, typecode: str, __initializer: bytes | Iterable[_T] = ...) -> None: ...
     def append(self, __v: _T) -> None: ...
     def buffer_info(self) -> tuple[int, int]: ...
     def byteswap(self) -> None: ...

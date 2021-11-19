@@ -17,13 +17,7 @@ _reducedtype = Union[
     Tuple[Callable[..., Any], Tuple[Any, ...]],
     Tuple[Callable[..., Any], Tuple[Any, ...], Any],
     Tuple[Callable[..., Any], Tuple[Any, ...], Any, Optional[Iterator[Any]]],
-    Tuple[
-        Callable[..., Any],
-        Tuple[Any, ...],
-        Any,
-        Optional[Iterator[Any]],
-        Optional[Iterator[Any]],
-    ],
+    Tuple[Callable[..., Any], Tuple[Any, ...], Any, Optional[Iterator[Any]], Optional[Iterator[Any]]],
 ]
 
 class Pickler:

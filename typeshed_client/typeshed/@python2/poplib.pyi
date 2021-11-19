@@ -41,10 +41,5 @@ class POP3:
 
 class POP3_SSL(POP3):
     def __init__(
-        self,
-        host: Text,
-        port: int = ...,
-        keyfile: Text | None = ...,
-        certfile: Text | None = ...,
-        timeout: float = ...,
+        self, host: Text, port: int = ..., keyfile: Text | None = ..., certfile: Text | None = ..., timeout: float = ...
     ) -> None: ...

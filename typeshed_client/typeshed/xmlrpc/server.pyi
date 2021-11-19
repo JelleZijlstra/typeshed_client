@@ -3,34 +3,11 @@ import pydoc
 import socketserver
 import sys
 from datetime import datetime
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Pattern,
-    Protocol,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Pattern, Protocol, Tuple, Type, Union
 from xmlrpc.client import Fault
 
 # TODO: Recursive type on tuple, list, dict
-_Marshallable = Union[
-    None,
-    bool,
-    int,
-    float,
-    str,
-    bytes,
-    Tuple[Any, ...],
-    List[Any],
-    Dict[Any, Any],
-    datetime,
-]
+_Marshallable = Union[None, bool, int, float, str, bytes, Tuple[Any, ...], List[Any], Dict[Any, Any], datetime]
 
 # The dispatch accepts anywhere from 0 to N arguments, no easy way to allow this in mypy
 class _DispatchArity0(Protocol):
@@ -40,39 +17,22 @@ class _DispatchArity1(Protocol):
     def __call__(self, __arg1: _Marshallable) -> _Marshallable: ...
 
 class _DispatchArity2(Protocol):
-    def __call__(
-        self, __arg1: _Marshallable, __arg2: _Marshallable
-    ) -> _Marshallable: ...
+    def __call__(self, __arg1: _Marshallable, __arg2: _Marshallable) -> _Marshallable: ...
 
 class _DispatchArity3(Protocol):
-    def __call__(
-        self, __arg1: _Marshallable, __arg2: _Marshallable, __arg3: _Marshallable
-    ) -> _Marshallable: ...
+    def __call__(self, __arg1: _Marshallable, __arg2: _Marshallable, __arg3: _Marshallable) -> _Marshallable: ...
 
 class _DispatchArity4(Protocol):
     def __call__(
-        self,
-        __arg1: _Marshallable,
-        __arg2: _Marshallable,
-        __arg3: _Marshallable,
-        __arg4: _Marshallable,
+        self, __arg1: _Marshallable, __arg2: _Marshallable, __arg3: _Marshallable, __arg4: _Marshallable
     ) -> _Marshallable: ...
 
 class _DispatchArityN(Protocol):
     def __call__(self, *args: _Marshallable) -> _Marshallable: ...
 
-_DispatchProtocol = Union[
-    _DispatchArity0,
-    _DispatchArity1,
-    _DispatchArity2,
-    _DispatchArity3,
-    _DispatchArity4,
-    _DispatchArityN,
-]
+_DispatchProtocol = Union[_DispatchArity0, _DispatchArity1, _DispatchArity2, _DispatchArity3, _DispatchArity4, _DispatchArityN]
 
-def resolve_dotted_attribute(
-    obj: Any, attr: str, allow_dotted_names: bool = ...
-) -> Any: ...  # undocumented
+def resolve_dotted_attribute(obj: Any, attr: str, allow_dotted_names: bool = ...) -> Any: ...  # undocumented
 def list_public_methods(obj: Any) -> list[str]: ...  # undocumented
 
 class SimpleXMLRPCDispatcher:  # undocumented
@@ -82,43 +42,25 @@ class SimpleXMLRPCDispatcher:  # undocumented
     allow_none: bool
     encoding: str
     use_builtin_types: bool
-    def __init__(
-        self,
-        allow_none: bool = ...,
-        encoding: str | None = ...,
-        use_builtin_types: bool = ...,
-    ) -> None: ...
-    def register_instance(
-        self, instance: Any, allow_dotted_names: bool = ...
-    ) -> None: ...
+    def __init__(self, allow_none: bool = ..., encoding: str | None = ..., use_builtin_types: bool = ...) -> None: ...
+    def register_instance(self, instance: Any, allow_dotted_names: bool = ...) -> None: ...
     if sys.version_info >= (3, 7):
-        def register_function(
-            self, function: _DispatchProtocol | None = ..., name: str | None = ...
-        ) -> Callable[..., Any]: ...
+        def register_function(self, function: _DispatchProtocol | None = ..., name: str | None = ...) -> Callable[..., Any]: ...
     else:
-        def register_function(
-            self, function: _DispatchProtocol, name: str | None = ...
-        ) -> Callable[..., Any]: ...
+        def register_function(self, function: _DispatchProtocol, name: str | None = ...) -> Callable[..., Any]: ...
     def register_introspection_functions(self) -> None: ...
     def register_multicall_functions(self) -> None: ...
     def _marshaled_dispatch(
         self,
         data: str,
-        dispatch_method: Callable[
-            [str | None, Tuple[_Marshallable, ...]], Fault | Tuple[_Marshallable, ...]
-        ]
-        | None = ...,
+        dispatch_method: Callable[[str | None, Tuple[_Marshallable, ...]], Fault | Tuple[_Marshallable, ...]] | None = ...,
         path: Any | None = ...,
     ) -> str: ...  # undocumented
     def system_listMethods(self) -> list[str]: ...  # undocumented
     def system_methodSignature(self, method_name: str) -> str: ...  # undocumented
     def system_methodHelp(self, method_name: str) -> str: ...  # undocumented
-    def system_multicall(
-        self, call_list: list[dict[str, _Marshallable]]
-    ) -> list[_Marshallable]: ...  # undocumented
-    def _dispatch(
-        self, method: str, params: Iterable[_Marshallable]
-    ) -> _Marshallable: ...  # undocumented
+    def system_multicall(self, call_list: list[dict[str, _Marshallable]]) -> list[_Marshallable]: ...  # undocumented
+    def _dispatch(self, method: str, params: Iterable[_Marshallable]) -> _Marshallable: ...  # undocumented
 
 class SimpleXMLRPCRequestHandler(http.server.BaseHTTPRequestHandler):
 
@@ -162,36 +104,24 @@ class MultiPathXMLRPCServer(SimpleXMLRPCServer):  # undocumented
         bind_and_activate: bool = ...,
         use_builtin_types: bool = ...,
     ) -> None: ...
-    def add_dispatcher(
-        self, path: str, dispatcher: SimpleXMLRPCDispatcher
-    ) -> SimpleXMLRPCDispatcher: ...
+    def add_dispatcher(self, path: str, dispatcher: SimpleXMLRPCDispatcher) -> SimpleXMLRPCDispatcher: ...
     def get_dispatcher(self, path: str) -> SimpleXMLRPCDispatcher: ...
     def _marshaled_dispatch(
         self,
         data: str,
-        dispatch_method: Callable[
-            [str | None, Tuple[_Marshallable, ...]], Fault | Tuple[_Marshallable, ...]
-        ]
-        | None = ...,
+        dispatch_method: Callable[[str | None, Tuple[_Marshallable, ...]], Fault | Tuple[_Marshallable, ...]] | None = ...,
         path: Any | None = ...,
     ) -> str: ...
 
 class CGIXMLRPCRequestHandler(SimpleXMLRPCDispatcher):
-    def __init__(
-        self,
-        allow_none: bool = ...,
-        encoding: str | None = ...,
-        use_builtin_types: bool = ...,
-    ) -> None: ...
+    def __init__(self, allow_none: bool = ..., encoding: str | None = ..., use_builtin_types: bool = ...) -> None: ...
     def handle_xmlrpc(self, request_text: str) -> None: ...
     def handle_get(self) -> None: ...
     def handle_request(self, request_text: str | None = ...) -> None: ...
 
 class ServerHTMLDoc(pydoc.HTMLDoc):  # undocumented
     def docroutine(self, object: object, name: str, mod: str | None = ..., funcs: Mapping[str, str] = ..., classes: Mapping[str, str] = ..., methods: Mapping[str, str] = ..., cl: type | None = ...) -> str: ...  # type: ignore
-    def docserver(
-        self, server_name: str, package_documentation: str, methods: dict[str, str]
-    ) -> str: ...
+    def docserver(self, server_name: str, package_documentation: str, methods: dict[str, str]) -> str: ...
 
 class XMLRPCDocGenerator:  # undocumented
 

@@ -85,38 +85,12 @@ def fcntl(__fd: FileDescriptorLike, __cmd: int, __arg: int = ...) -> int: ...
 @overload
 def fcntl(__fd: FileDescriptorLike, __cmd: int, __arg: bytes) -> bytes: ...
 @overload
-def ioctl(
-    __fd: FileDescriptorLike,
-    __request: int,
-    __arg: int = ...,
-    __mutate_flag: bool = ...,
-) -> int: ...
+def ioctl(__fd: FileDescriptorLike, __request: int, __arg: int = ..., __mutate_flag: bool = ...) -> int: ...
 @overload
-def ioctl(
-    __fd: FileDescriptorLike,
-    __request: int,
-    __arg: WriteableBuffer,
-    __mutate_flag: Literal[True] = ...,
-) -> int: ...
+def ioctl(__fd: FileDescriptorLike, __request: int, __arg: WriteableBuffer, __mutate_flag: Literal[True] = ...) -> int: ...
 @overload
-def ioctl(
-    __fd: FileDescriptorLike,
-    __request: int,
-    __arg: WriteableBuffer,
-    __mutate_flag: Literal[False],
-) -> bytes: ...
+def ioctl(__fd: FileDescriptorLike, __request: int, __arg: WriteableBuffer, __mutate_flag: Literal[False]) -> bytes: ...
 @overload
-def ioctl(
-    __fd: FileDescriptorLike,
-    __request: int,
-    __arg: ReadOnlyBuffer,
-    __mutate_flag: bool = ...,
-) -> bytes: ...
+def ioctl(__fd: FileDescriptorLike, __request: int, __arg: ReadOnlyBuffer, __mutate_flag: bool = ...) -> bytes: ...
 def flock(__fd: FileDescriptorLike, __operation: int) -> None: ...
-def lockf(
-    __fd: FileDescriptorLike,
-    __cmd: int,
-    __len: int = ...,
-    __start: int = ...,
-    __whence: int = ...,
-) -> Any: ...
+def lockf(__fd: FileDescriptorLike, __cmd: int, __len: int = ..., __start: int = ..., __whence: int = ...) -> Any: ...

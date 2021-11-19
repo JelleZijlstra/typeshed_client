@@ -17,16 +17,12 @@ class Style:
     def __init__(self, master: tkinter.Misc | None = ...): ...
     def configure(self, style, query_opt: Any | None = ..., **kw): ...
     def map(self, style, query_opt: Any | None = ..., **kw): ...
-    def lookup(
-        self, style, option, state: Any | None = ..., default: Any | None = ...
-    ): ...
+    def lookup(self, style, option, state: Any | None = ..., default: Any | None = ...): ...
     def layout(self, style, layoutspec: Any | None = ...): ...
     def element_create(self, elementname, etype, *args, **kw): ...
     def element_names(self): ...
     def element_options(self, elementname): ...
-    def theme_create(
-        self, themename, parent: Any | None = ..., settings: Any | None = ...
-    ): ...
+    def theme_create(self, themename, parent: Any | None = ..., settings: Any | None = ...): ...
     def theme_settings(self, themename, settings): ...
     def theme_names(self) -> Tuple[str, ...]: ...
     @overload
@@ -35,9 +31,7 @@ class Style:
     def theme_use(self, themename: None = ...) -> str: ...
 
 class Widget(tkinter.Widget):
-    def __init__(
-        self, master: tkinter.Misc | None, widgetname, kw: Any | None = ...
-    ): ...
+    def __init__(self, master: tkinter.Misc | None, widgetname, kw: Any | None = ...): ...
     def identify(self, x, y): ...
     def instate(self, statespec, callback: Any | None = ..., *args, **kw): ...
     def state(self, statespec: Any | None = ...): ...
@@ -238,9 +232,7 @@ class Combobox(Entry):
         style: str = ...,
         takefocus: tkinter._TakeFocusValue = ...,
         textvariable: tkinter.Variable = ...,
-        validate: Literal[
-            "none", "focus", "focusin", "focusout", "key", "all"
-        ] = ...,  # undocumented
+        validate: Literal["none", "focus", "focusin", "focusout", "key", "all"] = ...,  # undocumented
         validatecommand: tkinter._EntryValidateCommand = ...,  # undocumented
         values: list[str] | Tuple[str, ...] = ...,
         width: int = ...,
@@ -408,9 +400,7 @@ class Labelframe(Widget):
         class_: str = ...,
         cursor: tkinter._Cursor = ...,
         height: tkinter._ScreenUnits = ...,
-        labelanchor: Literal[
-            "nw", "n", "ne", "en", "e", "es", "se", "s", "sw", "ws", "w", "wn"
-        ] = ...,
+        labelanchor: Literal["nw", "n", "ne", "en", "e", "es", "se", "s", "sw", "ws", "w", "wn"] = ...,
         labelwidget: tkinter.Misc = ...,
         name: str = ...,
         padding: tkinter._Padding = ...,
@@ -430,9 +420,7 @@ class Labelframe(Widget):
         borderwidth: tkinter._ScreenUnits = ...,
         cursor: tkinter._Cursor = ...,
         height: tkinter._ScreenUnits = ...,
-        labelanchor: Literal[
-            "nw", "n", "ne", "en", "e", "es", "se", "s", "sw", "ws", "w", "wn"
-        ] = ...,
+        labelanchor: Literal["nw", "n", "ne", "en", "e", "es", "se", "s", "sw", "ws", "w", "wn"] = ...,
         labelwidget: tkinter.Misc = ...,
         padding: tkinter._Padding = ...,
         relief: tkinter._Relief = ...,
@@ -857,9 +845,7 @@ if sys.version_info >= (3, 7):
             takefocus: tkinter._TakeFocusValue = ...,
             textvariable: tkinter.Variable = ...,  # undocumented
             to: float = ...,
-            validate: Literal[
-                "none", "focus", "focusin", "focusout", "key", "all"
-            ] = ...,
+            validate: Literal["none", "focus", "focusin", "focusout", "key", "all"] = ...,
             validatecommand: tkinter._EntryValidateCommand = ...,
             values: list[str] | Tuple[str, ...] = ...,
             width: int = ...,  # undocumented
@@ -888,9 +874,7 @@ if sys.version_info >= (3, 7):
             takefocus: tkinter._TakeFocusValue = ...,
             textvariable: tkinter.Variable = ...,
             to: float = ...,
-            validate: Literal[
-                "none", "focus", "focusin", "focusout", "key", "all"
-            ] = ...,
+            validate: Literal["none", "focus", "focusin", "focusout", "key", "all"] = ...,
             validatecommand: tkinter._EntryValidateCommand = ...,
             values: list[str] | Tuple[str, ...] = ...,
             width: int = ...,
@@ -940,12 +924,7 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
         class_: str = ...,
         columns: str | list[str] | Tuple[str, ...] = ...,
         cursor: tkinter._Cursor = ...,
-        displaycolumns: str
-        | list[str]
-        | Tuple[str, ...]
-        | list[int]
-        | Tuple[int, ...]
-        | Literal["#all"] = ...,
+        displaycolumns: str | list[str] | Tuple[str, ...] | list[int] | Tuple[int, ...] | Literal["#all"] = ...,
         height: int = ...,
         name: str = ...,
         padding: tkinter._Padding = ...,
@@ -954,9 +933,7 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
         #
         # 'tree headings' is same as ['tree', 'headings'], and I wouldn't be
         # surprised if someone is using it.
-        show: Literal["tree", "headings", "tree headings", ""]
-        | list[str]
-        | Tuple[str, ...] = ...,
+        show: Literal["tree", "headings", "tree headings", ""] | list[str] | Tuple[str, ...] = ...,
         style: str = ...,
         takefocus: tkinter._TakeFocusValue = ...,
         xscrollcommand: tkinter._XYScrollCommand = ...,
@@ -969,18 +946,11 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
         *,
         columns: str | list[str] | Tuple[str, ...] = ...,
         cursor: tkinter._Cursor = ...,
-        displaycolumns: str
-        | list[str]
-        | Tuple[str, ...]
-        | list[int]
-        | Tuple[int, ...]
-        | Literal["#all"] = ...,
+        displaycolumns: str | list[str] | Tuple[str, ...] | list[int] | Tuple[int, ...] | Literal["#all"] = ...,
         height: int = ...,
         padding: tkinter._Padding = ...,
         selectmode: Literal["extended", "browse", "none"] = ...,
-        show: Literal["tree", "headings", "tree headings", ""]
-        | list[str]
-        | Tuple[str, ...] = ...,
+        show: Literal["tree", "headings", "tree headings", ""] | list[str] | Tuple[str, ...] = ...,
         style: str = ...,
         takefocus: tkinter._TakeFocusValue = ...,
         xscrollcommand: tkinter._XYScrollCommand = ...,
@@ -993,17 +963,11 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     def get_children(self, item: str | None = ...) -> Tuple[str, ...]: ...
     def set_children(self, item: str, *newchildren: str) -> None: ...
     @overload
-    def column(
-        self, column: _TreeviewColumnId, option: Literal["width", "minwidth"]
-    ) -> int: ...
+    def column(self, column: _TreeviewColumnId, option: Literal["width", "minwidth"]) -> int: ...
     @overload
-    def column(
-        self, column: _TreeviewColumnId, option: Literal["stretch"]
-    ) -> bool: ...  # actually 0 or 1
+    def column(self, column: _TreeviewColumnId, option: Literal["stretch"]) -> bool: ...  # actually 0 or 1
     @overload
-    def column(
-        self, column: _TreeviewColumnId, option: Literal["anchor"]
-    ) -> _tkinter.Tcl_Obj: ...
+    def column(self, column: _TreeviewColumnId, option: Literal["anchor"]) -> _tkinter.Tcl_Obj: ...
     @overload
     def column(self, column: _TreeviewColumnId, option: Literal["id"]) -> str: ...
     @overload
@@ -1030,13 +994,9 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     @overload
     def heading(self, column: _TreeviewColumnId, option: Literal["text"]) -> str: ...
     @overload
-    def heading(
-        self, column: _TreeviewColumnId, option: Literal["image"]
-    ) -> tuple[str]: ...
+    def heading(self, column: _TreeviewColumnId, option: Literal["image"]) -> tuple[str]: ...
     @overload
-    def heading(
-        self, column: _TreeviewColumnId, option: Literal["anchor"]
-    ) -> _tkinter.Tcl_Obj: ...
+    def heading(self, column: _TreeviewColumnId, option: Literal["anchor"]) -> _tkinter.Tcl_Obj: ...
     @overload
     def heading(self, column: _TreeviewColumnId, option: Literal["command"]) -> str: ...
     @overload
@@ -1055,12 +1015,8 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     def identify(self, component, x, y): ...
     def identify_row(self, y: int) -> str: ...
     def identify_column(self, x: int) -> str: ...
-    def identify_region(
-        self, x: int, y: int
-    ) -> Literal["heading", "separator", "tree", "cell", "nothing"]: ...
-    def identify_element(
-        self, x: int, y: int
-    ) -> str: ...  # don't know what possible return values are
+    def identify_region(self, x: int, y: int) -> Literal["heading", "separator", "tree", "cell", "nothing"]: ...
+    def identify_element(self, x: int, y: int) -> str: ...  # don't know what possible return values are
     def index(self, item: str) -> int: ...
     def insert(
         self,
@@ -1080,15 +1036,11 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     @overload
     def item(self, item: str, option: Literal["image"]) -> tuple[str] | Literal[""]: ...
     @overload
-    def item(
-        self, item: str, option: Literal["values"]
-    ) -> Tuple[Any, ...] | Literal[""]: ...
+    def item(self, item: str, option: Literal["values"]) -> Tuple[Any, ...] | Literal[""]: ...
     @overload
     def item(self, item: str, option: Literal["open"]) -> bool: ...  # actually 0 or 1
     @overload
-    def item(
-        self, item: str, option: Literal["tags"]
-    ) -> Tuple[str, ...] | Literal[""]: ...
+    def item(self, item: str, option: Literal["tags"]) -> Tuple[str, ...] | Literal[""]: ...
     @overload
     def item(self, item: str, option: str) -> Any: ...
     @overload
@@ -1112,17 +1064,13 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     if sys.version_info >= (3, 8):
         def selection(self) -> Tuple[str, ...]: ...
     else:
-        def selection(
-            self, selop: Any | None = ..., items: Any | None = ...
-        ) -> Tuple[str, ...]: ...
+        def selection(self, selop: Any | None = ..., items: Any | None = ...) -> Tuple[str, ...]: ...
     def selection_set(self, items: str | list[str] | Tuple[str, ...]) -> None: ...
     def selection_add(self, items: str | list[str] | Tuple[str, ...]) -> None: ...
     def selection_remove(self, items: str | list[str] | Tuple[str, ...]) -> None: ...
     def selection_toggle(self, items: str | list[str] | Tuple[str, ...]) -> None: ...
     @overload
-    def set(
-        self, item: str, column: None = ..., value: None = ...
-    ) -> dict[str, Any]: ...
+    def set(self, item: str, column: None = ..., value: None = ...) -> dict[str, Any]: ...
     @overload
     def set(self, item: str, column: _TreeviewColumnId, value: None = ...) -> Any: ...
     @overload
@@ -1131,23 +1079,16 @@ class Treeview(Widget, tkinter.XView, tkinter.YView):
     # Also, it's 'callback' instead of 'func' here.
     @overload
     def tag_bind(
-        self,
-        tagname: str,
-        sequence: str | None = ...,
-        callback: Callable[[tkinter.Event[Treeview]], Any] | None = ...,
+        self, tagname: str, sequence: str | None = ..., callback: Callable[[tkinter.Event[Treeview]], Any] | None = ...
     ) -> str: ...
     @overload
     def tag_bind(self, tagname: str, sequence: str | None, callback: str) -> None: ...
     @overload
     def tag_bind(self, tagname: str, *, callback: str) -> None: ...
     @overload
-    def tag_configure(
-        self, tagname: str, option: Literal["foreground", "background"]
-    ) -> tkinter._Color: ...
+    def tag_configure(self, tagname: str, option: Literal["foreground", "background"]) -> tkinter._Color: ...
     @overload
-    def tag_configure(
-        self, tagname: str, option: Literal["font"]
-    ) -> _FontDescription: ...
+    def tag_configure(self, tagname: str, option: Literal["font"]) -> _FontDescription: ...
     @overload
     def tag_configure(self, tagname: str, option: Literal["image"]) -> str: ...
     @overload
@@ -1193,11 +1134,7 @@ class OptionMenu(Menubutton):
         *values: str,
         # rest of these are keyword-only because *args syntax used above
         style: str = ...,
-        direction: Literal["above"]
-        | Literal["below"]
-        | Literal["left"]
-        | Literal["right"]
-        | Literal["flush"] = ...,
+        direction: Literal["above"] | Literal["below"] | Literal["left"] | Literal["right"] | Literal["flush"] = ...,
         command: Callable[[tkinter.StringVar], Any] | None = ...,
     ) -> None: ...
     # configure, config, cget, destroy are inherited from Menubutton

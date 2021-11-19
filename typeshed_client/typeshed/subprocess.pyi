@@ -1,20 +1,7 @@
 import sys
 from _typeshed import Self, StrOrBytesPath
 from types import TracebackType
-from typing import (
-    IO,
-    Any,
-    AnyStr,
-    Callable,
-    Generic,
-    Iterable,
-    Mapping,
-    Sequence,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import IO, Any, AnyStr, Callable, Generic, Iterable, Mapping, Sequence, Type, TypeVar, Union, overload
 from typing_extensions import Literal
 
 if sys.version_info >= (3, 9):
@@ -57,13 +44,7 @@ class CompletedProcess(Generic[_T]):
     # and writing all the overloads would be horrific.
     stdout: _T
     stderr: _T
-    def __init__(
-        self,
-        args: _CMD,
-        returncode: int,
-        stdout: _T | None = ...,
-        stderr: _T | None = ...,
-    ) -> None: ...
+    def __init__(self, args: _CMD, returncode: int, stdout: _T | None = ..., stderr: _T | None = ...) -> None: ...
     def check_returncode(self) -> None: ...
     if sys.version_info >= (3, 9):
         def __class_getitem__(cls, item: Any) -> GenericAlias: ...
@@ -702,13 +683,7 @@ DEVNULL: int
 class SubprocessError(Exception): ...
 
 class TimeoutExpired(SubprocessError):
-    def __init__(
-        self,
-        cmd: _CMD,
-        timeout: float,
-        output: _TXT | None = ...,
-        stderr: _TXT | None = ...,
-    ) -> None: ...
+    def __init__(self, cmd: _CMD, timeout: float, output: _TXT | None = ..., stderr: _TXT | None = ...) -> None: ...
     # morally: _CMD
     cmd: Any
     timeout: float
@@ -727,13 +702,7 @@ class CalledProcessError(SubprocessError):
     # morally: _TXT | None
     stdout: Any
     stderr: Any
-    def __init__(
-        self,
-        returncode: int,
-        cmd: _CMD,
-        output: _TXT | None = ...,
-        stderr: _TXT | None = ...,
-    ) -> None: ...
+    def __init__(self, returncode: int, cmd: _CMD, output: _TXT | None = ..., stderr: _TXT | None = ...) -> None: ...
 
 class Popen(Generic[AnyStr]):
     args: _CMD
@@ -1026,9 +995,7 @@ class Popen(Generic[AnyStr]):
     if sys.version_info >= (3, 7):
         def wait(self, timeout: float | None = ...) -> int: ...
     else:
-        def wait(
-            self, timeout: float | None = ..., endtime: float | None = ...
-        ) -> int: ...
+        def wait(self, timeout: float | None = ..., endtime: float | None = ...) -> int: ...
     # Return str/bytes
     def communicate(
         self,
@@ -1041,10 +1008,7 @@ class Popen(Generic[AnyStr]):
     def kill(self) -> None: ...
     def __enter__(self: Self) -> Self: ...
     def __exit__(
-        self,
-        type: Type[BaseException] | None,
-        value: BaseException | None,
-        traceback: TracebackType | None,
+        self, type: Type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
     ) -> None: ...
     if sys.version_info >= (3, 9):
         def __class_getitem__(cls, item: Any) -> GenericAlias: ...

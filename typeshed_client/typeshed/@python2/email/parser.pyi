@@ -1,6 +1,4 @@
-from .feedparser import (
-    FeedParser as FeedParser,
-)  # not in __all__ but listed in documentation
+from .feedparser import FeedParser as FeedParser  # not in __all__ but listed in documentation
 
 class Parser:
     def __init__(self, *args, **kws) -> None: ...

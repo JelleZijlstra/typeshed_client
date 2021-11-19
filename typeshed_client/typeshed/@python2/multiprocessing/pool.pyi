@@ -22,12 +22,7 @@ class Pool(object):
         initargs: Iterable[Any] = ...,
         maxtasksperchild: int | None = ...,
     ) -> None: ...
-    def apply(
-        self,
-        func: Callable[..., Any],
-        args: Iterable[Any] = ...,
-        kwds: Dict[str, Any] = ...,
-    ) -> Any: ...
+    def apply(self, func: Callable[..., Any], args: Iterable[Any] = ..., kwds: Dict[str, Any] = ...) -> Any: ...
     def apply_async(
         self,
         func: Callable[..., Any],
@@ -35,12 +30,7 @@ class Pool(object):
         kwds: Dict[str, Any] = ...,
         callback: Callable[..., None] | None = ...,
     ) -> AsyncResult: ...
-    def map(
-        self,
-        func: Callable[..., Any],
-        iterable: Iterable[Any] = ...,
-        chunksize: int | None = ...,
-    ) -> List[Any]: ...
+    def map(self, func: Callable[..., Any], iterable: Iterable[Any] = ..., chunksize: int | None = ...) -> List[Any]: ...
     def map_async(
         self,
         func: Callable[..., Any],
@@ -48,17 +38,9 @@ class Pool(object):
         chunksize: int | None = ...,
         callback: Callable[..., None] | None = ...,
     ) -> AsyncResult: ...
-    def imap(
-        self,
-        func: Callable[..., Any],
-        iterable: Iterable[Any] = ...,
-        chunksize: int | None = ...,
-    ) -> IMapIterator: ...
+    def imap(self, func: Callable[..., Any], iterable: Iterable[Any] = ..., chunksize: int | None = ...) -> IMapIterator: ...
     def imap_unordered(
-        self,
-        func: Callable[..., Any],
-        iterable: Iterable[Any] = ...,
-        chunksize: int | None = ...,
+        self, func: Callable[..., Any], iterable: Iterable[Any] = ..., chunksize: int | None = ...
     ) -> IMapIterator: ...
     def close(self) -> None: ...
     def terminate(self) -> None: ...
@@ -66,8 +48,5 @@ class Pool(object):
 
 class ThreadPool(Pool):
     def __init__(
-        self,
-        processes: int | None = ...,
-        initializer: Callable[..., Any] | None = ...,
-        initargs: Iterable[Any] = ...,
+        self, processes: int | None = ..., initializer: Callable[..., Any] | None = ..., initargs: Iterable[Any] = ...
     ) -> None: ...

@@ -28,10 +28,7 @@ _T_io = TypeVar("_T_io", bound=Optional[IO[str]])
 _F = TypeVar("_F", bound=Callable[..., Any])
 _P = ParamSpec("_P")
 
-_ExitFunc = Callable[
-    [Optional[Type[BaseException]], Optional[BaseException], Optional[TracebackType]],
-    bool,
-]
+_ExitFunc = Callable[[Optional[Type[BaseException]], Optional[BaseException], Optional[TracebackType]], bool]
 _CM_EF = TypeVar("_CM_EF", ContextManager[Any], _ExitFunc)
 
 class _GeneratorContextManager(ContextManager[_T_co]):
@@ -64,10 +61,7 @@ if sys.version_info >= (3, 10):
 class suppress(ContextManager[None]):
     def __init__(self, *exceptions: Type[BaseException]) -> None: ...
     def __exit__(
-        self,
-        exctype: Type[BaseException] | None,
-        excinst: BaseException | None,
-        exctb: TracebackType | None,
+        self, exctype: Type[BaseException] | None, excinst: BaseException | None, exctb: TracebackType | None
     ) -> bool: ...
 
 class redirect_stdout(ContextManager[_T_io]):
@@ -83,28 +77,16 @@ class ExitStack(ContextManager[ExitStack]):
     def __init__(self) -> None: ...
     def enter_context(self, cm: ContextManager[_T]) -> _T: ...
     def push(self, exit: _CM_EF) -> _CM_EF: ...
-    def callback(
-        self, __callback: Callable[..., Any], *args: Any, **kwds: Any
-    ) -> Callable[..., Any]: ...
+    def callback(self, __callback: Callable[..., Any], *args: Any, **kwds: Any) -> Callable[..., Any]: ...
     def pop_all(self: Self) -> Self: ...
     def close(self) -> None: ...
     def __enter__(self: Self) -> Self: ...
     def __exit__(
-        self,
-        __exc_type: Type[BaseException] | None,
-        __exc_value: BaseException | None,
-        __traceback: TracebackType | None,
+        self, __exc_type: Type[BaseException] | None, __exc_value: BaseException | None, __traceback: TracebackType | None
     ) -> bool: ...
 
 if sys.version_info >= (3, 7):
-    _ExitCoroFunc = Callable[
-        [
-            Optional[Type[BaseException]],
-            Optional[BaseException],
-            Optional[TracebackType],
-        ],
-        Awaitable[bool],
-    ]
+    _ExitCoroFunc = Callable[[Optional[Type[BaseException]], Optional[BaseException], Optional[TracebackType]], Awaitable[bool]]
     _CallbackCoroFunc = Callable[..., Awaitable[Any]]
     _ACM_EF = TypeVar("_ACM_EF", AsyncContextManager[Any], _ExitCoroFunc)
     class AsyncExitStack(AsyncContextManager[AsyncExitStack]):
@@ -113,20 +95,13 @@ if sys.version_info >= (3, 7):
         def enter_async_context(self, cm: AsyncContextManager[_T]) -> Awaitable[_T]: ...
         def push(self, exit: _CM_EF) -> _CM_EF: ...
         def push_async_exit(self, exit: _ACM_EF) -> _ACM_EF: ...
-        def callback(
-            self, __callback: Callable[..., Any], *args: Any, **kwds: Any
-        ) -> Callable[..., Any]: ...
-        def push_async_callback(
-            self, __callback: _CallbackCoroFunc, *args: Any, **kwds: Any
-        ) -> _CallbackCoroFunc: ...
+        def callback(self, __callback: Callable[..., Any], *args: Any, **kwds: Any) -> Callable[..., Any]: ...
+        def push_async_callback(self, __callback: _CallbackCoroFunc, *args: Any, **kwds: Any) -> _CallbackCoroFunc: ...
         def pop_all(self: Self) -> Self: ...
         def aclose(self) -> Awaitable[None]: ...
         def __aenter__(self: Self) -> Awaitable[Self]: ...
         def __aexit__(
-            self,
-            __exc_type: Type[BaseException] | None,
-            __exc_value: BaseException | None,
-            __traceback: TracebackType | None,
+            self, __exc_type: Type[BaseException] | None, __exc_value: BaseException | None, __traceback: TracebackType | None
         ) -> Awaitable[bool]: ...
 
 if sys.version_info >= (3, 10):

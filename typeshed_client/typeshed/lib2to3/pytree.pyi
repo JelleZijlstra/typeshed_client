@@ -56,12 +56,7 @@ class Leaf(Base):
     value: str
     fixers_applied: list[Any]
     def __init__(
-        self,
-        type: int,
-        value: str,
-        context: _Context | None = ...,
-        prefix: str | None = ...,
-        fixers_applied: list[Any] = ...,
+        self, type: int, value: str, context: _Context | None = ..., prefix: str | None = ..., fixers_applied: list[Any] = ...
     ) -> None: ...
 
 def convert(gr: Grammar, raw_node: _RawNode) -> _NL: ...
@@ -70,38 +65,24 @@ class BasePattern:
     type: int
     content: str | None
     name: str | None
-    def optimize(
-        self,
-    ) -> BasePattern: ...  # sic, subclasses are free to optimize themselves into different patterns
+    def optimize(self) -> BasePattern: ...  # sic, subclasses are free to optimize themselves into different patterns
     def match(self, node: _NL, results: _Results | None = ...) -> bool: ...
     def match_seq(self, nodes: list[_NL], results: _Results | None = ...) -> bool: ...
     def generate_matches(self, nodes: list[_NL]) -> Iterator[tuple[int, _Results]]: ...
 
 class LeafPattern(BasePattern):
-    def __init__(
-        self, type: int | None = ..., content: str | None = ..., name: str | None = ...
-    ) -> None: ...
+    def __init__(self, type: int | None = ..., content: str | None = ..., name: str | None = ...) -> None: ...
 
 class NodePattern(BasePattern):
     wildcards: bool
-    def __init__(
-        self, type: int | None = ..., content: str | None = ..., name: str | None = ...
-    ) -> None: ...
+    def __init__(self, type: int | None = ..., content: str | None = ..., name: str | None = ...) -> None: ...
 
 class WildcardPattern(BasePattern):
     min: int
     max: int
-    def __init__(
-        self,
-        content: str | None = ...,
-        min: int = ...,
-        max: int = ...,
-        name: str | None = ...,
-    ) -> None: ...
+    def __init__(self, content: str | None = ..., min: int = ..., max: int = ..., name: str | None = ...) -> None: ...
 
 class NegatedPattern(BasePattern):
     def __init__(self, content: str | None = ...) -> None: ...
 
-def generate_matches(
-    patterns: list[BasePattern], nodes: list[_NL]
-) -> Iterator[tuple[int, _Results]]: ...
+def generate_matches(patterns: list[BasePattern], nodes: list[_NL]) -> Iterator[tuple[int, _Results]]: ...

@@ -7,16 +7,7 @@ import ctypes
 import mmap
 import sys
 from os import PathLike
-from typing import (
-    AbstractSet,
-    Any,
-    Awaitable,
-    Container,
-    Iterable,
-    Protocol,
-    TypeVar,
-    Union,
-)
+from typing import AbstractSet, Any, Awaitable, Container, Iterable, Protocol, TypeVar, Union
 from typing_extensions import Literal, final
 
 _KT = TypeVar("_KT")
@@ -122,9 +113,7 @@ OpenTextModeUpdating = Literal[
     "+tx",
 ]
 OpenTextModeWriting = Literal["w", "wt", "tw", "a", "at", "ta", "x", "xt", "tx"]
-OpenTextModeReading = Literal[
-    "r", "rt", "tr", "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
-]
+OpenTextModeReading = Literal["r", "rt", "tr", "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"]
 OpenTextMode = Union[OpenTextModeUpdating, OpenTextModeWriting, OpenTextModeReading]
 OpenBinaryModeUpdating = Literal[
     "rb+",
@@ -154,9 +143,7 @@ OpenBinaryModeUpdating = Literal[
 ]
 OpenBinaryModeWriting = Literal["wb", "bw", "ab", "ba", "xb", "bx"]
 OpenBinaryModeReading = Literal["rb", "br", "rbU", "rUb", "Urb", "brU", "bUr", "Ubr"]
-OpenBinaryMode = Union[
-    OpenBinaryModeUpdating, OpenBinaryModeReading, OpenBinaryModeWriting
-]
+OpenBinaryMode = Union[OpenBinaryModeUpdating, OpenBinaryModeReading, OpenBinaryModeWriting]
 
 # stable
 class HasFileno(Protocol):
@@ -185,9 +172,7 @@ ReadOnlyBuffer = bytes  # stable
 # Anything that implements the read-write buffer interface.
 # The buffer interface is defined purely on the C level, so we cannot define a normal Protocol
 # for it. Instead we have to list the most common stdlib buffer classes in a Union.
-WriteableBuffer = Union[
-    bytearray, memoryview, array.array[Any], mmap.mmap, ctypes._CData
-]  # stable
+WriteableBuffer = Union[bytearray, memoryview, array.array[Any], mmap.mmap, ctypes._CData]  # stable
 # Same as _WriteableBuffer, but also includes read-only buffer types (like bytes).
 ReadableBuffer = Union[ReadOnlyBuffer, WriteableBuffer]  # stable
 

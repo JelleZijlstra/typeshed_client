@@ -27,9 +27,7 @@ class XMLParserType(object):
     def SetBase(self, __base: Text) -> None: ...
     def GetBase(self) -> str | None: ...
     def GetInputContext(self) -> bytes | None: ...
-    def ExternalEntityParserCreate(
-        self, __context: Text | None, __encoding: Text = ...
-    ) -> XMLParserType: ...
+    def ExternalEntityParserCreate(self, __context: Text | None, __encoding: Text = ...) -> XMLParserType: ...
     def SetParamEntityParsing(self, __flag: int) -> int: ...
     def UseForeignDTD(self, __flag: bool = ...) -> None: ...
     buffer_size: int
@@ -50,18 +48,14 @@ class XMLParserType(object):
     EndDoctypeDeclHandler: Callable[[], Any] | None
     ElementDeclHandler: Callable[[str, _Model], Any] | None
     AttlistDeclHandler: Callable[[str, str, str, str | None, bool], Any] | None
-    StartElementHandler: Callable[[str, Dict[str, str]], Any] | Callable[
-        [str, List[str]], Any
-    ] | Callable[[str, Dict[str, str], List[str]], Any] | None
+    StartElementHandler: Callable[[str, Dict[str, str]], Any] | Callable[[str, List[str]], Any] | Callable[
+        [str, Dict[str, str], List[str]], Any
+    ] | None
     EndElementHandler: Callable[[str], Any] | None
     ProcessingInstructionHandler: Callable[[str, str], Any] | None
     CharacterDataHandler: Callable[[str], Any] | None
-    UnparsedEntityDeclHandler: Callable[
-        [str, str | None, str, str | None, str], Any
-    ] | None
-    EntityDeclHandler: Callable[
-        [str, bool, str | None, str | None, str, str | None, str | None], Any
-    ] | None
+    UnparsedEntityDeclHandler: Callable[[str, str | None, str, str | None, str], Any] | None
+    EntityDeclHandler: Callable[[str, bool, str | None, str | None, str, str | None, str | None], Any] | None
     NotationDeclHandler: Callable[[str, str | None, str, str | None], Any] | None
     StartNamespaceDeclHandler: Callable[[str, str], Any] | None
     EndNamespaceDeclHandler: Callable[[str], Any] | None
@@ -71,15 +65,11 @@ class XMLParserType(object):
     DefaultHandler: Callable[[str], Any] | None
     DefaultHandlerExpand: Callable[[str], Any] | None
     NotStandaloneHandler: Callable[[], int] | None
-    ExternalEntityRefHandler: Callable[
-        [str, str | None, str | None, str | None], int
-    ] | None
+    ExternalEntityRefHandler: Callable[[str, str | None, str | None, str | None], int] | None
 
 def ErrorString(__code: int) -> str: ...
 
 # intern is undocumented
 def ParserCreate(
-    encoding: Text | None = ...,
-    namespace_separator: Text | None = ...,
-    intern: Dict[str, Any] | None = ...,
+    encoding: Text | None = ..., namespace_separator: Text | None = ..., intern: Dict[str, Any] | None = ...
 ) -> XMLParserType: ...

@@ -4,9 +4,7 @@ class NetrcParseError(Exception):
     filename: str | None
     lineno: int | None
     msg: str
-    def __init__(
-        self, msg: str, filename: Text | None = ..., lineno: int | None = ...
-    ) -> None: ...
+    def __init__(self, msg: str, filename: Text | None = ..., lineno: int | None = ...) -> None: ...
 
 # (login, account, password) tuple
 _NetrcTuple = Tuple[str, Optional[str], Optional[str]]

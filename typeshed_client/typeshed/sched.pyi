@@ -8,11 +8,7 @@ class Event(NamedTuple):
     kwargs: dict[str, Any]
 
 class scheduler:
-    def __init__(
-        self,
-        timefunc: Callable[[], float] = ...,
-        delayfunc: Callable[[float], None] = ...,
-    ) -> None: ...
+    def __init__(self, timefunc: Callable[[], float] = ..., delayfunc: Callable[[float], None] = ...) -> None: ...
     def enterabs(
         self,
         time: float,

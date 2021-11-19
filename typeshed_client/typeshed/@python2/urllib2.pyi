@@ -1,18 +1,6 @@
 import ssl
 from httplib import HTTPConnectionProtocol, HTTPResponse
-from typing import (
-    Any,
-    AnyStr,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Sequence,
-    Text,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, AnyStr, Callable, Dict, List, Mapping, Sequence, Text, Tuple, Type, Union
 from urllib import addinfourl
 
 _string = Union[str, unicode]
@@ -23,9 +11,7 @@ class URLError(IOError):
 class HTTPError(URLError, addinfourl):
     code: int
     headers: Mapping[str, str]
-    def __init__(
-        self, url, code: int, msg: str, hdrs: Mapping[str, str], fp: addinfourl
-    ) -> None: ...
+    def __init__(self, url, code: int, msg: str, hdrs: Mapping[str, str], fp: addinfourl) -> None: ...
 
 class Request(object):
     host: str
@@ -67,12 +53,7 @@ class Request(object):
 class OpenerDirector(object):
     addheaders: List[Tuple[str, str]]
     def add_handler(self, handler: BaseHandler) -> None: ...
-    def open(
-        self,
-        fullurl: Request | _string,
-        data: _string | None = ...,
-        timeout: float | None = ...,
-    ) -> addinfourl | None: ...
+    def open(self, fullurl: Request | _string, data: _string | None = ..., timeout: float | None = ...) -> addinfourl | None: ...
     def error(self, proto: _string, *args: Any): ...
 
 # Note that this type is somewhat a lie. The return *can* be None if
@@ -100,54 +81,16 @@ class HTTPErrorProcessor(BaseHandler):
     def http_response(self, request, response): ...
 
 class HTTPDefaultErrorHandler(BaseHandler):
-    def http_error_default(
-        self, req: Request, fp: addinfourl, code: int, msg: str, hdrs: Mapping[str, str]
-    ): ...
+    def http_error_default(self, req: Request, fp: addinfourl, code: int, msg: str, hdrs: Mapping[str, str]): ...
 
 class HTTPRedirectHandler(BaseHandler):
     max_repeats: int
     max_redirections: int
-    def redirect_request(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-        newurl,
-    ): ...
-    def http_error_301(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
-    def http_error_302(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
-    def http_error_303(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
-    def http_error_307(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
+    def redirect_request(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str], newurl): ...
+    def http_error_301(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
+    def http_error_302(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
+    def http_error_303(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
+    def http_error_307(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
     inf_msg: str
 
 class ProxyHandler(BaseHandler):
@@ -157,12 +100,8 @@ class ProxyHandler(BaseHandler):
 
 class HTTPPasswordMgr:
     def __init__(self) -> None: ...
-    def add_password(
-        self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text
-    ) -> None: ...
-    def find_user_password(
-        self, realm: Text | None, authuri: Text
-    ) -> Tuple[Any, Any]: ...
+    def add_password(self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text) -> None: ...
+    def find_user_password(self, realm: Text | None, authuri: Text) -> Tuple[Any, Any]: ...
     def reduce_uri(self, uri: _string, default_port: bool = ...) -> Tuple[Any, Any]: ...
     def is_suburi(self, base: _string, test: _string) -> bool: ...
 
@@ -170,100 +109,51 @@ class HTTPPasswordMgrWithDefaultRealm(HTTPPasswordMgr): ...
 
 class AbstractBasicAuthHandler:
     def __init__(self, password_mgr: HTTPPasswordMgr | None = ...) -> None: ...
-    def add_password(
-        self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text
-    ) -> None: ...
-    def http_error_auth_reqed(
-        self, authreq, host, req: Request, headers: Mapping[str, str]
-    ): ...
+    def add_password(self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text) -> None: ...
+    def http_error_auth_reqed(self, authreq, host, req: Request, headers: Mapping[str, str]): ...
     def retry_http_basic_auth(self, host, req: Request, realm): ...
 
 class HTTPBasicAuthHandler(AbstractBasicAuthHandler, BaseHandler):
     auth_header: str
-    def http_error_401(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
+    def http_error_401(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
 
 class ProxyBasicAuthHandler(AbstractBasicAuthHandler, BaseHandler):
     auth_header: str
-    def http_error_407(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
+    def http_error_407(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
 
 class AbstractDigestAuthHandler:
     def __init__(self, passwd: HTTPPasswordMgr | None = ...) -> None: ...
-    def add_password(
-        self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text
-    ) -> None: ...
+    def add_password(self, realm: Text | None, uri: Text | Sequence[Text], user: Text, passwd: Text) -> None: ...
     def reset_retry_count(self) -> None: ...
-    def http_error_auth_reqed(
-        self, auth_header: str, host: str, req: Request, headers: Mapping[str, str]
-    ) -> None: ...
-    def retry_http_digest_auth(
-        self, req: Request, auth: str
-    ) -> HTTPResponse | None: ...
+    def http_error_auth_reqed(self, auth_header: str, host: str, req: Request, headers: Mapping[str, str]) -> None: ...
+    def retry_http_digest_auth(self, req: Request, auth: str) -> HTTPResponse | None: ...
     def get_cnonce(self, nonce: str) -> str: ...
     def get_authorization(self, req: Request, chal: Mapping[str, str]) -> str: ...
-    def get_algorithm_impls(
-        self, algorithm: str
-    ) -> Tuple[Callable[[str], str], Callable[[str, str], str]]: ...
-    def get_entity_digest(
-        self, data: bytes | None, chal: Mapping[str, str]
-    ) -> str | None: ...
+    def get_algorithm_impls(self, algorithm: str) -> Tuple[Callable[[str], str], Callable[[str, str], str]]: ...
+    def get_entity_digest(self, data: bytes | None, chal: Mapping[str, str]) -> str | None: ...
 
 class HTTPDigestAuthHandler(BaseHandler, AbstractDigestAuthHandler):
     auth_header: str
     handler_order: int
-    def http_error_401(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
+    def http_error_401(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
 
 class ProxyDigestAuthHandler(BaseHandler, AbstractDigestAuthHandler):
     auth_header: str
     handler_order: int
-    def http_error_407(
-        self,
-        req: Request,
-        fp: addinfourl,
-        code: int,
-        msg: str,
-        headers: Mapping[str, str],
-    ): ...
+    def http_error_407(self, req: Request, fp: addinfourl, code: int, msg: str, headers: Mapping[str, str]): ...
 
 class AbstractHTTPHandler(BaseHandler):  # undocumented
     def __init__(self, debuglevel: int = ...) -> None: ...
     def set_http_debuglevel(self, level: int) -> None: ...
     def do_request_(self, request: Request) -> Request: ...
-    def do_open(
-        self,
-        http_class: HTTPConnectionProtocol,
-        req: Request,
-        **http_conn_args: Any | None,
-    ) -> addinfourl: ...
+    def do_open(self, http_class: HTTPConnectionProtocol, req: Request, **http_conn_args: Any | None) -> addinfourl: ...
 
 class HTTPHandler(AbstractHTTPHandler):
     def http_open(self, req: Request) -> addinfourl: ...
     def http_request(self, request: Request) -> Request: ...  # undocumented
 
 class HTTPSHandler(AbstractHTTPHandler):
-    def __init__(
-        self, debuglevel: int = ..., context: ssl.SSLContext | None = ...
-    ) -> None: ...
+    def __init__(self, debuglevel: int = ..., context: ssl.SSLContext | None = ...) -> None: ...
     def https_open(self, req: Request) -> addinfourl: ...
     def https_request(self, request: Request) -> Request: ...  # undocumented
 

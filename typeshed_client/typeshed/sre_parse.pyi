@@ -1,17 +1,6 @@
 import sys
 from sre_constants import _NamedIntConstant as _NIC, error as _Error
-from typing import (
-    Any,
-    FrozenSet,
-    Iterable,
-    List,
-    Match,
-    Optional,
-    Pattern as _Pattern,
-    Tuple,
-    Union,
-    overload,
-)
+from typing import Any, FrozenSet, Iterable, List, Match, Optional, Pattern as _Pattern, Tuple, Union, overload
 
 SPECIAL_CHARS: str
 REPEAT_CHARS: str
@@ -49,13 +38,7 @@ _OpSubpatternType = Tuple[Optional[int], int, int, SubPattern]
 _OpGroupRefExistsType = Tuple[int, SubPattern, SubPattern]
 _OpInType = List[Tuple[_NIC, int]]
 _OpBranchType = Tuple[None, List[SubPattern]]
-_AvType = Union[
-    _OpInType,
-    _OpBranchType,
-    Iterable[SubPattern],
-    _OpGroupRefExistsType,
-    _OpSubpatternType,
-]
+_AvType = Union[_OpInType, _OpBranchType, Iterable[SubPattern], _OpGroupRefExistsType, _OpSubpatternType]
 _CodeType = Tuple[_NIC, _AvType]
 
 class SubPattern:
@@ -64,14 +47,10 @@ class SubPattern:
 
     if sys.version_info >= (3, 8):
         state: State
-        def __init__(
-            self, state: State, data: list[_CodeType] | None = ...
-        ) -> None: ...
+        def __init__(self, state: State, data: list[_CodeType] | None = ...) -> None: ...
     else:
         pattern: Pattern
-        def __init__(
-            self, pattern: Pattern, data: list[_CodeType] | None = ...
-        ) -> None: ...
+        def __init__(self, pattern: Pattern, data: list[_CodeType] | None = ...) -> None: ...
     def dump(self, level: int = ...) -> None: ...
     def __len__(self) -> int: ...
     def __delitem__(self, index: int | slice) -> None: ...
@@ -113,9 +92,7 @@ if sys.version_info >= (3, 8):
     def parse_template(source: bytes, state: _Pattern[Any]) -> _TemplateByteType: ...
 
 else:
-    def parse(
-        str: str, flags: int = ..., pattern: Pattern | None = ...
-    ) -> SubPattern: ...
+    def parse(str: str, flags: int = ..., pattern: Pattern | None = ...) -> SubPattern: ...
     @overload
     def parse_template(source: str, pattern: _Pattern[Any]) -> _TemplateType: ...
     @overload

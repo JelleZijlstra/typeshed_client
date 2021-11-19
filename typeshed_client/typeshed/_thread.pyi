@@ -15,15 +15,10 @@ class LockType:
     def locked(self) -> bool: ...
     def __enter__(self) -> bool: ...
     def __exit__(
-        self,
-        type: Type[BaseException] | None,
-        value: BaseException | None,
-        traceback: TracebackType | None,
+        self, type: Type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
     ) -> None: ...
 
-def start_new_thread(
-    function: Callable[..., Any], args: Tuple[Any, ...], kwargs: dict[str, Any] = ...
-) -> int: ...
+def start_new_thread(function: Callable[..., Any], args: Tuple[Any, ...], kwargs: dict[str, Any] = ...) -> int: ...
 def interrupt_main() -> None: ...
 def exit() -> NoReturn: ...
 def allocate_lock() -> LockType: ...
@@ -34,14 +29,7 @@ TIMEOUT_MAX: float
 
 if sys.version_info >= (3, 8):
     def get_native_id() -> int: ...  # only available on some platforms
-    class _ExceptHookArgs(
-        Tuple[
-            Type[BaseException],
-            Optional[BaseException],
-            Optional[TracebackType],
-            Optional[Thread],
-        ]
-    ):
+    class _ExceptHookArgs(Tuple[Type[BaseException], Optional[BaseException], Optional[TracebackType], Optional[Thread]]):
         @property
         def exc_type(self) -> Type[BaseException]: ...
         @property

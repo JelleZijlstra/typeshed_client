@@ -103,9 +103,7 @@ OpenTextModeUpdating = Literal[
     "+tx",
 ]
 OpenTextModeWriting = Literal["w", "wt", "tw", "a", "at", "ta", "x", "xt", "tx"]
-OpenTextModeReading = Literal[
-    "r", "rt", "tr", "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
-]
+OpenTextModeReading = Literal["r", "rt", "tr", "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"]
 OpenTextMode = Union[OpenTextModeUpdating, OpenTextModeWriting, OpenTextModeReading]
 OpenBinaryModeUpdating = Literal[
     "rb+",
@@ -135,9 +133,7 @@ OpenBinaryModeUpdating = Literal[
 ]
 OpenBinaryModeWriting = Literal["wb", "bw", "ab", "ba", "xb", "bx"]
 OpenBinaryModeReading = Literal["rb", "br", "rbU", "rUb", "Urb", "brU", "bUr", "Ubr"]
-OpenBinaryMode = Union[
-    OpenBinaryModeUpdating, OpenBinaryModeReading, OpenBinaryModeWriting
-]
+OpenBinaryMode = Union[OpenBinaryModeUpdating, OpenBinaryModeReading, OpenBinaryModeWriting]
 
 class HasFileno(Protocol):
     def fileno(self) -> int: ...
@@ -157,9 +153,7 @@ class SupportsNoArgReadline(Protocol[_T_co]):
 class SupportsWrite(Protocol[_T_contra]):
     def write(self, __s: _T_contra) -> Any: ...
 
-ReadableBuffer = Union[
-    bytes, bytearray, memoryview, array.array[Any], mmap.mmap, buffer
-]
+ReadableBuffer = Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap, buffer]
 WriteableBuffer = Union[bytearray, memoryview, array.array[Any], mmap.mmap, buffer]
 
 # Used by type checkers for checks involving None (does not exist at runtime)

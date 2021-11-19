@@ -1,18 +1,5 @@
 from _weakrefset import WeakSet as WeakSet
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    MutableMapping,
-    Tuple,
-    Type,
-    TypeVar,
-    overload,
-)
+from typing import Any, Callable, Generic, Iterable, Iterator, List, Mapping, MutableMapping, Tuple, Type, TypeVar, overload
 
 from _weakref import (
     CallableProxyType as CallableProxyType,
@@ -36,9 +23,7 @@ class WeakValueDictionary(MutableMapping[_KT, _VT]):
     @overload
     def __init__(self) -> None: ...
     @overload
-    def __init__(
-        self, __other: Mapping[_KT, _VT] | Iterable[Tuple[_KT, _VT]], **kwargs: _VT
-    ) -> None: ...
+    def __init__(self, __other: Mapping[_KT, _VT] | Iterable[Tuple[_KT, _VT]], **kwargs: _VT) -> None: ...
     def __len__(self) -> int: ...
     def __getitem__(self, k: _KT) -> _VT: ...
     def __setitem__(self, k: _KT, v: _VT) -> None: ...

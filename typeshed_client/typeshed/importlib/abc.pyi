@@ -12,17 +12,7 @@ from _typeshed import (
 from abc import ABCMeta, abstractmethod
 from importlib.machinery import ModuleSpec
 from io import BufferedRandom, BufferedReader, BufferedWriter, FileIO, TextIOWrapper
-from typing import (
-    IO,
-    Any,
-    BinaryIO,
-    Iterator,
-    Mapping,
-    Protocol,
-    Sequence,
-    Union,
-    overload,
-)
+from typing import IO, Any, BinaryIO, Iterator, Mapping, Protocol, Sequence, Union, overload
 from typing_extensions import Literal, runtime_checkable
 
 _Path = Union[bytes, str]
@@ -56,16 +46,11 @@ class SourceLoader(ResourceLoader, ExecutionLoader, metaclass=ABCMeta):
 
 # Please keep in sync with sys._MetaPathFinder
 class MetaPathFinder(Finder):
-    def find_module(
-        self, fullname: str, path: Sequence[_Path] | None
-    ) -> Loader | None: ...
+    def find_module(self, fullname: str, path: Sequence[_Path] | None) -> Loader | None: ...
     def invalidate_caches(self) -> None: ...
     # Not defined on the actual class, but expected to exist.
     def find_spec(
-        self,
-        fullname: str,
-        path: Sequence[_Path] | None,
-        target: types.ModuleType | None = ...,
+        self, fullname: str, path: Sequence[_Path] | None, target: types.ModuleType | None = ...
     ) -> ModuleSpec | None: ...
 
 class PathEntryFinder(Finder):
@@ -73,9 +58,7 @@ class PathEntryFinder(Finder):
     def find_loader(self, fullname: str) -> tuple[Loader | None, Sequence[_Path]]: ...
     def invalidate_caches(self) -> None: ...
     # Not defined on the actual class, but expected to exist.
-    def find_spec(
-        self, fullname: str, target: types.ModuleType | None = ...
-    ) -> ModuleSpec | None: ...
+    def find_spec(self, fullname: str, target: types.ModuleType | None = ...) -> ModuleSpec | None: ...
 
 class Loader(metaclass=ABCMeta):
     def load_module(self, fullname: str) -> types.ModuleType: ...
@@ -133,12 +116,7 @@ if sys.version_info >= (3, 9):
         @overload
         @abstractmethod
         def open(
-            self,
-            mode: OpenBinaryMode,
-            buffering: Literal[0],
-            encoding: None = ...,
-            errors: None = ...,
-            newline: None = ...,
+            self, mode: OpenBinaryMode, buffering: Literal[0], encoding: None = ..., errors: None = ..., newline: None = ...
         ) -> FileIO: ...
         # Buffering is on: return BufferedRandom, BufferedReader, or BufferedWriter
         @overload
@@ -175,23 +153,13 @@ if sys.version_info >= (3, 9):
         @overload
         @abstractmethod
         def open(
-            self,
-            mode: OpenBinaryMode,
-            buffering: int,
-            encoding: None = ...,
-            errors: None = ...,
-            newline: None = ...,
+            self, mode: OpenBinaryMode, buffering: int, encoding: None = ..., errors: None = ..., newline: None = ...
         ) -> BinaryIO: ...
         # Fallback if mode is not specified
         @overload
         @abstractmethod
         def open(
-            self,
-            mode: str,
-            buffering: int = ...,
-            encoding: str | None = ...,
-            errors: str | None = ...,
-            newline: str | None = ...,
+            self, mode: str, buffering: int = ..., encoding: str | None = ..., errors: str | None = ..., newline: str | None = ...
         ) -> IO[Any]: ...
         @property
         def name(self) -> str: ...

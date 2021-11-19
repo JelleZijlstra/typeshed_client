@@ -5,19 +5,12 @@ class Error(Exception): ...
 
 if sys.version_info >= (3, 7):
     def register(
-        name: str,
-        klass: Callable[[], BaseBrowser] | None,
-        instance: BaseBrowser | None = ...,
-        *,
-        preferred: bool = ...,
+        name: str, klass: Callable[[], BaseBrowser] | None, instance: BaseBrowser | None = ..., *, preferred: bool = ...
     ) -> None: ...
 
 else:
     def register(
-        name: str,
-        klass: Callable[[], BaseBrowser] | None,
-        instance: BaseBrowser | None = ...,
-        update_tryorder: int = ...,
+        name: str, klass: Callable[[], BaseBrowser] | None, instance: BaseBrowser | None = ..., update_tryorder: int = ...
     ) -> None: ...
 
 def get(using: str | None = ...) -> BaseBrowser: ...

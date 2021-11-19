@@ -1,15 +1,5 @@
 from _typeshed import StrOrBytesPath
-from tkinter import (
-    Button,
-    Entry,
-    Frame,
-    Listbox,
-    Misc,
-    Scrollbar,
-    StringVar,
-    Toplevel,
-    commondialog,
-)
+from tkinter import Button, Entry, Frame, Listbox, Misc, Scrollbar, StringVar, Toplevel, commondialog
 from typing import IO, Any, ClassVar, Iterable, Tuple
 from typing_extensions import Literal
 
@@ -35,13 +25,7 @@ class FileDialog:
         self, master, title: Any | None = ...
     ) -> None: ...  # title is usually a str or None, but e.g. int doesn't raise en exception either
     how: Any | None
-    def go(
-        self,
-        dir_or_file: Any = ...,
-        pattern: str = ...,
-        default: str = ...,
-        key: Any | None = ...,
-    ): ...
+    def go(self, dir_or_file: Any = ..., pattern: str = ..., default: str = ..., key: Any | None = ...): ...
     def quit(self, how: Any | None = ...) -> None: ...
     def dirs_double_event(self, event) -> None: ...
     def dirs_select_event(self, event) -> None: ...
@@ -108,11 +92,7 @@ def askopenfilenames(
     typevariable: StringVar | str | None = ...,
 ) -> Literal[""] | Tuple[str, ...]: ...
 def askdirectory(
-    *,
-    initialdir: StrOrBytesPath | None = ...,
-    mustexist: bool | None = ...,
-    parent: Misc | None = ...,
-    title: str | None = ...,
+    *, initialdir: StrOrBytesPath | None = ..., mustexist: bool | None = ..., parent: Misc | None = ..., title: str | None = ...
 ) -> str: ...  # can be empty string
 
 # TODO: If someone actually uses these, overload to have the actual return type of open(..., mode)

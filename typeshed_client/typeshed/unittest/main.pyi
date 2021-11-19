@@ -7,9 +7,7 @@ from types import ModuleType
 from typing import Any, Iterable, Protocol, Type
 
 class _TestRunner(Protocol):
-    def run(
-        self, test: unittest.suite.TestSuite | unittest.case.TestCase
-    ) -> unittest.result.TestResult: ...
+    def run(self, test: unittest.suite.TestSuite | unittest.case.TestCase) -> unittest.result.TestResult: ...
 
 # not really documented
 class TestProgram:
@@ -43,11 +41,7 @@ class TestProgram:
     def usageExit(self, msg: Any = ...) -> None: ...
     def parseArgs(self, argv: list[str]) -> None: ...
     if sys.version_info >= (3, 7):
-        def createTests(
-            self,
-            from_discovery: bool = ...,
-            Loader: unittest.loader.TestLoader | None = ...,
-        ) -> None: ...
+        def createTests(self, from_discovery: bool = ..., Loader: unittest.loader.TestLoader | None = ...) -> None: ...
     else:
         def createTests(self) -> None: ...
     def runTests(self) -> None: ...  # undocumented

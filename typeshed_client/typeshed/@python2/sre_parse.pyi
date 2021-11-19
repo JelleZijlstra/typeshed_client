@@ -1,15 +1,4 @@
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Match,
-    Optional,
-    Pattern as _Pattern,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Any, Dict, Iterable, List, Match, Optional, Pattern as _Pattern, Set, Tuple, Union
 
 SPECIAL_CHARS: str
 REPEAT_CHARS: str
@@ -36,13 +25,7 @@ _OpSubpatternType = Tuple[Optional[int], int, int, SubPattern]
 _OpGroupRefExistsType = Tuple[int, SubPattern, SubPattern]
 _OpInType = List[Tuple[str, int]]
 _OpBranchType = Tuple[None, List[SubPattern]]
-_AvType = Union[
-    _OpInType,
-    _OpBranchType,
-    Iterable[SubPattern],
-    _OpGroupRefExistsType,
-    _OpSubpatternType,
-]
+_AvType = Union[_OpInType, _OpBranchType, Iterable[SubPattern], _OpGroupRefExistsType, _OpSubpatternType]
 _CodeType = Union[str, _AvType]
 
 class SubPattern:

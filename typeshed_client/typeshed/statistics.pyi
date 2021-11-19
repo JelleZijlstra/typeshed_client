@@ -2,17 +2,7 @@ import sys
 from _typeshed import SupportsLessThanT
 from decimal import Decimal
 from fractions import Fraction
-from typing import (
-    Any,
-    Hashable,
-    Iterable,
-    NamedTuple,
-    Sequence,
-    SupportsFloat,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Hashable, Iterable, NamedTuple, Sequence, SupportsFloat, Type, TypeVar, Union
 
 _T = TypeVar("_T")
 # Most functions in this module accept homogeneous collections of one of these types
@@ -31,9 +21,7 @@ if sys.version_info >= (3, 8):
 def mean(data: Iterable[_NumberT]) -> _NumberT: ...
 
 if sys.version_info >= (3, 10):
-    def harmonic_mean(
-        data: Iterable[_NumberT], weights: Iterable[_Number] | None = ...
-    ) -> _NumberT: ...
+    def harmonic_mean(data: Iterable[_NumberT], weights: Iterable[_Number] | None = ...) -> _NumberT: ...
 
 else:
     def harmonic_mean(data: Iterable[_NumberT]) -> _NumberT: ...
@@ -51,9 +39,7 @@ def pstdev(data: Iterable[_NumberT], mu: _NumberT | None = ...) -> _NumberT: ...
 def pvariance(data: Iterable[_NumberT], mu: _NumberT | None = ...) -> _NumberT: ...
 
 if sys.version_info >= (3, 8):
-    def quantiles(
-        data: Iterable[_NumberT], *, n: int = ..., method: str = ...
-    ) -> list[_NumberT]: ...
+    def quantiles(data: Iterable[_NumberT], *, n: int = ..., method: str = ...) -> list[_NumberT]: ...
 
 def stdev(data: Iterable[_NumberT], xbar: _NumberT | None = ...) -> _NumberT: ...
 def variance(data: Iterable[_NumberT], xbar: _NumberT | None = ...) -> _NumberT: ...
@@ -98,6 +84,4 @@ if sys.version_info >= (3, 10):
     class LinearRegression(NamedTuple):
         slope: float
         intercept: float
-    def linear_regression(
-        __regressor: Sequence[_Number], __dependent_variable: Sequence[_Number]
-    ) -> LinearRegression: ...
+    def linear_regression(__regressor: Sequence[_Number], __dependent_variable: Sequence[_Number]) -> LinearRegression: ...
