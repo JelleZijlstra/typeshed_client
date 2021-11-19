@@ -7,10 +7,18 @@ def glob1(dirname: AnyStr, pattern: AnyStr) -> list[AnyStr]: ...
 
 if sys.version_info >= (3, 10):
     def glob(
-        pathname: AnyStr, *, root_dir: StrOrBytesPath | None = ..., dir_fd: int | None = ..., recursive: bool = ...
+        pathname: AnyStr,
+        *,
+        root_dir: StrOrBytesPath | None = ...,
+        dir_fd: int | None = ...,
+        recursive: bool = ...,
     ) -> list[AnyStr]: ...
     def iglob(
-        pathname: AnyStr, *, root_dir: StrOrBytesPath | None = ..., dir_fd: int | None = ..., recursive: bool = ...
+        pathname: AnyStr,
+        *,
+        root_dir: StrOrBytesPath | None = ...,
+        dir_fd: int | None = ...,
+        recursive: bool = ...,
     ) -> Iterator[AnyStr]: ...
 
 else:

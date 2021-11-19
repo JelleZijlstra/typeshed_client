@@ -13,12 +13,19 @@ from multiprocessing.context import (
     TimeoutError as TimeoutError,
 )
 from multiprocessing.managers import SyncManager
-from multiprocessing.process import active_children as active_children, current_process as current_process
+from multiprocessing.process import (
+    active_children as active_children,
+    current_process as current_process,
+)
 
 # These are technically functions that return instances of these Queue classes.
 # Using them as annotations is deprecated. Either use imports from
 # multiprocessing.queues or the aliases defined below. See #4266 for discussion.
-from multiprocessing.queues import JoinableQueue as JoinableQueue, Queue as Queue, SimpleQueue as SimpleQueue
+from multiprocessing.queues import (
+    JoinableQueue as JoinableQueue,
+    Queue as Queue,
+    SimpleQueue as SimpleQueue,
+)
 from multiprocessing.spawn import freeze_support as freeze_support
 from typing import Any, Union, overload
 from typing_extensions import Literal
@@ -60,7 +67,9 @@ RawArray = context._default_context.RawArray
 Value = context._default_context.Value
 Array = context._default_context.Array
 
-def Barrier(parties: int, action: Callable[..., Any] | None = ..., timeout: float | None = ...) -> _BarrierType: ...
+def Barrier(
+    parties: int, action: Callable[..., Any] | None = ..., timeout: float | None = ...
+) -> _BarrierType: ...
 def BoundedSemaphore(value: int = ...) -> _BoundedSemaphoreType: ...
 def Condition(lock: _LockLike | None = ...) -> _ConditionType: ...
 def Event() -> _EventType: ...

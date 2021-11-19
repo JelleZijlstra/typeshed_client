@@ -93,7 +93,12 @@ class ParamSpec:
     __covariant__: bool
     __contravariant__: bool
     def __init__(
-        self, name: str, *, bound: None | Type[Any] | str = ..., contravariant: bool = ..., covariant: bool = ...
+        self,
+        name: str,
+        *,
+        bound: None | Type[Any] | str = ...,
+        contravariant: bool = ...,
+        covariant: bool = ...,
     ) -> None: ...
     @property
     def args(self) -> ParamSpecArgs: ...

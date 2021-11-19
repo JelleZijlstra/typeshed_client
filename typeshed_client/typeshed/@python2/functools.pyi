@@ -1,4 +1,15 @@
-from typing import Any, Callable, Dict, Generic, Iterable, Sequence, Tuple, Type, TypeVar, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    overload,
+)
 
 _AnyCallable = Callable[..., Any]
 
@@ -8,13 +19,18 @@ _S = TypeVar("_S")
 @overload
 def reduce(function: Callable[[_T, _T], _T], sequence: Iterable[_T]) -> _T: ...
 @overload
-def reduce(function: Callable[[_T, _S], _T], sequence: Iterable[_S], initial: _T) -> _T: ...
+def reduce(
+    function: Callable[[_T, _S], _T], sequence: Iterable[_S], initial: _T
+) -> _T: ...
 
 WRAPPER_ASSIGNMENTS: Sequence[str]
 WRAPPER_UPDATES: Sequence[str]
 
 def update_wrapper(
-    wrapper: _AnyCallable, wrapped: _AnyCallable, assigned: Sequence[str] = ..., updated: Sequence[str] = ...
+    wrapper: _AnyCallable,
+    wrapped: _AnyCallable,
+    assigned: Sequence[str] = ...,
+    updated: Sequence[str] = ...,
 ) -> _AnyCallable: ...
 def wraps(
     wrapped: _AnyCallable, assigned: Sequence[str] = ..., updated: Sequence[str] = ...

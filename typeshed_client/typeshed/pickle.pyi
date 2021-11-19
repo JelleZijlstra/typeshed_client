@@ -1,5 +1,17 @@
 import sys
-from typing import Any, Callable, ClassVar, Iterable, Iterator, Mapping, Optional, Protocol, Tuple, Type, Union
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Iterable,
+    Iterator,
+    Mapping,
+    Optional,
+    Protocol,
+    Tuple,
+    Type,
+    Union,
+)
 
 HIGHEST_PROTOCOL: int
 DEFAULT_PROTOCOL: int
@@ -30,7 +42,11 @@ if sys.version_info >= (3, 8):
         buffer_callback: _BufferCallback = ...,
     ) -> None: ...
     def dumps(
-        obj: Any, protocol: int | None = ..., *, fix_imports: bool = ..., buffer_callback: _BufferCallback = ...
+        obj: Any,
+        protocol: int | None = ...,
+        *,
+        fix_imports: bool = ...,
+        buffer_callback: _BufferCallback = ...,
     ) -> bytes: ...
     def load(
         file: _ReadableFileobj,
@@ -41,14 +57,35 @@ if sys.version_info >= (3, 8):
         buffers: Iterable[Any] | None = ...,
     ) -> Any: ...
     def loads(
-        __data: bytes, *, fix_imports: bool = ..., encoding: str = ..., errors: str = ..., buffers: Iterable[Any] | None = ...
+        __data: bytes,
+        *,
+        fix_imports: bool = ...,
+        encoding: str = ...,
+        errors: str = ...,
+        buffers: Iterable[Any] | None = ...,
     ) -> Any: ...
 
 else:
-    def dump(obj: Any, file: _WritableFileobj, protocol: int | None = ..., *, fix_imports: bool = ...) -> None: ...
-    def dumps(obj: Any, protocol: int | None = ..., *, fix_imports: bool = ...) -> bytes: ...
-    def load(file: _ReadableFileobj, *, fix_imports: bool = ..., encoding: str = ..., errors: str = ...) -> Any: ...
-    def loads(data: bytes, *, fix_imports: bool = ..., encoding: str = ..., errors: str = ...) -> Any: ...
+    def dump(
+        obj: Any,
+        file: _WritableFileobj,
+        protocol: int | None = ...,
+        *,
+        fix_imports: bool = ...,
+    ) -> None: ...
+    def dumps(
+        obj: Any, protocol: int | None = ..., *, fix_imports: bool = ...
+    ) -> bytes: ...
+    def load(
+        file: _ReadableFileobj,
+        *,
+        fix_imports: bool = ...,
+        encoding: str = ...,
+        errors: str = ...,
+    ) -> Any: ...
+    def loads(
+        data: bytes, *, fix_imports: bool = ..., encoding: str = ..., errors: str = ...
+    ) -> Any: ...
 
 class PickleError(Exception): ...
 class PicklingError(PickleError): ...
@@ -59,14 +96,22 @@ _reducedtype = Union[
     Tuple[Callable[..., Any], Tuple[Any, ...]],
     Tuple[Callable[..., Any], Tuple[Any, ...], Any],
     Tuple[Callable[..., Any], Tuple[Any, ...], Any, Optional[Iterator[Any]]],
-    Tuple[Callable[..., Any], Tuple[Any, ...], Any, Optional[Iterator[Any]], Optional[Iterator[Any]]],
+    Tuple[
+        Callable[..., Any],
+        Tuple[Any, ...],
+        Any,
+        Optional[Iterator[Any]],
+        Optional[Iterator[Any]],
+    ],
 ]
 
 class Pickler:
     fast: bool
     dispatch_table: Mapping[type, Callable[[Any], _reducedtype]]
     bin: bool  # undocumented
-    dispatch: ClassVar[dict[type, Callable[[Unpickler, Any], None]]]  # undocumented, _Pickler only
+    dispatch: ClassVar[
+        dict[type, Callable[[Unpickler, Any], None]]
+    ]  # undocumented, _Pickler only
 
     if sys.version_info >= (3, 8):
         def __init__(
@@ -79,13 +124,21 @@ class Pickler:
         ) -> None: ...
         def reducer_override(self, obj: Any) -> Any: ...
     else:
-        def __init__(self, file: _WritableFileobj, protocol: int | None = ..., *, fix_imports: bool = ...) -> None: ...
+        def __init__(
+            self,
+            file: _WritableFileobj,
+            protocol: int | None = ...,
+            *,
+            fix_imports: bool = ...,
+        ) -> None: ...
     def dump(self, __obj: Any) -> None: ...
     def clear_memo(self) -> None: ...
     def persistent_id(self, obj: Any) -> Any: ...
 
 class Unpickler:
-    dispatch: ClassVar[dict[int, Callable[[Unpickler], None]]]  # undocumented, _Unpickler only
+    dispatch: ClassVar[
+        dict[int, Callable[[Unpickler], None]]
+    ]  # undocumented, _Unpickler only
 
     if sys.version_info >= (3, 8):
         def __init__(
@@ -99,7 +152,12 @@ class Unpickler:
         ) -> None: ...
     else:
         def __init__(
-            self, file: _ReadableFileobj, *, fix_imports: bool = ..., encoding: str = ..., errors: str = ...
+            self,
+            file: _ReadableFileobj,
+            *,
+            fix_imports: bool = ...,
+            encoding: str = ...,
+            errors: str = ...,
         ) -> None: ...
     def load(self) -> Any: ...
     def find_class(self, __module_name: str, __global_name: str) -> Any: ...

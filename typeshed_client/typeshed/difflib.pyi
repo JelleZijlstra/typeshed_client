@@ -1,5 +1,17 @@
 import sys
-from typing import Any, AnyStr, Callable, Generic, Iterable, Iterator, NamedTuple, Sequence, TypeVar, Union, overload
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Generic,
+    Iterable,
+    Iterator,
+    NamedTuple,
+    Sequence,
+    TypeVar,
+    Union,
+    overload,
+)
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
@@ -14,18 +26,32 @@ class Match(NamedTuple):
 
 class SequenceMatcher(Generic[_T]):
     def __init__(
-        self, isjunk: Callable[[_T], bool] | None = ..., a: Sequence[_T] = ..., b: Sequence[_T] = ..., autojunk: bool = ...
+        self,
+        isjunk: Callable[[_T], bool] | None = ...,
+        a: Sequence[_T] = ...,
+        b: Sequence[_T] = ...,
+        autojunk: bool = ...,
     ) -> None: ...
     def set_seqs(self, a: Sequence[_T], b: Sequence[_T]) -> None: ...
     def set_seq1(self, a: Sequence[_T]) -> None: ...
     def set_seq2(self, b: Sequence[_T]) -> None: ...
     if sys.version_info >= (3, 9):
-        def find_longest_match(self, alo: int = ..., ahi: int | None = ..., blo: int = ..., bhi: int | None = ...) -> Match: ...
+        def find_longest_match(
+            self,
+            alo: int = ...,
+            ahi: int | None = ...,
+            blo: int = ...,
+            bhi: int | None = ...,
+        ) -> Match: ...
     else:
-        def find_longest_match(self, alo: int, ahi: int, blo: int, bhi: int) -> Match: ...
+        def find_longest_match(
+            self, alo: int, ahi: int, blo: int, bhi: int
+        ) -> Match: ...
     def get_matching_blocks(self) -> list[Match]: ...
     def get_opcodes(self) -> list[tuple[str, int, int, int, int]]: ...
-    def get_grouped_opcodes(self, n: int = ...) -> Iterable[list[tuple[str, int, int, int, int]]]: ...
+    def get_grouped_opcodes(
+        self, n: int = ...
+    ) -> Iterable[list[tuple[str, int, int, int, int]]]: ...
     def ratio(self) -> float: ...
     def quick_ratio(self) -> float: ...
     def real_quick_ratio(self) -> float: ...
@@ -39,11 +65,16 @@ def get_close_matches(  # type: ignore
 ) -> list[AnyStr]: ...
 @overload
 def get_close_matches(
-    word: Sequence[_T], possibilities: Iterable[Sequence[_T]], n: int = ..., cutoff: float = ...
+    word: Sequence[_T],
+    possibilities: Iterable[Sequence[_T]],
+    n: int = ...,
+    cutoff: float = ...,
 ) -> list[Sequence[_T]]: ...
 
 class Differ:
-    def __init__(self, linejunk: _JunkCallback | None = ..., charjunk: _JunkCallback | None = ...) -> None: ...
+    def __init__(
+        self, linejunk: _JunkCallback | None = ..., charjunk: _JunkCallback | None = ...
+    ) -> None: ...
     def compare(self, a: Sequence[str], b: Sequence[str]) -> Iterator[str]: ...
 
 def IS_LINE_JUNK(line: str, pat: Any = ...) -> bool: ...  # pat is undocumented
@@ -69,7 +100,10 @@ def context_diff(
     lineterm: str = ...,
 ) -> Iterator[str]: ...
 def ndiff(
-    a: Sequence[str], b: Sequence[str], linejunk: _JunkCallback | None = ..., charjunk: _JunkCallback | None = ...
+    a: Sequence[str],
+    b: Sequence[str],
+    linejunk: _JunkCallback | None = ...,
+    charjunk: _JunkCallback | None = ...,
 ) -> Iterator[str]: ...
 
 class HtmlDiff(object):
@@ -103,7 +137,9 @@ class HtmlDiff(object):
 
 def restore(delta: Iterable[str], which: int) -> Iterator[str]: ...
 def diff_bytes(
-    dfunc: Callable[[Sequence[str], Sequence[str], str, str, str, str, int, str], Iterator[str]],
+    dfunc: Callable[
+        [Sequence[str], Sequence[str], str, str, str, str, int, str], Iterator[str]
+    ],
     a: Sequence[bytes],
     b: Sequence[bytes],
     fromfile: bytes = ...,

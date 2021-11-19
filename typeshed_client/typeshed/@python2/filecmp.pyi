@@ -1,4 +1,14 @@
-from typing import AnyStr, Callable, Dict, Generic, Iterable, List, Sequence, Text, Tuple
+from typing import (
+    AnyStr,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    List,
+    Sequence,
+    Text,
+    Tuple,
+)
 
 DEFAULT_IGNORES: List[str]
 
@@ -9,7 +19,11 @@ def cmpfiles(
 
 class dircmp(Generic[AnyStr]):
     def __init__(
-        self, a: AnyStr, b: AnyStr, ignore: Sequence[AnyStr] | None = ..., hide: Sequence[AnyStr] | None = ...
+        self,
+        a: AnyStr,
+        b: AnyStr,
+        ignore: Sequence[AnyStr] | None = ...,
+        hide: Sequence[AnyStr] | None = ...,
     ) -> None: ...
     left: AnyStr
     right: AnyStr

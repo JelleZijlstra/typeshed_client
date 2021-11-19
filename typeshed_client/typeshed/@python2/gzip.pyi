@@ -15,7 +15,12 @@ class GzipFile(io.BufferedIOBase):
     offset: Any
     mtime: Any
     def __init__(
-        self, filename: str = ..., mode: Text = ..., compresslevel: int = ..., fileobj: IO[str] = ..., mtime: float = ...
+        self,
+        filename: str = ...,
+        mode: Text = ...,
+        compresslevel: int = ...,
+        fileobj: IO[str] = ...,
+        mtime: float = ...,
     ) -> None: ...
     @property
     def filename(self): ...

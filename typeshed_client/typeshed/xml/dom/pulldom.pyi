@@ -83,5 +83,9 @@ class SAX2DOM(PullDOM):
 
 default_bufsize: int
 
-def parse(stream_or_string: str | IO[bytes], parser: XMLReader | None = ..., bufsize: int | None = ...) -> DOMEventStream: ...
+def parse(
+    stream_or_string: str | IO[bytes],
+    parser: XMLReader | None = ...,
+    bufsize: int | None = ...,
+) -> DOMEventStream: ...
 def parseString(string: str, parser: XMLReader | None = ...) -> DOMEventStream: ...

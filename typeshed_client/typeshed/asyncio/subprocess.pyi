@@ -30,7 +30,10 @@ class Process:
     stderr: streams.StreamReader | None
     pid: int
     def __init__(
-        self, transport: transports.BaseTransport, protocol: protocols.BaseProtocol, loop: events.AbstractEventLoop
+        self,
+        transport: transports.BaseTransport,
+        protocol: protocols.BaseProtocol,
+        loop: events.AbstractEventLoop,
     ) -> None: ...
     @property
     def returncode(self) -> int | None: ...

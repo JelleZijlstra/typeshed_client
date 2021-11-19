@@ -5,7 +5,20 @@ import sys
 import types
 from _typeshed import Self, WriteableBuffer
 from socket import socket
-from typing import IO, Any, BinaryIO, Callable, Iterable, Iterator, Mapping, Protocol, Type, TypeVar, Union, overload
+from typing import (
+    IO,
+    Any,
+    BinaryIO,
+    Callable,
+    Iterable,
+    Iterator,
+    Mapping,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 _DataType = Union[bytes, IO[Any], Iterable[bytes], str]
 _T = TypeVar("_T")
@@ -76,7 +89,9 @@ responses: dict[int, str]
 class HTTPMessage(email.message.Message):
     def getallmatchingheaders(self, name: str) -> list[str]: ...  # undocumented
 
-def parse_headers(fp: io.BufferedIOBase, _class: Callable[[], email.message.Message] = ...) -> HTTPMessage: ...
+def parse_headers(
+    fp: io.BufferedIOBase, _class: Callable[[], email.message.Message] = ...
+) -> HTTPMessage: ...
 
 class HTTPResponse(io.BufferedIOBase, BinaryIO):
     msg: HTTPMessage
@@ -90,7 +105,13 @@ class HTTPResponse(io.BufferedIOBase, BinaryIO):
     chunk_left: int | None
     length: int | None
     will_close: bool
-    def __init__(self, sock: socket, debuglevel: int = ..., method: str | None = ..., url: str | None = ...) -> None: ...
+    def __init__(
+        self,
+        sock: socket,
+        debuglevel: int = ...,
+        method: str | None = ...,
+        url: str | None = ...,
+    ) -> None: ...
     def peek(self, n: int = ...) -> bytes: ...
     def read(self, amt: int | None = ...) -> bytes: ...
     def read1(self, n: int = ...) -> bytes: ...
@@ -106,7 +127,10 @@ class HTTPResponse(io.BufferedIOBase, BinaryIO):
     def __iter__(self) -> Iterator[bytes]: ...
     def __enter__(self: Self) -> Self: ...
     def __exit__(
-        self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: types.TracebackType | None
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
     ) -> bool | None: ...
     def info(self) -> email.message.Message: ...
     def geturl(self) -> str: ...
@@ -127,7 +151,11 @@ class _HTTPConnectionProtocol(Protocol):
         ) -> HTTPConnection: ...
     else:
         def __call__(
-            self, host: str, port: int | None = ..., timeout: float = ..., source_address: tuple[str, int] | None = ...
+            self,
+            host: str,
+            port: int | None = ...,
+            timeout: float = ...,
+            source_address: tuple[str, int] | None = ...,
         ) -> HTTPConnection: ...
 
 class HTTPConnection:
@@ -150,19 +178,39 @@ class HTTPConnection:
         ) -> None: ...
     else:
         def __init__(
-            self, host: str, port: int | None = ..., timeout: float | None = ..., source_address: tuple[str, int] | None = ...
+            self,
+            host: str,
+            port: int | None = ...,
+            timeout: float | None = ...,
+            source_address: tuple[str, int] | None = ...,
         ) -> None: ...
     def request(
-        self, method: str, url: str, body: _DataType | None = ..., headers: Mapping[str, str] = ..., *, encode_chunked: bool = ...
+        self,
+        method: str,
+        url: str,
+        body: _DataType | None = ...,
+        headers: Mapping[str, str] = ...,
+        *,
+        encode_chunked: bool = ...,
     ) -> None: ...
     def getresponse(self) -> HTTPResponse: ...
     def set_debuglevel(self, level: int) -> None: ...
-    def set_tunnel(self, host: str, port: int | None = ..., headers: Mapping[str, str] | None = ...) -> None: ...
+    def set_tunnel(
+        self, host: str, port: int | None = ..., headers: Mapping[str, str] | None = ...
+    ) -> None: ...
     def connect(self) -> None: ...
     def close(self) -> None: ...
-    def putrequest(self, method: str, url: str, skip_host: bool = ..., skip_accept_encoding: bool = ...) -> None: ...
+    def putrequest(
+        self,
+        method: str,
+        url: str,
+        skip_host: bool = ...,
+        skip_accept_encoding: bool = ...,
+    ) -> None: ...
     def putheader(self, header: str, *argument: str) -> None: ...
-    def endheaders(self, message_body: _DataType | None = ..., *, encode_chunked: bool = ...) -> None: ...
+    def endheaders(
+        self, message_body: _DataType | None = ..., *, encode_chunked: bool = ...
+    ) -> None: ...
     def send(self, data: _DataType) -> None: ...
 
 class HTTPSConnection(HTTPConnection):

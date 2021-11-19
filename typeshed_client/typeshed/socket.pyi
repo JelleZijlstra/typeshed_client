@@ -215,7 +215,11 @@ if sys.version_info >= (3, 7):
 if sys.platform != "win32":
     from _socket import sethostname as sethostname
 if sys.platform != "win32" or sys.version_info >= (3, 8):
-    from _socket import if_indextoname as if_indextoname, if_nameindex as if_nameindex, if_nametoindex as if_nametoindex
+    from _socket import (
+        if_indextoname as if_indextoname,
+        if_nameindex as if_nameindex,
+        if_nametoindex as if_nametoindex,
+    )
 if sys.platform == "linux":
     from _socket import (
         ALG_OP_DECRYPT as ALG_OP_DECRYPT,
@@ -540,7 +544,11 @@ if sys.platform == "win32":
 
 class socket(_socket.socket):
     def __init__(
-        self, family: AddressFamily | int = ..., type: SocketKind | int = ..., proto: int = ..., fileno: int | None = ...
+        self,
+        family: AddressFamily | int = ...,
+        type: SocketKind | int = ...,
+        proto: int = ...,
+        fileno: int | None = ...,
     ) -> None: ...
     def __enter__(self: Self) -> Self: ...
     def __exit__(self, *args: object) -> None: ...
@@ -561,14 +569,18 @@ class socket(_socket.socket):
     @overload
     def makefile(
         self,
-        mode: Literal["b", "rb", "br", "wb", "bw", "rwb", "rbw", "wrb", "wbr", "brw", "bwr"],
+        mode: Literal[
+            "b", "rb", "br", "wb", "bw", "rwb", "rbw", "wrb", "wbr", "brw", "bwr"
+        ],
         buffering: int | None = ...,
         *,
         encoding: str | None = ...,
         errors: str | None = ...,
         newline: str | None = ...,
     ) -> BinaryIO: ...
-    def sendfile(self, file: BinaryIO, offset: int = ..., count: int | None = ...) -> int: ...
+    def sendfile(
+        self, file: BinaryIO, offset: int = ..., count: int | None = ...
+    ) -> int: ...
     @property
     def family(self) -> AddressFamily: ...  # type: ignore
     @property
@@ -576,29 +588,43 @@ class socket(_socket.socket):
     def get_inheritable(self) -> bool: ...
     def set_inheritable(self, inheritable: bool) -> None: ...
 
-def fromfd(fd: _FD, family: AddressFamily | int, type: SocketKind | int, proto: int = ...) -> socket: ...
+def fromfd(
+    fd: _FD, family: AddressFamily | int, type: SocketKind | int, proto: int = ...
+) -> socket: ...
 
 if sys.platform != "win32":
     if sys.version_info >= (3, 9):
         # flags and address appear to be unused in send_fds and recv_fds
         def send_fds(
-            sock: socket, buffers: Iterable[bytes], fds: bytes | Iterable[int], flags: int = ..., address: None = ...
+            sock: socket,
+            buffers: Iterable[bytes],
+            fds: bytes | Iterable[int],
+            flags: int = ...,
+            address: None = ...,
         ) -> int: ...
-        def recv_fds(sock: socket, bufsize: int, maxfds: int, flags: int = ...) -> tuple[bytes, list[int], int, Any]: ...
+        def recv_fds(
+            sock: socket, bufsize: int, maxfds: int, flags: int = ...
+        ) -> tuple[bytes, list[int], int, Any]: ...
 
 if sys.platform == "win32":
     def fromshare(info: bytes) -> socket: ...
 
 if sys.platform == "win32":
-    def socketpair(family: int = ..., type: int = ..., proto: int = ...) -> tuple[socket, socket]: ...
+    def socketpair(
+        family: int = ..., type: int = ..., proto: int = ...
+    ) -> tuple[socket, socket]: ...
 
 else:
     def socketpair(  # type: ignore
-        family: int | AddressFamily | None = ..., type: SocketType | int = ..., proto: int = ...
+        family: int | AddressFamily | None = ...,
+        type: SocketType | int = ...,
+        proto: int = ...,
     ) -> tuple[socket, socket]: ...
 
 class SocketIO(RawIOBase):
-    def __init__(self, sock: socket, mode: Literal["r", "w", "rw", "rb", "wb", "rwb"]) -> None: ...
+    def __init__(
+        self, sock: socket, mode: Literal["r", "w", "rw", "rb", "wb", "rwb"]
+    ) -> None: ...
     def readinto(self, b: WriteableBuffer) -> int | None: ...
     def write(self, b: ReadableBuffer) -> int | None: ...
     @property
@@ -616,7 +642,12 @@ def create_connection(
 if sys.version_info >= (3, 8):
     def has_dualstack_ipv6() -> bool: ...
     def create_server(
-        address: _Address, *, family: int = ..., backlog: int | None = ..., reuse_port: bool = ..., dualstack_ipv6: bool = ...
+        address: _Address,
+        *,
+        family: int = ...,
+        backlog: int | None = ...,
+        reuse_port: bool = ...,
+        dualstack_ipv6: bool = ...,
     ) -> socket: ...
 
 # the 5th tuple item is an address
@@ -627,4 +658,8 @@ def getaddrinfo(
     type: int = ...,
     proto: int = ...,
     flags: int = ...,
-) -> list[tuple[AddressFamily, SocketKind, int, str, tuple[str, int] | tuple[str, int, int, int]]]: ...
+) -> list[
+    tuple[
+        AddressFamily, SocketKind, int, str, tuple[str, int] | tuple[str, int, int, int]
+    ]
+]: ...

@@ -23,10 +23,14 @@ if sys.platform == "linux":
     RLIMIT_SIGPENDING: int
     RUSAGE_THREAD: int
 
-_Tuple16 = Tuple[float, float, int, int, int, int, int, int, int, int, int, int, int, int, int, int]
+_Tuple16 = Tuple[
+    float, float, int, int, int, int, int, int, int, int, int, int, int, int, int, int
+]
 
 class struct_rusage(_Tuple16):
-    def __new__(cls, sequence: _Tuple16, dict: dict[str, Any] = ...) -> struct_rusage: ...
+    def __new__(
+        cls, sequence: _Tuple16, dict: dict[str, Any] = ...
+    ) -> struct_rusage: ...
     ru_utime: float
     ru_stime: float
     ru_maxrss: int
@@ -51,7 +55,9 @@ def setrlimit(__resource: int, __limits: tuple[int, int]) -> None: ...
 
 if sys.platform == "linux":
     @overload
-    def prlimit(pid: int, resource: int, limits: tuple[int, int]) -> tuple[int, int]: ...
+    def prlimit(
+        pid: int, resource: int, limits: tuple[int, int]
+    ) -> tuple[int, int]: ...
     @overload
     def prlimit(pid: int, resource: int) -> tuple[int, int]: ...
 

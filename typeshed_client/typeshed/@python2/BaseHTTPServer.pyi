@@ -5,7 +5,11 @@ from typing import Any, BinaryIO, Callable, Mapping, Tuple
 class HTTPServer(SocketServer.TCPServer):
     server_name: str
     server_port: int
-    def __init__(self, server_address: Tuple[str, int], RequestHandlerClass: Callable[..., BaseHTTPRequestHandler]) -> None: ...
+    def __init__(
+        self,
+        server_address: Tuple[str, int],
+        RequestHandlerClass: Callable[..., BaseHTTPRequestHandler],
+    ) -> None: ...
 
 class BaseHTTPRequestHandler(SocketServer.StreamRequestHandler):
     client_address: Tuple[str, int]
@@ -24,7 +28,12 @@ class BaseHTTPRequestHandler(SocketServer.StreamRequestHandler):
     protocol_version: str
     MessageClass: type
     responses: Mapping[int, Tuple[str, str]]
-    def __init__(self, request: bytes, client_address: Tuple[str, int], server: SocketServer.BaseServer) -> None: ...
+    def __init__(
+        self,
+        request: bytes,
+        client_address: Tuple[str, int],
+        server: SocketServer.BaseServer,
+    ) -> None: ...
     def handle(self) -> None: ...
     def handle_one_request(self) -> None: ...
     def send_error(self, code: int, message: str | None = ...) -> None: ...

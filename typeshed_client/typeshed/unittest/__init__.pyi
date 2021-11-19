@@ -21,4 +21,6 @@ from unittest.runner import *
 from unittest.signals import *
 from unittest.suite import *
 
-def load_tests(loader: TestLoader, tests: TestSuite, pattern: str | None) -> TestSuite: ...
+def load_tests(
+    loader: TestLoader, tests: TestSuite, pattern: str | None
+) -> TestSuite: ...

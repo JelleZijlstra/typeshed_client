@@ -1,4 +1,15 @@
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Tuple, Type, TypeVar, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Tuple,
+    Type,
+    TypeVar,
+    overload,
+)
 
 _T = TypeVar("_T")
 
@@ -95,9 +106,16 @@ class GeneratorType:
     def next(self) -> Any: ...
     def send(self, __arg: Any) -> Any: ...
     @overload
-    def throw(self, __typ: Type[BaseException], __val: BaseException | object = ..., __tb: TracebackType | None = ...) -> Any: ...
+    def throw(
+        self,
+        __typ: Type[BaseException],
+        __val: BaseException | object = ...,
+        __tb: TracebackType | None = ...,
+    ) -> Any: ...
     @overload
-    def throw(self, __typ: BaseException, __val: None = ..., __tb: TracebackType | None = ...) -> Any: ...
+    def throw(
+        self, __typ: BaseException, __val: None = ..., __tb: TracebackType | None = ...
+    ) -> Any: ...
 
 class ClassType: ...
 

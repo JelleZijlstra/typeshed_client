@@ -8,7 +8,13 @@ _Address = Tuple[str, int]  # (host, port)
 class SMTPChannel(asynchat.async_chat):
     COMMAND: int
     DATA: int
-    def __init__(self, server: SMTPServer, conn: socket.socket, addr: Any, data_size_limit: int = ...) -> None: ...
+    def __init__(
+        self,
+        server: SMTPServer,
+        conn: socket.socket,
+        addr: Any,
+        data_size_limit: int = ...,
+    ) -> None: ...
     # base asynchat.async_chat.push() accepts bytes
     def push(self, msg: Text) -> None: ...  # type: ignore
     def collect_incoming_data(self, data: bytes) -> None: ...
@@ -26,10 +32,17 @@ class SMTPServer(asyncore.dispatcher):
 
     data_size_limit: int
     enable_SMTPUTF8: bool
-    def __init__(self, localaddr: _Address, remoteaddr: _Address, data_size_limit: int = ...) -> None: ...
+    def __init__(
+        self, localaddr: _Address, remoteaddr: _Address, data_size_limit: int = ...
+    ) -> None: ...
     def handle_accepted(self, conn: socket.socket, addr: Any) -> None: ...
     def process_message(
-        self, peer: _Address, mailfrom: str, rcpttos: List[Text], data: bytes | str, **kwargs: Any
+        self,
+        peer: _Address,
+        mailfrom: str,
+        rcpttos: List[Text],
+        data: bytes | str,
+        **kwargs: Any,
     ) -> str | None: ...
 
 class DebuggingServer(SMTPServer): ...

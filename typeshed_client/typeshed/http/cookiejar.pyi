@@ -1,7 +1,16 @@
 import sys
 from _typeshed import StrPath
 from http.client import HTTPResponse
-from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, TypeVar, overload
+from typing import (
+    ClassVar,
+    Iterable,
+    Iterator,
+    Pattern,
+    Sequence,
+    Tuple,
+    TypeVar,
+    overload,
+)
 from urllib.request import Request
 
 _T = TypeVar("_T")
@@ -19,10 +28,14 @@ class CookieJar(Iterable[Cookie]):
     def add_cookie_header(self, request: Request) -> None: ...
     def extract_cookies(self, response: HTTPResponse, request: Request) -> None: ...
     def set_policy(self, policy: CookiePolicy) -> None: ...
-    def make_cookies(self, response: HTTPResponse, request: Request) -> Sequence[Cookie]: ...
+    def make_cookies(
+        self, response: HTTPResponse, request: Request
+    ) -> Sequence[Cookie]: ...
     def set_cookie(self, cookie: Cookie) -> None: ...
     def set_cookie_if_ok(self, cookie: Cookie, request: Request) -> None: ...
-    def clear(self, domain: str | None = ..., path: str | None = ..., name: str | None = ...) -> None: ...
+    def clear(
+        self, domain: str | None = ..., path: str | None = ..., name: str | None = ...
+    ) -> None: ...
     def clear_session_cookies(self) -> None: ...
     def clear_expired_cookies(self) -> None: ...  # undocumented
     def __iter__(self) -> Iterator[Cookie]: ...
@@ -34,18 +47,45 @@ class FileCookieJar(CookieJar):
     filename: str
     delayload: bool
     if sys.version_info >= (3, 8):
-        def __init__(self, filename: StrPath | None = ..., delayload: bool = ..., policy: CookiePolicy | None = ...) -> None: ...
+        def __init__(
+            self,
+            filename: StrPath | None = ...,
+            delayload: bool = ...,
+            policy: CookiePolicy | None = ...,
+        ) -> None: ...
     else:
-        def __init__(self, filename: str | None = ..., delayload: bool = ..., policy: CookiePolicy | None = ...) -> None: ...
-    def save(self, filename: str | None = ..., ignore_discard: bool = ..., ignore_expires: bool = ...) -> None: ...
-    def load(self, filename: str | None = ..., ignore_discard: bool = ..., ignore_expires: bool = ...) -> None: ...
-    def revert(self, filename: str | None = ..., ignore_discard: bool = ..., ignore_expires: bool = ...) -> None: ...
+        def __init__(
+            self,
+            filename: str | None = ...,
+            delayload: bool = ...,
+            policy: CookiePolicy | None = ...,
+        ) -> None: ...
+    def save(
+        self,
+        filename: str | None = ...,
+        ignore_discard: bool = ...,
+        ignore_expires: bool = ...,
+    ) -> None: ...
+    def load(
+        self,
+        filename: str | None = ...,
+        ignore_discard: bool = ...,
+        ignore_expires: bool = ...,
+    ) -> None: ...
+    def revert(
+        self,
+        filename: str | None = ...,
+        ignore_discard: bool = ...,
+        ignore_expires: bool = ...,
+    ) -> None: ...
 
 class MozillaCookieJar(FileCookieJar):
     header: ClassVar[str]  # undocumented
 
 class LWPCookieJar(FileCookieJar):
-    def as_lwp_str(self, ignore_discard: bool = ..., ignore_expires: bool = ...) -> str: ...  # undocumented
+    def as_lwp_str(
+        self, ignore_discard: bool = ..., ignore_expires: bool = ...
+    ) -> str: ...  # undocumented
 
 class CookiePolicy:
     netscape: bool
@@ -108,18 +148,36 @@ class DefaultCookiePolicy(CookiePolicy):
     def allowed_domains(self) -> Tuple[str, ...] | None: ...
     def set_allowed_domains(self, allowed_domains: Sequence[str] | None) -> None: ...
     def is_not_allowed(self, domain: str) -> bool: ...
-    def set_ok_version(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def set_ok_verifiability(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
+    def set_ok_version(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def set_ok_verifiability(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
     def set_ok_name(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
     def set_ok_path(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def set_ok_domain(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
+    def set_ok_domain(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
     def set_ok_port(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_version(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_verifiability(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_secure(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_expires(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_port(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
-    def return_ok_domain(self, cookie: Cookie, request: Request) -> bool: ...  # undocumented
+    def return_ok_version(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def return_ok_verifiability(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def return_ok_secure(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def return_ok_expires(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def return_ok_port(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
+    def return_ok_domain(
+        self, cookie: Cookie, request: Request
+    ) -> bool: ...  # undocumented
 
 class Cookie:
     version: int | None

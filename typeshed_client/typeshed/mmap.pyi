@@ -26,10 +26,23 @@ if sys.platform != "win32":
 
 class mmap(ContextManager[mmap], Iterable[int], Sized):
     if sys.platform == "win32":
-        def __init__(self, fileno: int, length: int, tagname: str | None = ..., access: int = ..., offset: int = ...) -> None: ...
+        def __init__(
+            self,
+            fileno: int,
+            length: int,
+            tagname: str | None = ...,
+            access: int = ...,
+            offset: int = ...,
+        ) -> None: ...
     else:
         def __init__(
-            self, fileno: int, length: int, flags: int = ..., prot: int = ..., access: int = ..., offset: int = ...
+            self,
+            fileno: int,
+            length: int,
+            flags: int = ...,
+            prot: int = ...,
+            access: int = ...,
+            offset: int = ...,
         ) -> None: ...
     def close(self) -> None: ...
     if sys.version_info >= (3, 8):

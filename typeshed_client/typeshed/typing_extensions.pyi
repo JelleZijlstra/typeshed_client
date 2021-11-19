@@ -92,7 +92,12 @@ class SupportsIndex(Protocol, metaclass=abc.ABCMeta):
 
 # PEP 612 support for Python < 3.9
 if sys.version_info >= (3, 10):
-    from typing import Concatenate as Concatenate, ParamSpec as ParamSpec, TypeAlias as TypeAlias, TypeGuard as TypeGuard
+    from typing import (
+        Concatenate as Concatenate,
+        ParamSpec as ParamSpec,
+        TypeAlias as TypeAlias,
+        TypeGuard as TypeGuard,
+    )
 else:
     class ParamSpecArgs:
         __origin__: ParamSpec
@@ -106,7 +111,12 @@ else:
         __covariant__: bool
         __contravariant__: bool
         def __init__(
-            self, name: str, *, bound: None | Type[Any] | str = ..., contravariant: bool = ..., covariant: bool = ...
+            self,
+            name: str,
+            *,
+            bound: None | Type[Any] | str = ...,
+            contravariant: bool = ...,
+            covariant: bool = ...,
         ) -> None: ...
         @property
         def args(self) -> ParamSpecArgs: ...

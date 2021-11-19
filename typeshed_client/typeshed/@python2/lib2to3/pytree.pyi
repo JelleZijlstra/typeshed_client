@@ -1,5 +1,16 @@
 from lib2to3.pgen2.grammar import Grammar
-from typing import Any, Callable, Dict, Iterator, List, Optional, Text, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Text,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 _P = TypeVar("_P")
 _NL = Union[Node, Leaf]
@@ -58,7 +69,12 @@ class Leaf(Base):
     value: Text
     fixers_applied: List[Any]
     def __init__(
-        self, type: int, value: Text, context: _Context | None = ..., prefix: Text | None = ..., fixers_applied: List[Any] = ...
+        self,
+        type: int,
+        value: Text,
+        context: _Context | None = ...,
+        prefix: Text | None = ...,
+        fixers_applied: List[Any] = ...,
     ) -> None: ...
 
 def convert(gr: Grammar, raw_node: _RawNode) -> _NL: ...
@@ -67,24 +83,44 @@ class BasePattern:
     type: int
     content: Text | None
     name: Text | None
-    def optimize(self) -> BasePattern: ...  # sic, subclasses are free to optimize themselves into different patterns
+    def optimize(
+        self,
+    ) -> BasePattern: ...  # sic, subclasses are free to optimize themselves into different patterns
     def match(self, node: _NL, results: _Results | None = ...) -> bool: ...
     def match_seq(self, nodes: List[_NL], results: _Results | None = ...) -> bool: ...
     def generate_matches(self, nodes: List[_NL]) -> Iterator[Tuple[int, _Results]]: ...
 
 class LeafPattern(BasePattern):
-    def __init__(self, type: int | None = ..., content: Text | None = ..., name: Text | None = ...) -> None: ...
+    def __init__(
+        self,
+        type: int | None = ...,
+        content: Text | None = ...,
+        name: Text | None = ...,
+    ) -> None: ...
 
 class NodePattern(BasePattern):
     wildcards: bool
-    def __init__(self, type: int | None = ..., content: Text | None = ..., name: Text | None = ...) -> None: ...
+    def __init__(
+        self,
+        type: int | None = ...,
+        content: Text | None = ...,
+        name: Text | None = ...,
+    ) -> None: ...
 
 class WildcardPattern(BasePattern):
     min: int
     max: int
-    def __init__(self, content: Text | None = ..., min: int = ..., max: int = ..., name: Text | None = ...) -> None: ...
+    def __init__(
+        self,
+        content: Text | None = ...,
+        min: int = ...,
+        max: int = ...,
+        name: Text | None = ...,
+    ) -> None: ...
 
 class NegatedPattern(BasePattern):
     def __init__(self, content: Text | None = ...) -> None: ...
 
-def generate_matches(patterns: List[BasePattern], nodes: List[_NL]) -> Iterator[Tuple[int, _Results]]: ...
+def generate_matches(
+    patterns: List[BasePattern], nodes: List[_NL]
+) -> Iterator[Tuple[int, _Results]]: ...

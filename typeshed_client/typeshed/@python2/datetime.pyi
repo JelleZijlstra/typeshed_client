@@ -60,7 +60,12 @@ class time:
     max: ClassVar[time]
     resolution: ClassVar[timedelta]
     def __new__(
-        cls: Type[_S], hour: int = ..., minute: int = ..., second: int = ..., microsecond: int = ..., tzinfo: _tzinfo | None = ...
+        cls: Type[_S],
+        hour: int = ...,
+        minute: int = ...,
+        second: int = ...,
+        microsecond: int = ...,
+        tzinfo: _tzinfo | None = ...,
     ) -> _S: ...
     @property
     def hour(self) -> int: ...
@@ -84,7 +89,12 @@ class time:
     def tzname(self) -> str | None: ...
     def dst(self) -> timedelta | None: ...
     def replace(
-        self, hour: int = ..., minute: int = ..., second: int = ..., microsecond: int = ..., tzinfo: _tzinfo | None = ...
+        self,
+        hour: int = ...,
+        minute: int = ...,
+        second: int = ...,
+        microsecond: int = ...,
+        tzinfo: _tzinfo | None = ...,
     ) -> time: ...
 
 _date = date

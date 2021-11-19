@@ -11,7 +11,12 @@ def quoteattr(data: str, entities: Mapping[str, str] = ...) -> str: ...
 class XMLGenerator(handler.ContentHandler):
     def __init__(
         self,
-        out: TextIOBase | RawIOBase | StreamWriter | StreamReaderWriter | SupportsWrite[str] | None = ...,
+        out: TextIOBase
+        | RawIOBase
+        | StreamWriter
+        | StreamReaderWriter
+        | SupportsWrite[str]
+        | None = ...,
         encoding: str = ...,
         short_empty_elements: bool = ...,
     ) -> None: ...

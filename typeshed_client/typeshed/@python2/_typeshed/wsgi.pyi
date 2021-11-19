@@ -8,7 +8,10 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Protocol, Text
 
 class StartResponse(Protocol):
     def __call__(
-        self, status: str, headers: List[Tuple[str, str]], exc_info: _OptExcInfo | None = ...
+        self,
+        status: str,
+        headers: List[Tuple[str, str]],
+        exc_info: _OptExcInfo | None = ...,
     ) -> Callable[[bytes], Any]: ...
 
 WSGIEnvironment = Dict[Text, Any]

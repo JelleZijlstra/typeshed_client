@@ -1,6 +1,16 @@
 import sys
 from _typeshed import Self
-from typing import Any, Callable, ContextManager, Generic, Iterable, Iterator, List, Mapping, TypeVar
+from typing import (
+    Any,
+    Callable,
+    ContextManager,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    TypeVar,
+)
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
@@ -12,7 +22,10 @@ _T = TypeVar("_T")
 class ApplyResult(Generic[_T]):
     if sys.version_info >= (3, 8):
         def __init__(
-            self, pool: Pool, callback: Callable[[_T], None] | None, error_callback: Callable[[BaseException], None] | None
+            self,
+            pool: Pool,
+            callback: Callable[[_T], None] | None,
+            error_callback: Callable[[BaseException], None] | None,
         ) -> None: ...
     else:
         def __init__(
@@ -71,7 +84,12 @@ class Pool(ContextManager[Pool]):
         maxtasksperchild: int | None = ...,
         context: Any | None = ...,
     ) -> None: ...
-    def apply(self, func: Callable[..., _T], args: Iterable[Any] = ..., kwds: Mapping[str, Any] = ...) -> _T: ...
+    def apply(
+        self,
+        func: Callable[..., _T],
+        args: Iterable[Any] = ...,
+        kwds: Mapping[str, Any] = ...,
+    ) -> _T: ...
     def apply_async(
         self,
         func: Callable[..., _T],
@@ -80,7 +98,12 @@ class Pool(ContextManager[Pool]):
         callback: Callable[[_T], None] | None = ...,
         error_callback: Callable[[BaseException], None] | None = ...,
     ) -> AsyncResult[_T]: ...
-    def map(self, func: Callable[[_S], _T], iterable: Iterable[_S], chunksize: int | None = ...) -> list[_T]: ...
+    def map(
+        self,
+        func: Callable[[_S], _T],
+        iterable: Iterable[_S],
+        chunksize: int | None = ...,
+    ) -> list[_T]: ...
     def map_async(
         self,
         func: Callable[[_S], _T],
@@ -89,11 +112,24 @@ class Pool(ContextManager[Pool]):
         callback: Callable[[_T], None] | None = ...,
         error_callback: Callable[[BaseException], None] | None = ...,
     ) -> MapResult[_T]: ...
-    def imap(self, func: Callable[[_S], _T], iterable: Iterable[_S], chunksize: int | None = ...) -> IMapIterator[_T]: ...
-    def imap_unordered(
-        self, func: Callable[[_S], _T], iterable: Iterable[_S], chunksize: int | None = ...
+    def imap(
+        self,
+        func: Callable[[_S], _T],
+        iterable: Iterable[_S],
+        chunksize: int | None = ...,
     ) -> IMapIterator[_T]: ...
-    def starmap(self, func: Callable[..., _T], iterable: Iterable[Iterable[Any]], chunksize: int | None = ...) -> list[_T]: ...
+    def imap_unordered(
+        self,
+        func: Callable[[_S], _T],
+        iterable: Iterable[_S],
+        chunksize: int | None = ...,
+    ) -> IMapIterator[_T]: ...
+    def starmap(
+        self,
+        func: Callable[..., _T],
+        iterable: Iterable[Iterable[Any]],
+        chunksize: int | None = ...,
+    ) -> list[_T]: ...
     def starmap_async(
         self,
         func: Callable[..., _T],
@@ -109,7 +145,10 @@ class Pool(ContextManager[Pool]):
 
 class ThreadPool(Pool, ContextManager[ThreadPool]):
     def __init__(
-        self, processes: int | None = ..., initializer: Callable[..., Any] | None = ..., initargs: Iterable[Any] = ...
+        self,
+        processes: int | None = ...,
+        initializer: Callable[..., Any] | None = ...,
+        initargs: Iterable[Any] = ...,
     ) -> None: ...
 
 # undocumented

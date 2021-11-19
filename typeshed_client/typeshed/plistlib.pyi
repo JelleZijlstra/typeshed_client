@@ -11,8 +11,18 @@ FMT_XML = PlistFormat.FMT_XML
 FMT_BINARY = PlistFormat.FMT_BINARY
 
 if sys.version_info >= (3, 9):
-    def load(fp: IO[bytes], *, fmt: PlistFormat | None = ..., dict_type: Type[MutableMapping[str, Any]] = ...) -> Any: ...
-    def loads(value: bytes, *, fmt: PlistFormat | None = ..., dict_type: Type[MutableMapping[str, Any]] = ...) -> Any: ...
+    def load(
+        fp: IO[bytes],
+        *,
+        fmt: PlistFormat | None = ...,
+        dict_type: Type[MutableMapping[str, Any]] = ...,
+    ) -> Any: ...
+    def loads(
+        value: bytes,
+        *,
+        fmt: PlistFormat | None = ...,
+        dict_type: Type[MutableMapping[str, Any]] = ...,
+    ) -> Any: ...
 
 else:
     def load(
@@ -31,7 +41,14 @@ else:
     ) -> Any: ...
 
 def dump(
-    value: Mapping[str, Any] | list[Any] | Tuple[Any, ...] | str | bool | float | bytes | datetime,
+    value: Mapping[str, Any]
+    | list[Any]
+    | Tuple[Any, ...]
+    | str
+    | bool
+    | float
+    | bytes
+    | datetime,
     fp: IO[bytes],
     *,
     fmt: PlistFormat = ...,
@@ -39,7 +56,14 @@ def dump(
     skipkeys: bool = ...,
 ) -> None: ...
 def dumps(
-    value: Mapping[str, Any] | list[Any] | Tuple[Any, ...] | str | bool | float | bytes | datetime,
+    value: Mapping[str, Any]
+    | list[Any]
+    | Tuple[Any, ...]
+    | str
+    | bool
+    | float
+    | bytes
+    | datetime,
     *,
     fmt: PlistFormat = ...,
     skipkeys: bool = ...,

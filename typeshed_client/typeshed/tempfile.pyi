@@ -2,7 +2,18 @@ import os
 import sys
 from _typeshed import Self
 from types import TracebackType
-from typing import IO, Any, AnyStr, Generic, Iterable, Iterator, Tuple, Type, Union, overload
+from typing import (
+    IO,
+    Any,
+    AnyStr,
+    Generic,
+    Iterable,
+    Iterator,
+    Tuple,
+    Type,
+    Union,
+    overload,
+)
 from typing_extensions import Literal
 
 if sys.version_info >= (3, 9):
@@ -18,7 +29,24 @@ _DirT = Union[AnyStr, os.PathLike[AnyStr]]
 if sys.version_info >= (3, 8):
     @overload
     def NamedTemporaryFile(
-        mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"],
+        mode: Literal[
+            "r",
+            "w",
+            "a",
+            "x",
+            "r+",
+            "w+",
+            "a+",
+            "x+",
+            "rt",
+            "wt",
+            "at",
+            "xt",
+            "r+t",
+            "w+t",
+            "a+t",
+            "x+t",
+        ],
         buffering: int = ...,
         encoding: str | None = ...,
         newline: str | None = ...,
@@ -59,7 +87,24 @@ if sys.version_info >= (3, 8):
 else:
     @overload
     def NamedTemporaryFile(
-        mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"],
+        mode: Literal[
+            "r",
+            "w",
+            "a",
+            "x",
+            "r+",
+            "w+",
+            "a+",
+            "x+",
+            "rt",
+            "wt",
+            "at",
+            "xt",
+            "r+t",
+            "w+t",
+            "a+t",
+            "x+t",
+        ],
         buffering: int = ...,
         encoding: str | None = ...,
         newline: str | None = ...,
@@ -97,7 +142,24 @@ else:
     if sys.version_info >= (3, 8):
         @overload
         def TemporaryFile(
-            mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"],
+            mode: Literal[
+                "r",
+                "w",
+                "a",
+                "x",
+                "r+",
+                "w+",
+                "a+",
+                "x+",
+                "rt",
+                "wt",
+                "at",
+                "xt",
+                "r+t",
+                "w+t",
+                "a+t",
+                "x+t",
+            ],
             buffering: int = ...,
             encoding: str | None = ...,
             newline: str | None = ...,
@@ -134,7 +196,24 @@ else:
     else:
         @overload
         def TemporaryFile(
-            mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"],
+            mode: Literal[
+                "r",
+                "w",
+                "a",
+                "x",
+                "r+",
+                "w+",
+                "a+",
+                "x+",
+                "rt",
+                "wt",
+                "at",
+                "xt",
+                "r+t",
+                "w+t",
+                "a+t",
+                "x+t",
+            ],
             buffering: int = ...,
             encoding: str | None = ...,
             newline: str | None = ...,
@@ -169,7 +248,12 @@ class _TemporaryFileWrapper(Generic[AnyStr], IO[AnyStr]):
     delete: bool
     def __init__(self, file: IO[AnyStr], name: str, delete: bool = ...) -> None: ...
     def __enter__(self: Self) -> Self: ...
-    def __exit__(self, exc: Type[BaseException] | None, value: BaseException | None, tb: TracebackType | None) -> bool | None: ...
+    def __exit__(
+        self,
+        exc: Type[BaseException] | None,
+        value: BaseException | None,
+        tb: TracebackType | None,
+    ) -> bool | None: ...
     def __getattr__(self, name: str) -> Any: ...
     def close(self) -> None: ...
     # These methods don't exist directly on this object, but
@@ -227,7 +311,24 @@ class SpooledTemporaryFile(IO[AnyStr]):
         def __init__(
             self: SpooledTemporaryFile[str],
             max_size: int = ...,
-            mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"] = ...,
+            mode: Literal[
+                "r",
+                "w",
+                "a",
+                "x",
+                "r+",
+                "w+",
+                "a+",
+                "x+",
+                "rt",
+                "wt",
+                "at",
+                "xt",
+                "r+t",
+                "w+t",
+                "a+t",
+                "x+t",
+            ] = ...,
             buffering: int = ...,
             encoding: str | None = ...,
             newline: str | None = ...,
@@ -270,7 +371,24 @@ class SpooledTemporaryFile(IO[AnyStr]):
         def __init__(
             self: SpooledTemporaryFile[str],
             max_size: int = ...,
-            mode: Literal["r", "w", "a", "x", "r+", "w+", "a+", "x+", "rt", "wt", "at", "xt", "r+t", "w+t", "a+t", "x+t"] = ...,
+            mode: Literal[
+                "r",
+                "w",
+                "a",
+                "x",
+                "r+",
+                "w+",
+                "a+",
+                "x+",
+                "rt",
+                "wt",
+                "at",
+                "xt",
+                "r+t",
+                "w+t",
+                "a+t",
+                "x+t",
+            ] = ...,
             buffering: int = ...,
             encoding: str | None = ...,
             newline: str | None = ...,
@@ -293,7 +411,10 @@ class SpooledTemporaryFile(IO[AnyStr]):
     def rollover(self) -> None: ...
     def __enter__(self: Self) -> Self: ...
     def __exit__(
-        self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> bool | None: ...
     # These methods are copied from the abstract methods of IO, because
     # SpooledTemporaryFile implements IO.
@@ -340,13 +461,26 @@ class TemporaryDirectory(Generic[AnyStr]):
         ) -> None: ...
     else:
         @overload
-        def __init__(self: TemporaryDirectory[str], suffix: None = ..., prefix: None = ..., dir: None = ...) -> None: ...
+        def __init__(
+            self: TemporaryDirectory[str],
+            suffix: None = ...,
+            prefix: None = ...,
+            dir: None = ...,
+        ) -> None: ...
         @overload
-        def __init__(self, suffix: AnyStr | None = ..., prefix: AnyStr | None = ..., dir: _DirT[AnyStr] | None = ...) -> None: ...
+        def __init__(
+            self,
+            suffix: AnyStr | None = ...,
+            prefix: AnyStr | None = ...,
+            dir: _DirT[AnyStr] | None = ...,
+        ) -> None: ...
     def cleanup(self) -> None: ...
     def __enter__(self) -> AnyStr: ...
     def __exit__(
-        self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None: ...
     if sys.version_info >= (3, 9):
         def __class_getitem__(cls, item: Any) -> GenericAlias: ...
@@ -355,16 +489,27 @@ class TemporaryDirectory(Generic[AnyStr]):
 def mkstemp() -> tuple[int, str]: ...
 @overload
 def mkstemp(
-    suffix: AnyStr | None = ..., prefix: AnyStr | None = ..., dir: _DirT[AnyStr] | None = ..., text: bool = ...
+    suffix: AnyStr | None = ...,
+    prefix: AnyStr | None = ...,
+    dir: _DirT[AnyStr] | None = ...,
+    text: bool = ...,
 ) -> tuple[int, AnyStr]: ...
 @overload
 def mkdtemp() -> str: ...
 @overload
-def mkdtemp(suffix: AnyStr | None = ..., prefix: AnyStr | None = ..., dir: _DirT[AnyStr] | None = ...) -> AnyStr: ...
+def mkdtemp(
+    suffix: AnyStr | None = ...,
+    prefix: AnyStr | None = ...,
+    dir: _DirT[AnyStr] | None = ...,
+) -> AnyStr: ...
 @overload
 def mktemp() -> str: ...
 @overload
-def mktemp(suffix: AnyStr | None = ..., prefix: AnyStr | None = ..., dir: _DirT[AnyStr] | None = ...) -> AnyStr: ...
+def mktemp(
+    suffix: AnyStr | None = ...,
+    prefix: AnyStr | None = ...,
+    dir: _DirT[AnyStr] | None = ...,
+) -> AnyStr: ...
 def gettempdirb() -> bytes: ...
 def gettempprefixb() -> bytes: ...
 def gettempdir() -> str: ...

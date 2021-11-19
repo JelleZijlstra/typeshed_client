@@ -1,4 +1,16 @@
-from typing import IO, Any, Callable, Generic, Mapping, Optional, Sequence, Text, Tuple, TypeVar, Union
+from typing import (
+    IO,
+    Any,
+    Callable,
+    Generic,
+    Mapping,
+    Optional,
+    Sequence,
+    Text,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 _FILE = Union[None, int, IO[Any]]
 _TXT = Union[bytes, Text]
@@ -65,7 +77,9 @@ class CalledProcessError(Exception):
     cmd: Any
     # morally: Optional[bytes]
     output: bytes
-    def __init__(self, returncode: int, cmd: _CMD, output: bytes | None = ...) -> None: ...
+    def __init__(
+        self, returncode: int, cmd: _CMD, output: bytes | None = ...
+    ) -> None: ...
 
 # We use a dummy type variable used to make Popen generic like it is in python 3
 _T = TypeVar("_T", bound=bytes)

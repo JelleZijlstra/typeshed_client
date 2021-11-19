@@ -85,21 +85,45 @@ class BZ2File(BaseStream, IO[bytes]):
     def __enter__(self: Self) -> Self: ...
     if sys.version_info >= (3, 9):
         @overload
-        def __init__(self, filename: _WritableFileobj, mode: _WriteBinaryMode, *, compresslevel: int = ...) -> None: ...
-        @overload
-        def __init__(self, filename: _ReadableFileobj, mode: _ReadBinaryMode = ..., *, compresslevel: int = ...) -> None: ...
+        def __init__(
+            self,
+            filename: _WritableFileobj,
+            mode: _WriteBinaryMode,
+            *,
+            compresslevel: int = ...,
+        ) -> None: ...
         @overload
         def __init__(
-            self, filename: StrOrBytesPath, mode: _ReadBinaryMode | _WriteBinaryMode = ..., *, compresslevel: int = ...
+            self,
+            filename: _ReadableFileobj,
+            mode: _ReadBinaryMode = ...,
+            *,
+            compresslevel: int = ...,
+        ) -> None: ...
+        @overload
+        def __init__(
+            self,
+            filename: StrOrBytesPath,
+            mode: _ReadBinaryMode | _WriteBinaryMode = ...,
+            *,
+            compresslevel: int = ...,
         ) -> None: ...
     else:
         @overload
         def __init__(
-            self, filename: _WritableFileobj, mode: _WriteBinaryMode, buffering: Any | None = ..., compresslevel: int = ...
+            self,
+            filename: _WritableFileobj,
+            mode: _WriteBinaryMode,
+            buffering: Any | None = ...,
+            compresslevel: int = ...,
         ) -> None: ...
         @overload
         def __init__(
-            self, filename: _ReadableFileobj, mode: _ReadBinaryMode = ..., buffering: Any | None = ..., compresslevel: int = ...
+            self,
+            filename: _ReadableFileobj,
+            mode: _ReadBinaryMode = ...,
+            buffering: Any | None = ...,
+            compresslevel: int = ...,
         ) -> None: ...
         @overload
         def __init__(

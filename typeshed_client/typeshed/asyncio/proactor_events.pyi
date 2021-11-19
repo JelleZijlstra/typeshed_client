@@ -8,10 +8,16 @@ from . import base_events, constants, events, futures, streams, transports
 if sys.version_info >= (3, 8):
     class _WarnCallbackProtocol(Protocol):
         def __call__(
-            self, message: str, category: Type[Warning] | None = ..., stacklevel: int = ..., source: Any | None = ...
+            self,
+            message: str,
+            category: Type[Warning] | None = ...,
+            stacklevel: int = ...,
+            source: Any | None = ...,
         ) -> None: ...
 
-class _ProactorBasePipeTransport(transports._FlowControlMixin, transports.BaseTransport):
+class _ProactorBasePipeTransport(
+    transports._FlowControlMixin, transports.BaseTransport
+):
     def __init__(
         self,
         loop: events.AbstractEventLoop,
@@ -39,7 +45,9 @@ class _ProactorReadPipeTransport(_ProactorBasePipeTransport, transports.ReadTran
         server: events.AbstractServer | None = ...,
     ) -> None: ...
 
-class _ProactorBaseWritePipeTransport(_ProactorBasePipeTransport, transports.WriteTransport):
+class _ProactorBaseWritePipeTransport(
+    _ProactorBasePipeTransport, transports.WriteTransport
+):
     def __init__(
         self,
         loop: events.AbstractEventLoop,
@@ -61,9 +69,13 @@ class _ProactorWritePipeTransport(_ProactorBaseWritePipeTransport):
         server: events.AbstractServer | None = ...,
     ) -> None: ...
 
-class _ProactorDuplexPipeTransport(_ProactorReadPipeTransport, _ProactorBaseWritePipeTransport, transports.Transport): ...
+class _ProactorDuplexPipeTransport(
+    _ProactorReadPipeTransport, _ProactorBaseWritePipeTransport, transports.Transport
+): ...
 
-class _ProactorSocketTransport(_ProactorReadPipeTransport, _ProactorBaseWritePipeTransport, transports.Transport):
+class _ProactorSocketTransport(
+    _ProactorReadPipeTransport, _ProactorBaseWritePipeTransport, transports.Transport
+):
 
     _sendfile_compatible: constants._SendfileMode
     def __init__(

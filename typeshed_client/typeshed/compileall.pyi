@@ -21,7 +21,8 @@ if sys.version_info >= (3, 9):
         workers: int = ...,
         invalidation_mode: PycInvalidationMode | None = ...,
         *,
-        stripdir: str | None = ...,  # TODO: change to StrPath | None once https://bugs.python.org/issue40447 is resolved
+        stripdir: str
+        | None = ...,  # TODO: change to StrPath | None once https://bugs.python.org/issue40447 is resolved
         prependdir: StrPath | None = ...,
         limit_sl_dest: StrPath | None = ...,
         hardlink_dupes: bool = ...,
@@ -36,7 +37,8 @@ if sys.version_info >= (3, 9):
         optimize: int = ...,
         invalidation_mode: PycInvalidationMode | None = ...,
         *,
-        stripdir: str | None = ...,  # TODO: change to StrPath | None once https://bugs.python.org/issue40447 is resolved
+        stripdir: str
+        | None = ...,  # TODO: change to StrPath | None once https://bugs.python.org/issue40447 is resolved
         prependdir: StrPath | None = ...,
         limit_sl_dest: StrPath | None = ...,
         hardlink_dupes: bool = ...,

@@ -2,9 +2,25 @@ import threading
 from _typeshed import StrPath
 from time import struct_time
 from types import FrameType, TracebackType
-from typing import IO, Any, Callable, Dict, List, Mapping, MutableMapping, Optional, Sequence, Text, Tuple, Union, overload
+from typing import (
+    IO,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Text,
+    Tuple,
+    Union,
+    overload,
+)
 
-_SysExcInfoType = Union[Tuple[type, BaseException, Optional[TracebackType]], Tuple[None, None, None]]
+_SysExcInfoType = Union[
+    Tuple[type, BaseException, Optional[TracebackType]], Tuple[None, None, None]
+]
 _ExcInfoType = Union[None, bool, _SysExcInfoType]
 _ArgsType = Union[Tuple[Any, ...], Mapping[str, Any]]
 _FilterType = Union[Filter, Callable[[LogRecord], int]]
@@ -40,30 +56,71 @@ class Logger(Filterer):
     def getEffectiveLevel(self) -> int: ...
     def getChild(self, suffix: str) -> Logger: ...
     def debug(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def info(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def warning(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     warn = warning
     def error(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def critical(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     fatal = critical
     def log(
-        self, level: int, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        level: int,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def exception(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def _log(
-        self, level: int, msg: Any, args: _ArgsType, exc_info: _ExcInfoType | None = ..., extra: Dict[str, Any] | None = ...
+        self,
+        level: int,
+        msg: Any,
+        args: _ArgsType,
+        exc_info: _ExcInfoType | None = ...,
+        extra: Dict[str, Any] | None = ...,
     ) -> None: ...  # undocumented
     def filter(self, record: LogRecord) -> bool: ...
     def addHandler(self, hdlr: Handler) -> None: ...
@@ -163,27 +220,65 @@ class LoggerAdapter:
     logger: Logger
     extra: Mapping[str, Any]
     def __init__(self, logger: Logger, extra: Mapping[str, Any]) -> None: ...
-    def process(self, msg: Any, kwargs: MutableMapping[str, Any]) -> Tuple[Any, MutableMapping[str, Any]]: ...
+    def process(
+        self, msg: Any, kwargs: MutableMapping[str, Any]
+    ) -> Tuple[Any, MutableMapping[str, Any]]: ...
     def debug(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def info(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def warning(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def error(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def exception(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def critical(
-        self, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def log(
-        self, level: int, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+        self,
+        level: int,
+        msg: Any,
+        *args: Any,
+        exc_info: _ExcInfoType = ...,
+        extra: Dict[str, Any] | None = ...,
+        **kwargs: Any,
     ) -> None: ...
     def isEnabledFor(self, level: int) -> bool: ...
 
@@ -192,17 +287,58 @@ def getLogger() -> Logger: ...
 @overload
 def getLogger(name: Text | str) -> Logger: ...
 def getLoggerClass() -> type: ...
-def debug(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
-def info(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
-def warning(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
+def debug(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
+def info(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
+def warning(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
 
 warn = warning
 
-def error(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
-def critical(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
-def exception(msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any) -> None: ...
+def error(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
+def critical(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
+def exception(
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
+) -> None: ...
 def log(
-    level: int, msg: Any, *args: Any, exc_info: _ExcInfoType = ..., extra: Dict[str, Any] | None = ..., **kwargs: Any
+    level: int,
+    msg: Any,
+    *args: Any,
+    exc_info: _ExcInfoType = ...,
+    extra: Dict[str, Any] | None = ...,
+    **kwargs: Any,
 ) -> None: ...
 
 fatal = critical
@@ -223,7 +359,9 @@ def basicConfig(
     level: _Level | None = ...,
     stream: IO[str] = ...,
 ) -> None: ...
-def shutdown(handlerList: Sequence[Any] = ...) -> None: ...  # handlerList is undocumented
+def shutdown(
+    handlerList: Sequence[Any] = ...,
+) -> None: ...  # handlerList is undocumented
 def setLoggerClass(klass: type) -> None: ...
 def captureWarnings(capture: bool) -> None: ...
 
@@ -236,7 +374,13 @@ class FileHandler(StreamHandler):
     mode: str  # undocumented
     encoding: str | None  # undocumented
     delay: bool  # undocumented
-    def __init__(self, filename: StrPath, mode: str = ..., encoding: str | None = ..., delay: bool = ...) -> None: ...
+    def __init__(
+        self,
+        filename: StrPath,
+        mode: str = ...,
+        encoding: str | None = ...,
+        delay: bool = ...,
+    ) -> None: ...
     def _open(self) -> IO[Any]: ...
 
 class NullHandler(Handler): ...

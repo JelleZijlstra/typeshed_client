@@ -18,7 +18,10 @@ if sys.version_info >= (3, 7):
 
 else:
     def create_archive(
-        source: _Path, target: _Path | None = ..., interpreter: str | None = ..., main: str | None = ...
+        source: _Path,
+        target: _Path | None = ...,
+        interpreter: str | None = ...,
+        main: str | None = ...,
     ) -> None: ...
 
 def get_interpreter(archive: _Path) -> str: ...

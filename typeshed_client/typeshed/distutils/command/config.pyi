@@ -37,7 +37,11 @@ class config(Command):
         lang: str = ...,
     ) -> bool: ...
     def try_compile(
-        self, body: str, headers: Sequence[str] | None = ..., include_dirs: Sequence[str] | None = ..., lang: str = ...
+        self,
+        body: str,
+        headers: Sequence[str] | None = ...,
+        include_dirs: Sequence[str] | None = ...,
+        lang: str = ...,
     ) -> bool: ...
     def try_link(
         self,
@@ -76,7 +80,11 @@ class config(Command):
         other_libraries: list[str] = ...,
     ) -> bool: ...
     def check_header(
-        self, header: str, include_dirs: Sequence[str] | None = ..., library_dirs: Sequence[str] | None = ..., lang: str = ...
+        self,
+        header: str,
+        include_dirs: Sequence[str] | None = ...,
+        library_dirs: Sequence[str] | None = ...,
+        lang: str = ...,
     ) -> bool: ...
 
 def dump_file(filename: str, head: Any | None = ...) -> None: ...

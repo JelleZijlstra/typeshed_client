@@ -1,7 +1,10 @@
 from typing import Any, Callable, Hashable, Optional, SupportsInt, Tuple, TypeVar, Union
 
 _TypeT = TypeVar("_TypeT", bound=type)
-_Reduce = Union[Tuple[Callable[..., _TypeT], Tuple[Any, ...]], Tuple[Callable[..., _TypeT], Tuple[Any, ...], Optional[Any]]]
+_Reduce = Union[
+    Tuple[Callable[..., _TypeT], Tuple[Any, ...]],
+    Tuple[Callable[..., _TypeT], Tuple[Any, ...], Optional[Any]],
+]
 
 __all__: list[str]
 

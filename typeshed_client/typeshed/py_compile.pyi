@@ -6,7 +6,13 @@ class PyCompileError(Exception):
     exc_value: BaseException
     file: str
     msg: str
-    def __init__(self, exc_type: Type[BaseException], exc_value: BaseException, file: str, msg: str = ...) -> None: ...
+    def __init__(
+        self,
+        exc_type: Type[BaseException],
+        exc_value: BaseException,
+        file: str,
+        msg: str = ...,
+    ) -> None: ...
 
 if sys.version_info >= (3, 7):
     import enum
@@ -39,7 +45,11 @@ elif sys.version_info >= (3, 7):
 
 else:
     def compile(
-        file: AnyStr, cfile: AnyStr | None = ..., dfile: AnyStr | None = ..., doraise: bool = ..., optimize: int = ...
+        file: AnyStr,
+        cfile: AnyStr | None = ...,
+        dfile: AnyStr | None = ...,
+        doraise: bool = ...,
+        optimize: int = ...,
     ) -> AnyStr | None: ...
 
 def main(args: list[str] | None = ...) -> int: ...

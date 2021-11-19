@@ -4,7 +4,10 @@ _Option = Tuple[str, Optional[str], str]
 _GR = Tuple[List[str], OptionDummy]
 
 def fancy_getopt(
-    options: list[_Option], negative_opt: Mapping[_Option, _Option], object: Any, args: list[str] | None
+    options: list[_Option],
+    negative_opt: Mapping[_Option, _Option],
+    object: Any,
+    args: list[str] | None,
 ) -> list[str] | _GR: ...
 def wrap_text(text: str, width: int) -> list[str]: ...
 
