@@ -136,7 +136,21 @@ class _NameExtractor(ast3.NodeVisitor):
 
     def visit_ClassDef(self, node: ast3.ClassDef) -> Iterable[NameInfo]:
         children = [info for child in node.body for info in self.visit(child)]
-        child_dict = {info.name: info for info in children}
+        child_dict: NameDict = {}
+        for info in children:
+            if info.name in child_dict:
+                existing = child_dict[info.name]
+                if isinstance(existing.ast, OverloadedName):
+                    existing.ast.definitions.append(info.ast)
+                else:
+                    new_info = NameInfo(
+                        existing.name,
+                        existing.is_exported,
+                        OverloadedName([existing.ast, info.ast]),
+                    )
+                    child_dict[info.name] = new_info
+            else:
+                child_dict[info.name] = info
         yield NameInfo(node.name, not node.name.startswith("_"), node, child_dict)
 
     def visit_Assign(self, node: ast3.Assign) -> Iterable[NameInfo]:

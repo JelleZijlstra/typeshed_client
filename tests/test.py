@@ -211,9 +211,18 @@ class TestParser(unittest.TestCase):
 
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", search_context=get_context((3, 5)))
-        self.assertEqual(set(names.keys()), {"overload", "overloaded"})
+        self.assertEqual(set(names.keys()), {"overload", "overloaded", "OverloadClass"})
         self.check_nameinfo(names, "overloaded", typeshed_client.OverloadedName)
         definitions = names["overloaded"].ast.definitions
+        self.assertEqual(len(definitions), 2)
+        for defn in definitions:
+            self.assertIsInstance(defn, ast3.FunctionDef)
+
+        classdef = names["OverloadClass"]
+        self.assertIsInstance(classdef.ast, ast3.ClassDef)
+        children = classdef.child_nodes
+        self.assertEqual(set(children.keys()), {"overloaded"})
+        definitions = children["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:
             self.assertIsInstance(defn, ast3.FunctionDef)
