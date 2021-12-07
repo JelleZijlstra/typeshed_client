@@ -81,6 +81,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.2.0 (December 6, 2021)
+
+- Support overloaded methods
+- Update bundled typeshed
+
 Version 1.1.4 (December 6, 2021)
 
 - Updated bundled typeshed
