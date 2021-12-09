@@ -262,6 +262,11 @@ class TestResolver(unittest.TestCase):
             res.get_name(path, "overloads"),
             typeshed_client.ModulePath(("subdir", "overloads")),
         )
+        path2 = typeshed_client.ModulePath(("subdir", "subsubdir", "sibling"))
+        self.assertEqual(
+            res.get_name(path2, "overloads"),
+            typeshed_client.ModulePath(("subdir", "overloads")),
+        )
 
 
 class IntegrationTest(unittest.TestCase):
