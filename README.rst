@@ -81,7 +81,7 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 1.2.1 (December 9, 2021)
 
 - Fix bug with resolution of relative imports
 - Update bundled typeshed
