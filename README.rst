@@ -84,6 +84,7 @@ Changelog
 Unreleased
 
 - Fix bug with resolution of relative imports
+- Update bundled typeshed
 
 Version 1.2.0 (December 6, 2021)
 
