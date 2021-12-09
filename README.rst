@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.2.2 (December 9, 2021)
+
+- Further fix relative import resolution
+
 Version 1.2.1 (December 9, 2021)
 
 - Fix bug with resolution of relative imports

@@ -15,7 +15,7 @@ from typing import (
 )
 
 from . import finder
-from .finder import get_search_context, SearchContext, ModulePath
+from .finder import get_search_context, SearchContext, ModulePath, parse_stub_file
 
 log = logging.getLogger(__name__)
 
@@ -50,16 +50,24 @@ def get_stub_names(
     """Given a module name, return a dictionary of names defined in that module."""
     if search_context is None:
         search_context = get_search_context()
-    ast = finder.get_stub_ast(module_name, search_context=search_context)
-    if ast is None:
+    path = finder.get_stub_file(module_name, search_context=search_context)
+    if path is None:
         return None
-    return parse_ast(ast, search_context, ModulePath(tuple(module_name.split("."))))
+    is_init = path.name == "__init__.pyi"
+    ast = parse_stub_file(path)
+    return parse_ast(
+        ast, search_context, ModulePath(tuple(module_name.split("."))), is_init=is_init
+    )
 
 
 def parse_ast(
-    ast: ast3.AST, search_context: SearchContext, module_name: ModulePath
+    ast: ast3.AST,
+    search_context: SearchContext,
+    module_name: ModulePath,
+    *,
+    is_init: bool = False,
 ) -> NameDict:
-    visitor = _NameExtractor(search_context, module_name)
+    visitor = _NameExtractor(search_context, module_name, is_init=is_init)
     name_dict: NameDict = {}
     try:
         names = visitor.visit(ast)
@@ -121,9 +129,12 @@ _CMP_OP_TO_FUNCTION = {
 class _NameExtractor(ast3.NodeVisitor):
     """Extract names from a stub module."""
 
-    def __init__(self, ctx: SearchContext, module_name: ModulePath) -> None:
+    def __init__(
+        self, ctx: SearchContext, module_name: ModulePath, *, is_init: bool = False
+    ) -> None:
         self.ctx = ctx
         self.module_name = module_name
+        self.is_init = is_init
 
     def visit_Module(self, node: ast3.Module) -> List[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
@@ -209,9 +220,15 @@ class _NameExtractor(ast3.NodeVisitor):
         if node.level == 0:
             source_module = ModulePath(module)
         elif node.level == 1:
-            source_module = ModulePath(self.module_name + module)
+            if self.is_init:
+                source_module = ModulePath(self.module_name + module)
+            else:
+                source_module = ModulePath(self.module_name[:-1] + module)
         else:
-            source_module = ModulePath(self.module_name[: 1 - node.level] + module)
+            if self.is_init:
+                source_module = ModulePath(self.module_name[: 1 - node.level] + module)
+            else:
+                source_module = ModulePath(self.module_name[: -node.level] + module)
         for alias in node.names:
             if alias.asname is not None:
                 is_exported = not alias.asname.startswith("_")
