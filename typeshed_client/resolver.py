@@ -43,7 +43,9 @@ class Resolver:
 
 
 class Module:
-    def __init__(self, names: parser.NameDict, ctx: SearchContext, *, exists: bool = True) -> None:
+    def __init__(
+        self, names: parser.NameDict, ctx: SearchContext, *, exists: bool = True
+    ) -> None:
         self.names = names
         self.ctx = ctx
         self._name_cache: Dict[str, ResolvedName] = {}
