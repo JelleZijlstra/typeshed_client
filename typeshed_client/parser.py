@@ -208,8 +208,10 @@ class _NameExtractor(ast3.NodeVisitor):
             module = tuple(node.module.split("."))
         if node.level == 0:
             source_module = ModulePath(module)
+        elif node.level == 1:
+            source_module = ModulePath(self.module_name + module)
         else:
-            source_module = ModulePath(self.module_name[: -node.level] + module)
+            source_module = ModulePath(self.module_name[: 1 - node.level] + module)
         for alias in node.names:
             if alias.asname is not None:
                 is_exported = not alias.asname.startswith("_")

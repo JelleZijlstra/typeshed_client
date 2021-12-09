@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Unreleased
+
+- Fix bug with resolution of relative imports
+
 Version 1.2.0 (December 6, 2021)
 
 - Support overloaded methods

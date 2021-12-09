@@ -1,5 +1,4 @@
 from pathlib import Path
-import sys
 from typed_ast import ast3
 import typeshed_client
 from typeshed_client.finder import (
@@ -147,6 +146,20 @@ class TestParser(unittest.TestCase):
         self.assertEqual(
             names["public"].ast, typeshed_client.ImportedName(path, "public")
         )
+
+    def test_dot_import(self) -> None:
+        ctx = get_context((3, 5))
+        names = get_stub_names("subdir", search_context=ctx)
+        self.assertEqual(set(names.keys()), {"f"})
+        self.check_nameinfo(names, "f", typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(("subdir", "overloads"))
+        self.assertEqual(names["f"].ast, typeshed_client.ImportedName(path, "f"))
+
+        names = get_stub_names("subdir.subsubdir", search_context=ctx)
+        self.assertEqual(set(names.keys()), {"f"})
+        self.check_nameinfo(names, "f", typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(("subdir", "overloads"))
+        self.assertEqual(names["f"].ast, typeshed_client.ImportedName(path, "f"))
 
     def check_nameinfo(
         self,
