@@ -255,6 +255,14 @@ class TestResolver(unittest.TestCase):
 
         self.assertIsInstance(res.get_name(path, "var"), typeshed_client.NameInfo)
 
+    def test_module(self) -> None:
+        res = typeshed_client.Resolver(get_context((3, 5)))
+        path = typeshed_client.ModulePath(("subdir",))
+        self.assertEqual(
+            res.get_name(path, "overloads"),
+            typeshed_client.ModulePath(("subdir", "overloads")),
+        )
+
 
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error."""
