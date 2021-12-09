@@ -149,7 +149,12 @@ class TestParser(unittest.TestCase):
 
     def test_dot_import(self) -> None:
         ctx = get_context((3, 5))
-        for mod in ("subdir", "subdir.subsubdir", "subdir.subsubdir.sibling"):
+        for mod in (
+            "subdir",
+            "subdir.sibling",
+            "subdir.subsubdir",
+            "subdir.subsubdir.sibling",
+        ):
             with self.subTest(mod):
                 names = get_stub_names(mod, search_context=ctx)
                 self.assertEqual(set(names.keys()), {"f", "overloads"})
