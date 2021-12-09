@@ -152,7 +152,7 @@ class TestParser(unittest.TestCase):
         for mod in ("subdir", "subdir.subsubdir", "subdir.subsubdir.sibling"):
             with self.subTest(mod):
                 names = get_stub_names(mod, search_context=ctx)
-                self.assertEqual(set(names.keys()), {"f"})
+                self.assertEqual(set(names.keys()), {"f", "overloads"})
                 self.check_nameinfo(names, "f", typeshed_client.ImportedName)
                 path = typeshed_client.ModulePath(("subdir", "overloads"))
                 self.assertEqual(
