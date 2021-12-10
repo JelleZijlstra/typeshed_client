@@ -29,7 +29,7 @@ class SearchContext(NamedTuple):
     search_path: Sequence[Path]
     version: PythonVersion
     platform: str
-        
+
     def is_python2(self) -> bool:
         return self.version[0] == 2
 
@@ -145,7 +145,11 @@ def get_all_stub_files(
                 continue
             if version.max is not None and search_context.version > version.max:
                 continue
-            if search_context.is_python2() and typeshed_dir.name != "@python2" and version.in_python2:
+            if (
+                search_context.is_python2()
+                and typeshed_dir.name != "@python2"
+                and version.in_python2
+            ):
                 continue
             if entry.is_dir():
                 seen = yield from _get_all_stub_files_from_directory(
