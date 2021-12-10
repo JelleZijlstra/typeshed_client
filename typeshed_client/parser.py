@@ -75,19 +75,17 @@ def parse_ast(
         return name_dict
     for info in names:
         if info.name in name_dict:
-            if isinstance(info.ast, ImportedName) or info.child_nodes:
-                log.warning(
-                    "Imported name is already present in %s: %s",
-                    ".".join(module_name),
-                    info,
-                )
-                continue
-            elif info.child_nodes:
+            if info.child_nodes:
                 log.warning(
                     "Name is already present in %s: %s", ".".join(module_name), info
                 )
                 continue
             existing = name_dict[info.name]
+            
+            # This is common and harmless, likely from an "import *"
+            if isinstance(existing.ast, ImportedName) and isinstance(info.ast, ImportedName):
+                continue
+
             if isinstance(existing.ast, ImportedName):
                 log.warning(
                     "Name is already imported in %s: %s",
