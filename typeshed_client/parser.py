@@ -81,9 +81,11 @@ def parse_ast(
                 )
                 continue
             existing = name_dict[info.name]
-            
+
             # This is common and harmless, likely from an "import *"
-            if isinstance(existing.ast, ImportedName) and isinstance(info.ast, ImportedName):
+            if isinstance(existing.ast, ImportedName) and isinstance(
+                info.ast, ImportedName
+            ):
                 continue
 
             if isinstance(existing.ast, ImportedName):
