@@ -81,6 +81,12 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 1.2.3 (December 12, 2021)
+
+- Update bundled typeshed
+- Remove noisy warning if a name is imported multiple times
+- Fix `get_all_stub_files()` in Python 3 for modules that also exist in Python 2
+
 Version 1.2.2 (December 9, 2021)
 
 - Further fix relative import resolution
