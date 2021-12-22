@@ -1,7 +1,7 @@
 """This module is responsible for parsing a stub AST into a dictionary of names."""
 
 import logging
-from typed_ast import ast3
+import ast
 from typing import (
     Any,
     Dict,
@@ -30,13 +30,13 @@ class ImportedName(NamedTuple):
 
 
 class OverloadedName(NamedTuple):
-    definitions: List[ast3.AST]
+    definitions: List[ast.AST]
 
 
 class NameInfo(NamedTuple):
     name: str
     is_exported: bool
-    ast: Union[ast3.AST, ImportedName, OverloadedName]
+    ast: Union[ast.AST, ImportedName, OverloadedName]
     # should be Optional[NameDict] but that needs a recursive type
     child_nodes: Optional[Dict[str, Any]] = None
 
@@ -61,7 +61,7 @@ def get_stub_names(
 
 
 def parse_ast(
-    ast: ast3.AST,
+    ast: ast.AST,
     search_context: SearchContext,
     module_name: ModulePath,
     *,
@@ -113,20 +113,20 @@ def parse_ast(
 
 
 _CMP_OP_TO_FUNCTION = {
-    ast3.Eq: lambda x, y: x == y,
-    ast3.NotEq: lambda x, y: x != y,
-    ast3.Lt: lambda x, y: x < y,
-    ast3.LtE: lambda x, y: x <= y,
-    ast3.Gt: lambda x, y: x > y,
-    ast3.GtE: lambda x, y: x >= y,
-    ast3.Is: lambda x, y: x is y,
-    ast3.IsNot: lambda x, y: x is not y,
-    ast3.In: lambda x, y: x in y,
-    ast3.NotIn: lambda x, y: x not in y,
+    ast.Eq: lambda x, y: x == y,
+    ast.NotEq: lambda x, y: x != y,
+    ast.Lt: lambda x, y: x < y,
+    ast.LtE: lambda x, y: x <= y,
+    ast.Gt: lambda x, y: x > y,
+    ast.GtE: lambda x, y: x >= y,
+    ast.Is: lambda x, y: x is y,
+    ast.IsNot: lambda x, y: x is not y,
+    ast.In: lambda x, y: x in y,
+    ast.NotIn: lambda x, y: x not in y,
 }
 
 
-class _NameExtractor(ast3.NodeVisitor):
+class _NameExtractor(ast.NodeVisitor):
     """Extract names from a stub module."""
 
     def __init__(
@@ -136,16 +136,16 @@ class _NameExtractor(ast3.NodeVisitor):
         self.module_name = module_name
         self.is_init = is_init
 
-    def visit_Module(self, node: ast3.Module) -> List[NameInfo]:
+    def visit_Module(self, node: ast.Module) -> List[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
 
-    def visit_FunctionDef(self, node: ast3.FunctionDef) -> Iterable[NameInfo]:
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> Iterable[NameInfo]:
         yield NameInfo(node.name, not node.name.startswith("_"), node)
 
-    def visit_AsyncFunctionDef(self, node: ast3.AsyncFunctionDef) -> Iterable[NameInfo]:
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> Iterable[NameInfo]:
         yield NameInfo(node.name, not node.name.startswith("_"), node)
 
-    def visit_ClassDef(self, node: ast3.ClassDef) -> Iterable[NameInfo]:
+    def visit_ClassDef(self, node: ast.ClassDef) -> Iterable[NameInfo]:
         children = [info for child in node.body for info in self.visit(child)]
         child_dict: NameDict = {}
         for info in children:
@@ -164,23 +164,23 @@ class _NameExtractor(ast3.NodeVisitor):
                 child_dict[info.name] = info
         yield NameInfo(node.name, not node.name.startswith("_"), node, child_dict)
 
-    def visit_Assign(self, node: ast3.Assign) -> Iterable[NameInfo]:
+    def visit_Assign(self, node: ast.Assign) -> Iterable[NameInfo]:
         for target in node.targets:
-            if not isinstance(target, ast3.Name):
+            if not isinstance(target, ast.Name):
                 raise InvalidStub(
-                    f"Assignment should only be to a simple name: {ast3.dump(node)}"
+                    f"Assignment should only be to a simple name: {ast.dump(node)}"
                 )
             yield NameInfo(target.id, not target.id.startswith("_"), node)
 
-    def visit_AnnAssign(self, node: ast3.AnnAssign) -> Iterable[NameInfo]:
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> Iterable[NameInfo]:
         target = node.target
-        if not isinstance(target, ast3.Name):
+        if not isinstance(target, ast.Name):
             raise InvalidStub(
-                f"Assignment should only be to a simple name: {ast3.dump(node)}"
+                f"Assignment should only be to a simple name: {ast.dump(node)}"
             )
         yield NameInfo(target.id, not target.id.startswith("_"), node)
 
-    def visit_If(self, node: ast3.If) -> Iterable[NameInfo]:
+    def visit_If(self, node: ast.If) -> Iterable[NameInfo]:
         visitor = _LiteralEvalVisitor(self.ctx)
         value = visitor.visit(node.test)
         if value:
@@ -190,7 +190,7 @@ class _NameExtractor(ast3.NodeVisitor):
             for stmt in node.orelse:
                 yield from self.visit(stmt)
 
-    def visit_Assert(self, node: ast3.Assert) -> Iterable[NameInfo]:
+    def visit_Assert(self, node: ast.Assert) -> Iterable[NameInfo]:
         visitor = _LiteralEvalVisitor(self.ctx)
         value = visitor.visit(node.test)
         if value:
@@ -198,7 +198,7 @@ class _NameExtractor(ast3.NodeVisitor):
         else:
             raise _AssertFailed
 
-    def visit_Import(self, node: ast3.Import) -> Iterable[NameInfo]:
+    def visit_Import(self, node: ast.Import) -> Iterable[NameInfo]:
         for alias in node.names:
             if alias.asname is not None:
                 yield NameInfo(
@@ -211,7 +211,7 @@ class _NameExtractor(ast3.NodeVisitor):
                 name = alias.name.split(".", 1)[0]
                 yield NameInfo(name, False, ImportedName(ModulePath((name,))))
 
-    def visit_ImportFrom(self, node: ast3.ImportFrom) -> Iterable[NameInfo]:
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> Iterable[NameInfo]:
         module: Tuple[str, ...]
         if node.module is None:
             module = ()
@@ -253,77 +253,77 @@ class _NameExtractor(ast3.NodeVisitor):
                     alias.name, False, ImportedName(source_module, alias.name)
                 )
 
-    def visit_Expr(self, node: ast3.Expr) -> Iterable[NameInfo]:
-        if not isinstance(node.value, (ast3.Ellipsis, ast3.Str)):
-            raise InvalidStub(f"Cannot handle node {ast3.dump(node)}")
+    def visit_Expr(self, node: ast.Expr) -> Iterable[NameInfo]:
+        if not isinstance(node.value, (ast.Ellipsis, ast.Str)):
+            raise InvalidStub(f"Cannot handle node {ast.dump(node)}")
         return []
 
-    def visit_Pass(self, node: ast3.Pass) -> Iterable[NameInfo]:
+    def visit_Pass(self, node: ast.Pass) -> Iterable[NameInfo]:
         return []
 
-    def generic_visit(self, node: ast3.AST) -> NoReturn:
-        raise InvalidStub(f"Cannot handle node {ast3.dump(node)}")
+    def generic_visit(self, node: ast.AST) -> NoReturn:
+        raise InvalidStub(f"Cannot handle node {ast.dump(node)}")
 
 
-class _LiteralEvalVisitor(ast3.NodeVisitor):
+class _LiteralEvalVisitor(ast.NodeVisitor):
     def __init__(self, ctx: SearchContext) -> None:
         self.ctx = ctx
 
-    def visit_Num(self, node: ast3.Num) -> Union[int, float]:
+    def visit_Num(self, node: ast.Num) -> Union[int, float]:
         return node.n
 
-    def visit_Str(self, node: ast3.Str) -> str:
+    def visit_Str(self, node: ast.Str) -> str:
         return node.s
 
-    def visit_Index(self, node: ast3.Index) -> int:
+    def visit_Index(self, node: ast.Index) -> int:
         return self.visit(node.value)
 
-    def visit_Tuple(self, node: ast3.Tuple) -> Tuple[Any, ...]:
+    def visit_Tuple(self, node: ast.Tuple) -> Tuple[Any, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 
-    def visit_Subscript(self, node: ast3.Subscript) -> Any:
+    def visit_Subscript(self, node: ast.Subscript) -> Any:
         value = self.visit(node.value)
         slc = self.visit(node.slice)
         return value[slc]
 
-    def visit_Compare(self, node: ast3.Compare) -> bool:
+    def visit_Compare(self, node: ast.Compare) -> bool:
         if len(node.ops) != 1:
-            raise InvalidStub(f"Cannot evaluate chained comparison {ast3.dump(node)}")
+            raise InvalidStub(f"Cannot evaluate chained comparison {ast.dump(node)}")
         fn = _CMP_OP_TO_FUNCTION[type(node.ops[0])]
         return fn(self.visit(node.left), self.visit(node.comparators[0]))
 
-    def visit_BoolOp(self, node: ast3.BoolOp) -> bool:
+    def visit_BoolOp(self, node: ast.BoolOp) -> bool:
         for val_node in node.values:
             val = self.visit(val_node)
-            if (isinstance(node.op, ast3.Or) and val) or (
-                isinstance(node.op, ast3.And) and not val
+            if (isinstance(node.op, ast.Or) and val) or (
+                isinstance(node.op, ast.And) and not val
             ):
                 return val
         return val
 
-    def visit_Slice(self, node: ast3.Slice) -> slice:
+    def visit_Slice(self, node: ast.Slice) -> slice:
         lower = self.visit(node.lower) if node.lower is not None else None
         upper = self.visit(node.upper) if node.upper is not None else None
         step = self.visit(node.step) if node.step is not None else None
         return slice(lower, upper, step)
 
-    def visit_Attribute(self, node: ast3.Attribute) -> Any:
+    def visit_Attribute(self, node: ast.Attribute) -> Any:
         val = node.value
-        if not isinstance(val, ast3.Name):
-            raise InvalidStub(f"Invalid code in stub: {ast3.dump(node)}")
+        if not isinstance(val, ast.Name):
+            raise InvalidStub(f"Invalid code in stub: {ast.dump(node)}")
         if val.id != "sys":
             raise InvalidStub(
-                f"Attribute access must be on the sys module: {ast3.dump(node)}"
+                f"Attribute access must be on the sys module: {ast.dump(node)}"
             )
         if node.attr == "platform":
             return self.ctx.platform
         elif node.attr == "version_info":
             return self.ctx.version
         else:
-            raise InvalidStub(f"Invalid attribute on {ast3.dump(node)}")
+            raise InvalidStub(f"Invalid attribute on {ast.dump(node)}")
 
-    def generic_visit(self, node: ast3.AST) -> NoReturn:
-        raise InvalidStub(f"Cannot evaluate node {ast3.dump(node)}")
+    def generic_visit(self, node: ast.AST) -> NoReturn:
+        raise InvalidStub(f"Cannot evaluate node {ast.dump(node)}")
 
 
 class _AssertFailed(Exception):

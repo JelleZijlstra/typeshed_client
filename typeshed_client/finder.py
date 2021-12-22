@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from typed_ast import ast3
+import ast
 from typing import (
     Dict,
     Generator,
@@ -87,7 +87,7 @@ def get_stub_file(
 
 def get_stub_ast(
     module_name: str, *, search_context: Optional[SearchContext] = None
-) -> Optional[ast3.AST]:
+) -> Optional[ast.AST]:
     """Return the AST for the stub for the given module name."""
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
@@ -313,10 +313,9 @@ def find_typeshed() -> Path:
     return importlib_resources.files("typeshed_client") / "typeshed"
 
 
-def parse_stub_file(path: Path) -> ast3.AST:
+def parse_stub_file(path: Path) -> ast.AST:
     text = path.read_text()
-    # Always parse stubs as Python 3.6
-    return ast3.parse(text, filename=str(path), feature_version=6)
+    return ast.parse(text, filename=str(path))
 
 
 def _path_to_module(path: Path) -> str:
