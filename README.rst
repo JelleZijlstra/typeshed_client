@@ -81,7 +81,7 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.0.0 (December 22, 2021)
 
 - Breaking change: Use `ast` instead of `typed_ast` for parsing
 
