@@ -39,7 +39,7 @@ Functions provided:
   ``Path('/path/to/typeshed/stdlib/@python2/typing.pyi')``. If there is no stub for the
   module, returns None.
 - ``typeshed_client.get_stub_ast`` has the same interface, but returns an AST
-  object (parsed using `typed_ast <https://www.github.com/python/typed_ast>`_).
+  object (parsed using the standard library ``ast`` module).
 
 Collecting names from stubs
 ---------------------------
@@ -80,6 +80,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 
 Changelog
 ---------
+
+Unreleased
+
+- Breaking change: Use `ast` instead of `typed_ast` for parsing
 
 Version 1.2.3 (December 12, 2021)
 

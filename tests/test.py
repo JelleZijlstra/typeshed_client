@@ -1,5 +1,5 @@
 from pathlib import Path
-from typed_ast import ast3
+import ast
 import typeshed_client
 from typeshed_client.finder import (
     get_search_context,
@@ -92,11 +92,11 @@ class TestParser(unittest.TestCase):
         )
 
         # Simple assignments
-        self.check_nameinfo(names, "var", ast3.AnnAssign)
-        self.check_nameinfo(names, "old_var", ast3.Assign)
-        self.check_nameinfo(names, "_private", ast3.AnnAssign, is_exported=False)
-        self.check_nameinfo(names, "multiple", ast3.Assign)
-        self.check_nameinfo(names, "assignment", ast3.Assign)
+        self.check_nameinfo(names, "var", ast.AnnAssign)
+        self.check_nameinfo(names, "old_var", ast.Assign)
+        self.check_nameinfo(names, "_private", ast.AnnAssign, is_exported=False)
+        self.check_nameinfo(names, "multiple", ast.Assign)
+        self.check_nameinfo(names, "assignment", ast.Assign)
 
         # Imports
         path = typeshed_client.ModulePath(("other",))
@@ -127,15 +127,15 @@ class TestParser(unittest.TestCase):
         )
 
         # Functions
-        self.check_nameinfo(names, "func", ast3.FunctionDef)
-        self.check_nameinfo(names, "async_func", ast3.AsyncFunctionDef)
+        self.check_nameinfo(names, "func", ast.FunctionDef)
+        self.check_nameinfo(names, "async_func", ast.AsyncFunctionDef)
 
         # Classes
-        self.check_nameinfo(names, "Cls", ast3.ClassDef, has_child_nodes=True)
+        self.check_nameinfo(names, "Cls", ast.ClassDef, has_child_nodes=True)
         cls_names = names["Cls"].child_nodes
         self.assertEqual(set(cls_names.keys()), {"attr", "method"})
-        self.check_nameinfo(cls_names, "attr", ast3.AnnAssign)
-        self.check_nameinfo(cls_names, "method", ast3.FunctionDef)
+        self.check_nameinfo(cls_names, "attr", ast.AnnAssign)
+        self.check_nameinfo(cls_names, "method", ast.FunctionDef)
 
     def test_starimport(self) -> None:
         ctx = get_context((3, 5))
@@ -232,16 +232,16 @@ class TestParser(unittest.TestCase):
         definitions = names["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:
-            self.assertIsInstance(defn, ast3.FunctionDef)
+            self.assertIsInstance(defn, ast.FunctionDef)
 
         classdef = names["OverloadClass"]
-        self.assertIsInstance(classdef.ast, ast3.ClassDef)
+        self.assertIsInstance(classdef.ast, ast.ClassDef)
         children = classdef.child_nodes
         self.assertEqual(set(children.keys()), {"overloaded"})
         definitions = children["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:
-            self.assertIsInstance(defn, ast3.FunctionDef)
+            self.assertIsInstance(defn, ast.FunctionDef)
 
 
 class TestResolver(unittest.TestCase):
@@ -256,7 +256,7 @@ class TestResolver(unittest.TestCase):
         name_info = typeshed_client.NameInfo("exported", True, mock.ANY)
         resolved = res.get_name(path, "exported")
         self.assertEqual(resolved, typeshed_client.ImportedInfo(other_path, name_info))
-        self.assertIsInstance(resolved.info.ast, ast3.AnnAssign)
+        self.assertIsInstance(resolved.info.ast, ast.AnnAssign)
 
         self.assertIsInstance(res.get_name(path, "var"), typeshed_client.NameInfo)
 
