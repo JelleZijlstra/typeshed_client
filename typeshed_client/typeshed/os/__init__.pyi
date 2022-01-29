@@ -46,6 +46,8 @@ if sys.version_info >= (3, 9):
 path = _path
 
 _T = TypeVar("_T")
+_T1 = TypeVar("_T1")
+_T2 = TypeVar("_T2")
 _AnyStr_co = TypeVar("_AnyStr_co", str, bytes, covariant=True)
 
 # ----- os variables -----
@@ -245,6 +247,16 @@ class _Environ(MutableMapping[AnyStr, AnyStr], Generic[AnyStr]):
     def __setitem__(self, key: AnyStr, value: AnyStr) -> None: ...
     def __iter__(self) -> Iterator[AnyStr]: ...
     def __len__(self) -> int: ...
+    if sys.version_info >= (3, 9):
+        def __or__(self, value: Mapping[_T1, _T2]) -> dict[AnyStr | _T1, AnyStr | _T2]: ...
+        def __ror__(self, value: Mapping[_T1, _T2]) -> dict[AnyStr | _T1, AnyStr | _T2]: ...
+        # We use @overload instead of a Union for reasons similar to those given for
+        # overloading MutableMapping.update in stdlib/typing.pyi
+        # The type: ignore is needed due to incompatible __or__/__ior__ signatures
+        @overload  # type: ignore[misc]
+        def __ior__(self: Self, value: Mapping[AnyStr, AnyStr]) -> Self: ...
+        @overload
+        def __ior__(self: Self, value: Iterable[tuple[AnyStr, AnyStr]]) -> Self: ...
 
 environ: _Environ[str]
 if sys.platform != "win32":
