@@ -1,10 +1,42 @@
 import io
 import sys
-from _typeshed import Self, StrPath
+from _typeshed import Self, StrOrBytesPath, StrPath
 from os import PathLike
 from types import TracebackType
 from typing import IO, Any, Callable, Iterable, Iterator, Protocol, Sequence, overload
 from typing_extensions import Literal
+
+if sys.version_info >= (3, 8):
+    __all__ = [
+        "BadZipFile",
+        "BadZipfile",
+        "error",
+        "ZIP_STORED",
+        "ZIP_DEFLATED",
+        "ZIP_BZIP2",
+        "ZIP_LZMA",
+        "is_zipfile",
+        "ZipInfo",
+        "ZipFile",
+        "PyZipFile",
+        "LargeZipFile",
+        "Path",
+    ]
+else:
+    __all__ = [
+        "BadZipFile",
+        "BadZipfile",
+        "error",
+        "ZIP_STORED",
+        "ZIP_DEFLATED",
+        "ZIP_BZIP2",
+        "ZIP_LZMA",
+        "is_zipfile",
+        "ZipInfo",
+        "ZipFile",
+        "PyZipFile",
+        "LargeZipFile",
+    ]
 
 _DateTuple = tuple[int, int, int, int, int, int]
 _ReadWriteMode = Literal["r", "w"]
@@ -24,6 +56,12 @@ class _ZipStream(Protocol):
     # def seekable(self) -> bool: ...
     # def tell(self) -> int: ...
     # def seek(self, __n: int) -> object: ...
+
+# Stream shape as required by _EndRecData() and _EndRecData64().
+class _SupportsReadSeekTell(Protocol):
+    def read(self, __n: int = ...) -> bytes: ...
+    def seek(self, __cookie: int, __whence: int) -> object: ...
+    def tell(self) -> int: ...
 
 class _ClosableZipStream(_ZipStream, Protocol):
     def close(self) -> object: ...
@@ -146,7 +184,7 @@ class ZipFile:
 
     def __enter__(self: Self) -> Self: ...
     def __exit__(
-        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+        self, type: type[BaseException] | None, value: BaseException | None, traceback: TracebackType | None
     ) -> None: ...
     def close(self) -> None: ...
     def getinfo(self, name: str) -> ZipInfo: ...
@@ -262,7 +300,7 @@ if sys.version_info >= (3, 8):
 
         def __truediv__(self, add: StrPath) -> Path: ...
 
-def is_zipfile(filename: StrPath | IO[bytes]) -> bool: ...
+def is_zipfile(filename: StrOrBytesPath | _SupportsReadSeekTell) -> bool: ...
 
 ZIP_STORED: int
 ZIP_DEFLATED: int
