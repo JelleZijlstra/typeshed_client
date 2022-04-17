@@ -7,15 +7,17 @@ from datetime import datetime
 from io import BytesIO
 from types import TracebackType
 from typing import Any, Callable, Iterable, Mapping, Protocol, Union, overload
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 
 class _SupportsTimeTuple(Protocol):
     def timetuple(self) -> time.struct_time: ...
 
-_DateTimeComparable = Union[DateTime, datetime, str, _SupportsTimeTuple]
-_Marshallable = Union[None, bool, int, float, str, bytes, tuple[Any, ...], list[Any], dict[Any, Any], datetime, DateTime, Binary]
-_XMLDate = Union[int, datetime, tuple[int, ...], time.struct_time]
-_HostType = Union[tuple[str, dict[str, str]], str]
+_DateTimeComparable: TypeAlias = DateTime | datetime | str | _SupportsTimeTuple
+_Marshallable: TypeAlias = (
+    bool | int | float | str | bytes | None | tuple[Any, ...] | list[Any] | dict[Any, Any] | datetime | DateTime | Binary
+)
+_XMLDate: TypeAlias = int | datetime | tuple[int, ...] | time.struct_time
+_HostType: TypeAlias = Union[tuple[str, dict[str, str]], str]
 
 def escape(s: str) -> str: ...  # undocumented
 

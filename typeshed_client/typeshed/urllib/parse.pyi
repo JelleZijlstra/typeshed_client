@@ -1,5 +1,6 @@
 import sys
-from typing import Any, AnyStr, Callable, Generic, Mapping, NamedTuple, Sequence, Union, overload
+from typing import Any, AnyStr, Callable, Generic, Mapping, NamedTuple, Sequence, overload
+from typing_extensions import TypeAlias
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
@@ -28,7 +29,7 @@ __all__ = [
     "SplitResultBytes",
 ]
 
-_Str = Union[bytes, str]
+_Str: TypeAlias = bytes | str
 
 uses_relative: list[str]
 uses_netloc: list[str]
@@ -64,6 +65,8 @@ class _NetlocResultMixinStr(_NetlocResultMixinBase[str], _ResultMixinStr): ...
 class _NetlocResultMixinBytes(_NetlocResultMixinBase[bytes], _ResultMixinBytes): ...
 
 class _DefragResultBase(tuple[Any, ...], Generic[AnyStr]):
+    if sys.version_info >= (3, 10):
+        __match_args__ = ("url", "fragment")
     @property
     def url(self) -> AnyStr: ...
     @property
