@@ -6,7 +6,8 @@
 
 import sys
 from _typeshed import OptExcInfo
-from typing import Any, Callable, Iterable, Protocol
+from collections.abc import Callable, Iterable, Iterator
+from typing import Any, Protocol
 from typing_extensions import TypeAlias
 
 class _Readable(Protocol):
@@ -30,7 +31,7 @@ else:
         def read(self, __size: int = ...) -> bytes: ...
         def readline(self, __size: int = ...) -> bytes: ...
         def readlines(self, __hint: int = ...) -> list[bytes]: ...
-        def __iter__(self) -> Iterable[bytes]: ...
+        def __iter__(self) -> Iterator[bytes]: ...
 
     # WSGI error streams per PEP 3333, stable
     class ErrorStream(Protocol):

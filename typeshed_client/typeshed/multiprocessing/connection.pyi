@@ -2,7 +2,8 @@ import socket
 import sys
 import types
 from _typeshed import Self
-from typing import Any, Iterable, Union
+from collections.abc import Iterable
+from typing import Any, Union
 from typing_extensions import SupportsIndex, TypeAlias
 
 __all__ = ["Client", "Listener", "Pipe", "wait"]
@@ -57,4 +58,12 @@ def wait(
     object_list: Iterable[Connection | socket.socket | int], timeout: float | None = ...
 ) -> list[Connection | socket.socket | int]: ...
 def Client(address: _Address, family: str | None = ..., authkey: bytes | None = ...) -> Connection: ...
-def Pipe(duplex: bool = ...) -> tuple[Connection, Connection]: ...
+
+# N.B. Keep this in sync with multiprocessing.context.BaseContext.Pipe.
+# _ConnectionBase is the common base class of Connection and PipeConnection
+# and can be used in cross-platform code.
+if sys.platform != "win32":
+    def Pipe(duplex: bool = ...) -> tuple[Connection, Connection]: ...
+
+else:
+    def Pipe(duplex: bool = ...) -> tuple[PipeConnection, PipeConnection]: ...
