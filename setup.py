@@ -23,6 +23,7 @@ with (ts_client_dir / "__init__.py").open() as f:
 
 
 def find_bundled_files() -> Iterable[str]:
+    yield str(ts_client_dir / "py.typed")
     for root, _, files in os.walk(typeshed_dir):
         root_path = Path(root)
         for file in files:
