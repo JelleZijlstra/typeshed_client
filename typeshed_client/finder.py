@@ -8,6 +8,7 @@ import subprocess
 import sys
 import ast
 from typing import (
+    TYPE_CHECKING,
     Dict,
     Generator,
     Iterable,
@@ -22,6 +23,12 @@ from typing import (
 
 PythonVersion = Tuple[int, int]
 ModulePath = NewType("ModulePath", Tuple[str, ...])
+
+
+if TYPE_CHECKING:
+    _DirEntry = os.DirEntry[str]
+else:
+    _DirEntry = os.DirEntry
 
 
 class SearchContext(NamedTuple):
@@ -82,7 +89,7 @@ def get_stub_file(
     """Return the path to the stub file for this module, if any."""
     if search_context is None:
         search_context = get_search_context()
-    return get_stub_file_name(tuple(module_name.split(".")), search_context)
+    return get_stub_file_name(ModulePath(tuple(module_name.split("."))), search_context)
 
 
 def get_stub_ast(
@@ -165,13 +172,13 @@ def get_all_stub_files(
 
 
 def _get_all_stub_files_from_directory(
-    directory: os.DirEntry, root_directory: Path, seen: Set[str]
+    directory: _DirEntry, root_directory: Path, seen: Set[str]
 ) -> Generator[Tuple[str, Path], None, Set[str]]:
     new_seen = set(seen)
     to_do: Set[os.PathLike[str]] = {directory}
     while to_do:
-        directory = to_do.pop()
-        for dir_entry in os.scandir(directory):
+        current_dir = to_do.pop()
+        for dir_entry in os.scandir(current_dir):
             if dir_entry.is_dir():
                 if not dir_entry.name.isidentifier():
                     continue
@@ -215,13 +222,14 @@ def get_stub_file_name(
     # https://www.python.org/dev/peps/pep-0561/#type-checker-module-resolution-order
     # typeshed_client doesn't support 1 (MYPYPATH equivalent) and 2 (user code)
     top_level_name, *rest = module_name
+    rest_module_path = ModulePath(tuple(rest))
 
     # 3. stub packages
     stubs_package = f"{top_level_name}-stubs"
     for path in search_context.search_path:
         stubdir = path / stubs_package
         if stubdir.exists():
-            stub = _find_stub_in_dir(stubdir, rest)
+            stub = _find_stub_in_dir(stubdir, rest_module_path)
             if stub is not None:
                 return stub
 
@@ -229,7 +237,7 @@ def get_stub_file_name(
     for path in search_context.search_path:
         stubdir = path / top_level_name
         if stubdir.exists():
-            stub = _find_stub_in_dir(stubdir, rest)
+            stub = _find_stub_in_dir(stubdir, rest_module_path)
             if stub is not None:
                 return stub
 
@@ -305,7 +313,7 @@ def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Optional[Path]:
     next_name, *rest = module
     next_dir = stubdir / next_name
     if next_dir.exists():
-        return _find_stub_in_dir(next_dir, rest)
+        return _find_stub_in_dir(next_dir, ModulePath(tuple(rest)))
     return None
 
 

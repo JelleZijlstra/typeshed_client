@@ -217,7 +217,7 @@ class TestParser(unittest.TestCase):
         info = get_stub_names("conditions", search_context=ctx)
         self.assertEqual(set(info.keys()), names | {"sys"})
 
-    def test_top_level_assert(self):
+    def test_top_level_assert(self) -> None:
         ctx = get_context((3, 6), "flat")
         info = get_stub_names("top_level_assert", search_context=ctx)
         self.assertEqual(set(info.keys()), set())
@@ -279,7 +279,7 @@ class IntegrationTest(unittest.TestCase):
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
-    def test(self):
+    def test(self) -> None:
         ctx = get_search_context()
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(path=module_name):

@@ -2,8 +2,10 @@
 
 import logging
 import ast
+import sys
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterable,
     List,
@@ -11,7 +13,9 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
+    Type,
     Union,
+    cast,
 )
 
 from . import finder
@@ -112,7 +116,7 @@ def parse_ast(
     return name_dict
 
 
-_CMP_OP_TO_FUNCTION = {
+_CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
     ast.Eq: lambda x, y: x == y,
     ast.NotEq: lambda x, y: x != y,
     ast.Lt: lambda x, y: x < y,
@@ -153,6 +157,10 @@ class _NameExtractor(ast.NodeVisitor):
                 existing = child_dict[info.name]
                 if isinstance(existing.ast, OverloadedName):
                     existing.ast.definitions.append(info.ast)
+                elif isinstance(existing.ast, ImportedName):
+                    raise RuntimeError(
+                        f"Unexpected import name in class: {existing.ast}"
+                    )
                 else:
                     new_info = NameInfo(
                         existing.name,
