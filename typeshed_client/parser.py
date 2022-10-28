@@ -2,8 +2,10 @@
 
 import logging
 import ast
+import sys
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterable,
     List,
@@ -11,7 +13,9 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
+    Type,
     Union,
+    cast,
 )
 
 from . import finder
@@ -112,7 +116,7 @@ def parse_ast(
     return name_dict
 
 
-_CMP_OP_TO_FUNCTION = {
+_CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
     ast.Eq: lambda x, y: x == y,
     ast.NotEq: lambda x, y: x != y,
     ast.Lt: lambda x, y: x < y,
@@ -153,6 +157,10 @@ class _NameExtractor(ast.NodeVisitor):
                 existing = child_dict[info.name]
                 if isinstance(existing.ast, OverloadedName):
                     existing.ast.definitions.append(info.ast)
+                elif isinstance(existing.ast, ImportedName):
+                    raise RuntimeError(
+                        f"Unexpected import name in class: {existing.ast}"
+                    )
                 else:
                     new_info = NameInfo(
                         existing.name,
@@ -269,14 +277,25 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def __init__(self, ctx: SearchContext) -> None:
         self.ctx = ctx
 
-    def visit_Num(self, node: ast.Num) -> Union[int, float]:
-        return node.n
+    # from version 3.8 on all constants are represented as ast.Constant
+    if sys.version_info < (3, 8):
 
-    def visit_Str(self, node: ast.Str) -> str:
-        return node.s
+        def visit_Num(self, node: ast.Num) -> Union[int, float, complex]:
+            return node.n
 
-    def visit_Index(self, node: ast.Index) -> int:
-        return self.visit(node.value)
+        def visit_Str(self, node: ast.Str) -> str:
+            return node.s
+
+    else:
+
+        def visit_Constant(self, node: ast.Constant) -> Any:
+            return node.value
+
+    # from version 3.9 on an index is represented as the value directly
+    if sys.version_info < (3, 9):
+
+        def visit_Index(self, node: ast.Index) -> int:
+            return self.visit(node.value)
 
     def visit_Tuple(self, node: ast.Tuple) -> Tuple[Any, ...]:
         return tuple(self.visit(elt) for elt in node.elts)

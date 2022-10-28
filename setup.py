@@ -2,6 +2,7 @@ import ast
 import os
 from pathlib import Path
 import re
+from typing import Iterable
 from setuptools import setup
 
 
@@ -14,11 +15,15 @@ _version_re = re.compile(r"__version__\s+=\s+(?P<version>.*)")
 
 
 with (ts_client_dir / "__init__.py").open() as f:
-    version = _version_re.search(f.read()).group("version")
+    match = _version_re.search(f.read())
+    if match is None:
+        raise RuntimeError("Could not find in the init file")
+    version = match.group("version")
     version = str(ast.literal_eval(version))
 
 
-def find_bundled_files():
+def find_bundled_files() -> Iterable[str]:
+    yield str(ts_client_dir / "py.typed")
     for root, _, files in os.walk(typeshed_dir):
         root_path = Path(root)
         for file in files:

@@ -72,6 +72,7 @@ class TestParser(unittest.TestCase):
     def test_get_stub_names(self) -> None:
         ctx = get_context((3, 5))
         names = get_stub_names("simple", search_context=ctx)
+        assert names is not None
         self.assertEqual(
             set(names.keys()),
             {
@@ -133,6 +134,7 @@ class TestParser(unittest.TestCase):
         # Classes
         self.check_nameinfo(names, "Cls", ast.ClassDef, has_child_nodes=True)
         cls_names = names["Cls"].child_nodes
+        assert cls_names is not None
         self.assertEqual(set(cls_names.keys()), {"attr", "method"})
         self.check_nameinfo(cls_names, "attr", ast.AnnAssign)
         self.check_nameinfo(cls_names, "method", ast.FunctionDef)
@@ -140,6 +142,7 @@ class TestParser(unittest.TestCase):
     def test_starimport(self) -> None:
         ctx = get_context((3, 5))
         names = get_stub_names("starimport", search_context=ctx)
+        assert names is not None
         self.assertEqual(set(names.keys()), {"public"})
         self.check_nameinfo(names, "public", typeshed_client.ImportedName)
         path = typeshed_client.ModulePath(("imported",))
@@ -157,6 +160,7 @@ class TestParser(unittest.TestCase):
         ):
             with self.subTest(mod):
                 names = get_stub_names(mod, search_context=ctx)
+                assert names is not None
                 self.assertEqual(set(names.keys()), {"f", "overloads"})
                 self.check_nameinfo(names, "f", typeshed_client.ImportedName)
                 path = typeshed_client.ModulePath(("subdir", "overloads"))
@@ -215,20 +219,25 @@ class TestParser(unittest.TestCase):
     ) -> None:
         ctx = get_context(version, platform)
         info = get_stub_names("conditions", search_context=ctx)
+        assert info is not None
         self.assertEqual(set(info.keys()), names | {"sys"})
 
-    def test_top_level_assert(self):
+    def test_top_level_assert(self) -> None:
         ctx = get_context((3, 6), "flat")
         info = get_stub_names("top_level_assert", search_context=ctx)
+        assert info is not None
         self.assertEqual(set(info.keys()), set())
         ctx = get_context((3, 6), "linux")
         info = get_stub_names("top_level_assert", search_context=ctx)
+        assert info is not None
         self.assertEqual(set(info.keys()), {"x", "sys"})
 
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", search_context=get_context((3, 5)))
+        assert names is not None
         self.assertEqual(set(names.keys()), {"overload", "overloaded", "OverloadClass"})
         self.check_nameinfo(names, "overloaded", typeshed_client.OverloadedName)
+        assert isinstance(names["overloaded"].ast, typeshed_client.OverloadedName)
         definitions = names["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:
@@ -237,6 +246,7 @@ class TestParser(unittest.TestCase):
         classdef = names["OverloadClass"]
         self.assertIsInstance(classdef.ast, ast.ClassDef)
         children = classdef.child_nodes
+        assert children is not None
         self.assertEqual(set(children.keys()), {"overloaded"})
         definitions = children["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
@@ -255,6 +265,7 @@ class TestResolver(unittest.TestCase):
 
         name_info = typeshed_client.NameInfo("exported", True, mock.ANY)
         resolved = res.get_name(path, "exported")
+        assert isinstance(resolved, typeshed_client.ImportedInfo)
         self.assertEqual(resolved, typeshed_client.ImportedInfo(other_path, name_info))
         self.assertIsInstance(resolved.info.ast, ast.AnnAssign)
 
@@ -279,11 +290,12 @@ class IntegrationTest(unittest.TestCase):
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
-    def test(self):
+    def test(self) -> None:
         ctx = get_search_context()
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(path=module_name):
                 ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+                assert ast is not None
                 typeshed_client.parser.parse_ast(ast, ctx, self.fake_path)
 
 

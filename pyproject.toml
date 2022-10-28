@@ -20,3 +20,37 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+strict_optional = true
+warn_no_return = true
+disallow_any_unimported = true
+
+# Across versions of mypy, the flags toggled by --strict vary.  To ensure
+# we have reproducible type check, we instead manually specify the flags
+warn_unused_configs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+# warn_return_any = true
+warn_unreachable = true
+implicit_reexport = false
+strict_equality = true
+
+# Disallow any
+# disallow_any_explicit = true
+disallow_any_decorated = true
+
+exclude = [
+  "typeshed_client/typeshed",
+  "tests/typeshed",
+  "build/",
+  ".tox/",
+]
