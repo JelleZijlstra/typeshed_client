@@ -11,3 +11,4 @@ overloads: 3.5
 subdir: 2.7
 starimport: 3.5
 imported: 3.5
+dunder_all: 3.5-
