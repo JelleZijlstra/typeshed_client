@@ -1,13 +1,13 @@
 from _typeshed import Self
+from collections.abc import Iterator
 from lib2to3.pgen2.grammar import Grammar
-from typing import Any, Callable, Iterator
+from typing import Any
 from typing_extensions import TypeAlias
 
 _NL: TypeAlias = Node | Leaf
 _Context: TypeAlias = tuple[str, int, int]
 _Results: TypeAlias = dict[str, _NL]
 _RawNode: TypeAlias = tuple[int, str, _Context, list[_NL] | None]
-_Convert: TypeAlias = Callable[[Grammar, _RawNode], Any]
 
 HUGE: int
 

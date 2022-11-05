@@ -1,6 +1,7 @@
 from array import array
 from collections import deque
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from typing_extensions import TypeAlias
 
 __all__ = ["Repr", "repr", "recursive_repr"]
@@ -21,7 +22,6 @@ class Repr:
     maxlong: int
     maxstring: int
     maxother: int
-    def __init__(self) -> None: ...
     def repr(self, x: Any) -> str: ...
     def repr1(self, x: Any, level: int) -> str: ...
     def repr_tuple(self, x: tuple[Any, ...], level: int) -> str: ...

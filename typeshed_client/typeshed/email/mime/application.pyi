@@ -8,9 +8,9 @@ __all__ = ["MIMEApplication"]
 class MIMEApplication(MIMENonMultipart):
     def __init__(
         self,
-        _data: str | bytes,
+        _data: str | bytes | bytearray,
         _subtype: str = ...,
-        _encoder: Callable[[MIMEApplication], None] = ...,
+        _encoder: Callable[[MIMEApplication], object] = ...,
         *,
         policy: Policy | None = ...,
         **_params: _ParamsType,
