@@ -15,7 +15,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from . import finder
@@ -130,6 +129,14 @@ _CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
 }
 
 
+def _name_is_exported(name: str) -> bool:
+    if not name.startswith("_"):
+        return True
+    if name.startswith("__") and name.endswith("__"):
+        return True
+    return False
+
+
 class _NameExtractor(ast.NodeVisitor):
     """Extract names from a stub module."""
 
@@ -144,10 +151,10 @@ class _NameExtractor(ast.NodeVisitor):
         return [info for child in node.body for info in self.visit(child)]
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Iterable[NameInfo]:
-        yield NameInfo(node.name, not node.name.startswith("_"), node)
+        yield NameInfo(node.name, _name_is_exported(node.name), node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> Iterable[NameInfo]:
-        yield NameInfo(node.name, not node.name.startswith("_"), node)
+        yield NameInfo(node.name, _name_is_exported(node.name), node)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> Iterable[NameInfo]:
         children = [info for child in node.body for info in self.visit(child)]
@@ -170,7 +177,7 @@ class _NameExtractor(ast.NodeVisitor):
                     child_dict[info.name] = new_info
             else:
                 child_dict[info.name] = info
-        yield NameInfo(node.name, not node.name.startswith("_"), node, child_dict)
+        yield NameInfo(node.name, _name_is_exported(node.name), node, child_dict)
 
     def visit_Assign(self, node: ast.Assign) -> Iterable[NameInfo]:
         for target in node.targets:
@@ -178,7 +185,14 @@ class _NameExtractor(ast.NodeVisitor):
                 raise InvalidStub(
                     f"Assignment should only be to a simple name: {ast.dump(node)}"
                 )
-            yield NameInfo(target.id, not target.id.startswith("_"), node)
+            yield NameInfo(target.id, _name_is_exported(target.id), node)
+
+    def visit_AugAssign(self, node: ast.AugAssign) -> Iterable[NameInfo]:
+        if not isinstance(node.op, ast.Add):
+            raise InvalidStub(f"Only += is allowed in stubs: {ast.dump(node)}")
+        if not isinstance(node.target, ast.Name) or node.target.id != "__all__":
+            raise InvalidStub(f"+= is allowed for __all__: {ast.dump(node)}")
+        yield NameInfo("__all__", True, node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Iterable[NameInfo]:
         target = node.target
@@ -186,7 +200,7 @@ class _NameExtractor(ast.NodeVisitor):
             raise InvalidStub(
                 f"Assignment should only be to a simple name: {ast.dump(node)}"
             )
-        yield NameInfo(target.id, not target.id.startswith("_"), node)
+        yield NameInfo(target.id, _name_is_exported(target.id), node)
 
     def visit_If(self, node: ast.If) -> Iterable[NameInfo]:
         visitor = _LiteralEvalVisitor(self.ctx)

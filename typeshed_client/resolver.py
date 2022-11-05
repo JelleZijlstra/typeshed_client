@@ -1,6 +1,7 @@
 """Module responsible for resolving names to the module they come from."""
 
-from typing import Dict, NamedTuple, Optional, Union
+import ast
+from typing import Dict, List, NamedTuple, Optional, Union
 
 from .finder import SearchContext, get_search_context, ModulePath
 from . import parser
@@ -55,6 +56,40 @@ class Module:
         if name not in self._name_cache:
             self._name_cache[name] = self._uncached_get_name(name, resolver)
         return self._name_cache[name]
+
+    def get_dunder_all(self, resolver: Resolver) -> Optional[List[str]]:
+        """Return the contents of __all__, or None if it does not exist."""
+        resolved_name = self.get_name("__all__", resolver)
+        if resolved_name is None:
+            return None
+        if isinstance(resolved_name, ImportedInfo):
+            resolved_name = resolved_name.info
+        if not isinstance(resolved_name, parser.NameInfo):
+            raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
+        if isinstance(resolved_name.ast, parser.OverloadedName):
+            names = []
+            for defn in resolved_name.ast.definitions:
+                subnames = self._get_dunder_all_from_ast(defn)
+                if subnames is None:
+                    raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
+                names += subnames
+            return names
+        if isinstance(resolved_name.ast, parser.ImportedName):
+            raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
+        return self._get_dunder_all_from_ast(resolved_name.ast)
+
+    def _get_dunder_all_from_ast(self, node: ast.AST) -> Optional[List[str]]:
+        if not isinstance(node, (ast.Assign, ast.AugAssign)):
+            return None
+        rhs = node.value
+        if not isinstance(rhs, ast.List):
+            return None
+        names = []
+        for elt in rhs.elts:
+            if not isinstance(elt, ast.Str):
+                return None
+            names.append(elt.s)
+        return names
 
     def _uncached_get_name(self, name: str, resolver: Resolver) -> ResolvedName:
         if name not in self.names:

@@ -284,6 +284,19 @@ class TestResolver(unittest.TestCase):
             typeshed_client.ModulePath(("subdir", "overloads")),
         )
 
+    def test_dunder_all(self) -> None:
+        path = typeshed_client.ModulePath(("dunder_all",))
+
+        res = typeshed_client.Resolver(get_context((3, 5)))
+        mod = res.get_module(path)
+        self.assertIsNotNone(mod)
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "d"])
+
+        res = typeshed_client.Resolver(get_context((3, 11)))
+        mod = res.get_module(path)
+        self.assertIsNotNone(mod)
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c"])
+
 
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error."""
