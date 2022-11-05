@@ -1,5 +1,6 @@
 import sys
-from typing import Any, AnyStr, Callable, Generic, Iterable, Iterator, NamedTuple, Sequence, TypeVar, overload
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from typing import Any, AnyStr, Generic, NamedTuple, TypeVar, overload
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
@@ -27,8 +28,17 @@ class Match(NamedTuple):
     size: int
 
 class SequenceMatcher(Generic[_T]):
+    @overload
+    def __init__(self, isjunk: Callable[[_T], bool] | None, a: Sequence[_T], b: Sequence[_T], autojunk: bool = ...) -> None: ...
+    @overload
+    def __init__(self, *, a: Sequence[_T], b: Sequence[_T], autojunk: bool = ...) -> None: ...
+    @overload
     def __init__(
-        self, isjunk: Callable[[_T], bool] | None = ..., a: Sequence[_T] = ..., b: Sequence[_T] = ..., autojunk: bool = ...
+        self: SequenceMatcher[str],
+        isjunk: Callable[[str], bool] | None = ...,
+        a: Sequence[str] = ...,
+        b: Sequence[str] = ...,
+        autojunk: bool = ...,
     ) -> None: ...
     def set_seqs(self, a: Sequence[_T], b: Sequence[_T]) -> None: ...
     def set_seq1(self, a: Sequence[_T]) -> None: ...
@@ -117,12 +127,12 @@ class HtmlDiff:
 def restore(delta: Iterable[str], which: int) -> Iterator[str]: ...
 def diff_bytes(
     dfunc: Callable[[Sequence[str], Sequence[str], str, str, str, str, int, str], Iterator[str]],
-    a: Sequence[bytes],
-    b: Sequence[bytes],
-    fromfile: bytes = ...,
-    tofile: bytes = ...,
-    fromfiledate: bytes = ...,
-    tofiledate: bytes = ...,
+    a: Iterable[bytes | bytearray],
+    b: Iterable[bytes | bytearray],
+    fromfile: bytes | bytearray = ...,
+    tofile: bytes | bytearray = ...,
+    fromfiledate: bytes | bytearray = ...,
+    tofiledate: bytes | bytearray = ...,
     n: int = ...,
-    lineterm: bytes = ...,
+    lineterm: bytes | bytearray = ...,
 ) -> Iterator[bytes]: ...

@@ -1,7 +1,8 @@
 from _typeshed import StrPath
+from collections.abc import Iterable, Iterator
 from lib2to3.pgen2 import grammar
 from lib2to3.pgen2.tokenize import _TokenInfo
-from typing import IO, Any, Iterable, Iterator, NoReturn
+from typing import IO, Any, NoReturn
 
 class PgenGrammar(grammar.Grammar): ...
 
@@ -31,7 +32,6 @@ class ParserGenerator:
 
 class NFAState:
     arcs: list[tuple[str | None, NFAState]]
-    def __init__(self) -> None: ...
     def addarc(self, next: NFAState, label: str | None = ...) -> None: ...
 
 class DFAState:

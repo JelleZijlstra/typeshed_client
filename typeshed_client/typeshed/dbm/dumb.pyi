@@ -1,6 +1,6 @@
 from _typeshed import Self
+from collections.abc import Iterator, MutableMapping
 from types import TracebackType
-from typing import Iterator, MutableMapping
 from typing_extensions import TypeAlias
 
 __all__ = ["error", "open"]
@@ -10,6 +10,9 @@ _ValueType: TypeAlias = str | bytes
 
 error = OSError
 
+# This class doesn't exist at runtime. open() can return an instance of
+# any of the three implementations of dbm (dumb, gnu, ndbm), and this
+# class is intended to represent the common interface supported by all three.
 class _Database(MutableMapping[_KeyType, bytes]):
     def __init__(self, filebasename: str, mode: str, flag: str = ...) -> None: ...
     def sync(self) -> None: ...

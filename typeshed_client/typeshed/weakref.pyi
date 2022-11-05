@@ -1,9 +1,5 @@
 import sys
 from _typeshed import Self, SupportsKeysAndGetItem
-from _weakrefset import WeakSet as WeakSet
-from typing import Any, Callable, Generic, Iterable, Iterator, Mapping, MutableMapping, TypeVar, overload
-from typing_extensions import ParamSpec
-
 from _weakref import (
     CallableProxyType as CallableProxyType,
     ProxyType as ProxyType,
@@ -13,6 +9,10 @@ from _weakref import (
     proxy as proxy,
     ref as ref,
 )
+from _weakrefset import WeakSet as WeakSet
+from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
+from typing import Any, Generic, TypeVar, overload
+from typing_extensions import ParamSpec
 
 __all__ = [
     "ref",
@@ -87,7 +87,7 @@ class WeakValueDictionary(MutableMapping[_KT, _VT]):
 class KeyedRef(ref[_T], Generic[_KT, _T]):
     key: _KT
     # This __new__ method uses a non-standard name for the "cls" parameter
-    def __new__(type: type[Self], ob: _T, callback: Callable[[_T], Any], key: _KT) -> Self: ...  # type: ignore
+    def __new__(type: type[Self], ob: _T, callback: Callable[[_T], Any], key: _KT) -> Self: ...
     def __init__(self, ob: _T, callback: Callable[[_T], Any], key: _KT) -> None: ...
 
 class WeakKeyDictionary(MutableMapping[_KT, _VT]):

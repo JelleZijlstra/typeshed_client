@@ -1,7 +1,8 @@
 import sys
 from _typeshed import FileDescriptorLike, Self
+from collections.abc import Iterable
 from types import TracebackType
-from typing import Any, Iterable
+from typing import Any
 from typing_extensions import final
 
 if sys.platform != "win32":
@@ -20,7 +21,6 @@ if sys.platform != "win32":
     POLLWRNORM: int
 
 class poll:
-    def __init__(self) -> None: ...
     def register(self, fd: FileDescriptorLike, eventmask: int = ...) -> None: ...
     def modify(self, fd: FileDescriptorLike, eventmask: int) -> None: ...
     def unregister(self, fd: FileDescriptorLike) -> None: ...

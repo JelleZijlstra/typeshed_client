@@ -1,4 +1,5 @@
-from typing import IO, Any, Callable, Iterator, MutableMapping
+from collections.abc import Callable, Iterator, MutableMapping
+from typing import IO, Any
 from typing_extensions import TypeAlias
 
 __all__ = ["dis", "genops", "optimize"]
@@ -155,10 +156,10 @@ class OpcodeInfo:
 
 opcodes: list[OpcodeInfo]
 
-def genops(pickle: bytes | IO[bytes]) -> Iterator[tuple[OpcodeInfo, Any | None, int | None]]: ...
-def optimize(p: bytes | IO[bytes]) -> bytes: ...
+def genops(pickle: bytes | bytearray | IO[bytes]) -> Iterator[tuple[OpcodeInfo, Any | None, int | None]]: ...
+def optimize(p: bytes | bytearray | IO[bytes]) -> bytes: ...
 def dis(
-    pickle: bytes | IO[bytes],
+    pickle: bytes | bytearray | IO[bytes],
     out: IO[str] | None = ...,
     memo: MutableMapping[int, Any] | None = ...,
     indentlevel: int = ...,
