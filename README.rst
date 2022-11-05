@@ -81,6 +81,14 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.1.0 (November 5, 2022)
+
+- Update bundled typeshed
+- Declare support for Python 3.11
+- Add ``typeshed_client.resolver.Module.get_dunder_all`` to get the contents of ``__all__``
+- Add support for ``__all__ +=`` syntax
+- Type check the code using mypy (thanks to Nicolas)
+
 Version 2.0.5 (April 17, 2022)
 
 - Update bundled typeshed
