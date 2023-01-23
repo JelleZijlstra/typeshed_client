@@ -1,5 +1,6 @@
-from __future__ import annotations
 """This module is responsible for finding stub files."""
+from __future__ import annotations
+
 from functools import lru_cache
 import importlib_resources
 import json

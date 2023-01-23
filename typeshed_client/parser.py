@@ -1,5 +1,6 @@
-from __future__ import annotations
 """This module is responsible for parsing a stub AST into a dictionary of names."""
+
+from __future__ import annotations
 
 import logging
 import ast

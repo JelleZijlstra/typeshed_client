@@ -1,5 +1,6 @@
-from __future__ import annotations
 """Module responsible for resolving names to the module they come from."""
+
+from __future__ import annotations
 
 import ast
 from typing import Dict, List, NamedTuple, Optional, Union
