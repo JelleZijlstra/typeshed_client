@@ -5,14 +5,7 @@ from __future__ import annotations
 import logging
 import ast
 import sys
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    NamedTuple,
-    NoReturn,
-)
+from typing import Any, Callable, Dict, Iterable, NamedTuple, NoReturn
 
 from . import finder
 from .finder import get_search_context, SearchContext, ModulePath, parse_stub_file

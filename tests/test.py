@@ -27,9 +27,7 @@ def get_context(version: PythonVersion, platform: str = "linux") -> SearchContex
 
 
 class TestFinder(unittest.TestCase):
-    def check(
-        self, name: str, version: PythonVersion, expected: Path | None
-    ) -> None:
+    def check(self, name: str, version: PythonVersion, expected: Path | None) -> None:
         ctx = get_context(version)
         self.assertEqual(get_stub_file(name, search_context=ctx), expected)
 
