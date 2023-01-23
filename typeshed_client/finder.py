@@ -175,11 +175,9 @@ def _get_all_stub_files_from_directory(
     directory: _DirEntry, root_directory: Path, seen: Set[str]
 ) -> Generator[Tuple[str, Path], None, Set[str]]:
     new_seen = set(seen)
-    # Use a dict for to_do to ensure modules are yielded in a deterministic order
-    # The keys in the dict are irrelevant; this is just a standin for an ordered set
-    to_do: Dict[os.PathLike[str], None] = {directory: None}
+    to_do: List[os.PathLike[str]] = [directory]
     while to_do:
-        current_dir, _ = to_do.popitem()
+        current_dir = to_do.pop()
         for dir_entry in os.scandir(current_dir):
             if dir_entry.is_dir():
                 if not dir_entry.name.isidentifier():
@@ -188,7 +186,7 @@ def _get_all_stub_files_from_directory(
                 if (path / "__init__.pyi").is_file() or (
                     path / "__init__.py"
                 ).is_file():
-                    to_do[path] = None
+                    to_do.append(path)
             elif dir_entry.is_file():
                 path = Path(dir_entry)
                 if path.suffix != ".pyi":
