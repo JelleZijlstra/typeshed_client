@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import ast
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import NamedTuple, Union
 
 from .finder import SearchContext, get_search_context, ModulePath
 from . import parser

@@ -9,7 +9,7 @@ from typeshed_client.finder import (
     SearchContext,
 )
 from typeshed_client.parser import get_stub_names
-from typing import Any, Set, Type, Optional
+from typing import Any
 from unittest import mock
 import unittest
 

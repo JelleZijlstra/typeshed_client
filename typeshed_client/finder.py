@@ -11,15 +11,11 @@ import sys
 import ast
 from typing import (
     TYPE_CHECKING,
-    Dict,
     Generator,
     Iterable,
-    List,
     NamedTuple,
     NewType,
-    Optional,
     Sequence,
-    Set,
     Tuple,
 )
 

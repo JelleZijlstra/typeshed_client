@@ -10,13 +10,8 @@ from typing import (
     Callable,
     Dict,
     Iterable,
-    List,
     NamedTuple,
     NoReturn,
-    Optional,
-    Tuple,
-    Type,
-    Union,
 )
 
 from . import finder
