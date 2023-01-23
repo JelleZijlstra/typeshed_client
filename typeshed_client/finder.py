@@ -45,10 +45,10 @@ class SearchContext(NamedTuple):
 
 def get_search_context(
     *,
-    typeshed: Optional[Path] = None,
-    search_path: Optional[Sequence[Path]] = None,
-    python_executable: Optional[str] = None,
-    version: Optional[PythonVersion] = None,
+    typeshed: Path | None = None,
+    search_path: Sequence[Path] | None = None,
+    python_executable: str | None = None,
+    version: PythonVersion | None = None,
     platform: str = sys.platform,
 ) -> SearchContext:
     """Return a context for finding stubs. This context can be passed to other
@@ -86,8 +86,8 @@ def get_search_context(
 
 
 def get_stub_file(
-    module_name: str, *, search_context: Optional[SearchContext] = None
-) -> Optional[Path]:
+    module_name: str, *, search_context: SearchContext | None = None
+) -> Path | None:
     """Return the path to the stub file for this module, if any."""
     if search_context is None:
         search_context = get_search_context()
@@ -95,8 +95,8 @@ def get_stub_file(
 
 
 def get_stub_ast(
-    module_name: str, *, search_context: Optional[SearchContext] = None
-) -> Optional[ast.AST]:
+    module_name: str, *, search_context: SearchContext | None = None
+) -> ast.AST | None:
     """Return the AST for the stub for the given module name."""
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
@@ -105,8 +105,8 @@ def get_stub_ast(
 
 
 def get_all_stub_files(
-    search_context: Optional[SearchContext] = None,
-) -> Iterable[Tuple[str, Path]]:
+    search_context: SearchContext | None = None,
+) -> Iterable[tuple[str, Path]]:
     """Return paths to all stub files for a given Python version.
 
     Return pairs of (module name, module path).
@@ -115,7 +115,7 @@ def get_all_stub_files(
     if search_context is None:
         search_context = get_search_context()
 
-    seen: Set[str] = set()
+    seen: set[str] = set()
     # third-party packages
     for stub_packages in (True, False):
         for search_path_entry in search_context.search_path:
@@ -174,10 +174,10 @@ def get_all_stub_files(
 
 
 def _get_all_stub_files_from_directory(
-    directory: _DirEntry, root_directory: Path, seen: Set[str]
-) -> Generator[Tuple[str, Path], None, Set[str]]:
+    directory: _DirEntry, root_directory: Path, seen: set[str]
+) -> Generator[tuple[str, Path], None, set[str]]:
     new_seen = set(seen)
-    to_do: Set[os.PathLike[str]] = {directory}
+    to_do: set[os.PathLike[str]] = {directory}
     while to_do:
         current_dir = to_do.pop()
         for dir_entry in os.scandir(current_dir):
@@ -202,9 +202,9 @@ def _get_all_stub_files_from_directory(
 
 
 @lru_cache()
-def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
+def get_search_path(typeshed_dir: Path, pyversion: tuple[int, int]) -> tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
-    path: List[Path] = []
+    path: list[Path] = []
 
     versions = [
         f"{pyversion[0]}.{minor}" for minor in reversed(range(pyversion[1] + 1))
@@ -220,7 +220,7 @@ def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Pat
 
 def get_stub_file_name(
     module_name: ModulePath, search_context: SearchContext
-) -> Optional[Path]:
+) -> Path | None:
     # https://www.python.org/dev/peps/pep-0561/#type-checker-module-resolution-order
     # typeshed_client doesn't support 1 (MYPYPATH equivalent) and 2 (user code)
     top_level_name, *rest = module_name
@@ -264,13 +264,13 @@ def get_stub_file_name(
 
 class _VersionData(NamedTuple):
     min: PythonVersion
-    max: Optional[PythonVersion]
+    max: PythonVersion | None
     # whether it is present in @python2
     in_python2: bool
 
 
 @lru_cache()
-def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
+def get_typeshed_versions(typeshed: Path) -> dict[str, _VersionData]:
     versions = {}
     try:
         python2_files = set(os.listdir(typeshed / "@python2"))
@@ -302,7 +302,7 @@ def _parse_version(version: str) -> PythonVersion:
     return (int(major), int(minor))
 
 
-def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Optional[Path]:
+def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Path | None:
     if not module:
         init_name = stubdir / "__init__.pyi"
         if init_name.exists():

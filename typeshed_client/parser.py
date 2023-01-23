@@ -31,27 +31,27 @@ class InvalidStub(Exception):
 
 class ImportedName(NamedTuple):
     module_name: ModulePath
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class OverloadedName(NamedTuple):
-    definitions: List[ast.AST]
+    definitions: list[ast.AST]
 
 
 class NameInfo(NamedTuple):
     name: str
     is_exported: bool
-    ast: Union[ast.AST, ImportedName, OverloadedName]
+    ast: ast.AST | ImportedName | OverloadedName
     # should be Optional[NameDict] but that needs a recursive type
-    child_nodes: Optional[Dict[str, Any]] = None
+    child_nodes: dict[str, Any] | None = None
 
 
 NameDict = Dict[str, NameInfo]
 
 
 def get_stub_names(
-    module_name: str, *, search_context: Optional[SearchContext] = None
-) -> Optional[NameDict]:
+    module_name: str, *, search_context: SearchContext | None = None
+) -> NameDict | None:
     """Given a module name, return a dictionary of names defined in that module."""
     if search_context is None:
         search_context = get_search_context()
@@ -117,7 +117,7 @@ def parse_ast(
     return name_dict
 
 
-_CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
+_CMP_OP_TO_FUNCTION: dict[type[ast.AST], Callable[[Any, Any], bool]] = {
     ast.Eq: lambda x, y: x == y,
     ast.NotEq: lambda x, y: x != y,
     ast.Lt: lambda x, y: x < y,
@@ -149,7 +149,7 @@ class _NameExtractor(ast.NodeVisitor):
         self.module_name = module_name
         self.is_init = is_init
 
-    def visit_Module(self, node: ast.Module) -> List[NameInfo]:
+    def visit_Module(self, node: ast.Module) -> list[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Iterable[NameInfo]:
@@ -236,7 +236,7 @@ class _NameExtractor(ast.NodeVisitor):
                 yield NameInfo(name, False, ImportedName(ModulePath((name,))))
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Iterable[NameInfo]:
-        module: Tuple[str, ...]
+        module: tuple[str, ...]
         if node.module is None:
             module = ()
         else:
@@ -296,7 +296,7 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     # from version 3.8 on all constants are represented as ast.Constant
     if sys.version_info < (3, 8):
 
-        def visit_Num(self, node: ast.Num) -> Union[int, float, complex]:
+        def visit_Num(self, node: ast.Num) -> int | float | complex:
             return node.n
 
         def visit_Str(self, node: ast.Str) -> str:
@@ -313,7 +313,7 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         def visit_Index(self, node: ast.Index) -> int:
             return self.visit(node.value)
 
-    def visit_Tuple(self, node: ast.Tuple) -> Tuple[Any, ...]:
+    def visit_Tuple(self, node: ast.Tuple) -> tuple[Any, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 
     def visit_Subscript(self, node: ast.Subscript) -> Any:

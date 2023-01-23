@@ -18,13 +18,13 @@ ResolvedName = Union[None, ModulePath, ImportedInfo, parser.NameInfo]
 
 
 class Resolver:
-    def __init__(self, search_context: Optional[SearchContext] = None) -> None:
+    def __init__(self, search_context: SearchContext | None = None) -> None:
         if search_context is None:
             search_context = get_search_context()
         self.ctx = search_context
-        self._module_cache: Dict[ModulePath, Module] = {}
+        self._module_cache: dict[ModulePath, Module] = {}
 
-    def get_module(self, module_name: ModulePath) -> "Module":
+    def get_module(self, module_name: ModulePath) -> Module:
         if module_name not in self._module_cache:
             names = parser.get_stub_names(
                 ".".join(module_name), search_context=self.ctx
@@ -51,7 +51,7 @@ class Module:
     ) -> None:
         self.names = names
         self.ctx = ctx
-        self._name_cache: Dict[str, ResolvedName] = {}
+        self._name_cache: dict[str, ResolvedName] = {}
         self.exists = exists
 
     def get_name(self, name: str, resolver: Resolver) -> ResolvedName:
@@ -59,7 +59,7 @@ class Module:
             self._name_cache[name] = self._uncached_get_name(name, resolver)
         return self._name_cache[name]
 
-    def get_dunder_all(self, resolver: Resolver) -> Optional[List[str]]:
+    def get_dunder_all(self, resolver: Resolver) -> list[str] | None:
         """Return the contents of __all__, or None if it does not exist."""
         resolved_name = self.get_name("__all__", resolver)
         if resolved_name is None:
@@ -80,7 +80,7 @@ class Module:
             raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
         return self._get_dunder_all_from_ast(resolved_name.ast)
 
-    def _get_dunder_all_from_ast(self, node: ast.AST) -> Optional[List[str]]:
+    def _get_dunder_all_from_ast(self, node: ast.AST) -> list[str] | None:
         if not isinstance(node, (ast.Assign, ast.AugAssign)):
             return None
         rhs = node.value

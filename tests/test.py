@@ -28,7 +28,7 @@ def get_context(version: PythonVersion, platform: str = "linux") -> SearchContex
 
 class TestFinder(unittest.TestCase):
     def check(
-        self, name: str, version: PythonVersion, expected: Optional[Path]
+        self, name: str, version: PythonVersion, expected: Path | None
     ) -> None:
         ctx = get_context(version)
         self.assertEqual(get_stub_file(name, search_context=ctx), expected)
@@ -173,7 +173,7 @@ class TestParser(unittest.TestCase):
         self,
         names: typeshed_client.NameDict,
         name: str,
-        ast_type: Type[Any],
+        ast_type: type[Any],
         *,
         is_exported: bool = True,
         has_child_nodes: bool = False,
@@ -213,7 +213,7 @@ class TestParser(unittest.TestCase):
 
     def check_conditions(
         self,
-        names: Set[str],
+        names: set[str],
         *,
         version: PythonVersion = (3, 6),
         platform: str = "linux",
