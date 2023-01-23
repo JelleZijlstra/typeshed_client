@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Package for retrieving data from typeshed."""
 from . import finder
 from . import parser

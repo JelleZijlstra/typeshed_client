@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Module responsible for resolving names to the module they come from."""
 
 import ast
