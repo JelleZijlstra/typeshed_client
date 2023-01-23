@@ -1,6 +1,9 @@
 """Package for retrieving data from typeshed."""
 from __future__ import annotations
 
+from . import finder
+from . import parser
+from . import resolver
 
 # Exported names
 from .finder import (
