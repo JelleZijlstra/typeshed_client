@@ -300,8 +300,10 @@ class _NameExtractor(ast.NodeVisitor):
                 )
                 if names is None:
                     _warn(
-                        f"could not import {source_module} in {self.module_name} with "
-                        f"{self.ctx}",
+                        (
+                            f"could not import {source_module} in"
+                            f" {self.module_name} with {self.ctx}"
+                        ),
                         self.ctx,
                     )
                     continue
