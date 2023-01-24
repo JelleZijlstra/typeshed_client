@@ -83,6 +83,7 @@ Changelog
 
 Unreleased
 
+- Fix crash on stubs that use ``if MYPY``
 - Fix incorrect handling of ``import *`` in stubs
 - Drop support for Python 3.6 (thanks to Alex Waygood)
 

@@ -8,6 +8,7 @@ py2only: 2.7
 simple: 3.5
 other: 3.5
 overloads: 3.5
+ifmypy: 3.5-
 subdir: 2.7
 starimport: 3.5
 imported: 3.5

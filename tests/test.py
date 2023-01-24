@@ -252,6 +252,11 @@ class TestParser(unittest.TestCase):
         assert info is not None
         self.assertEqual(set(info.keys()), {"x", "sys"})
 
+    def test_ifmypy(self) -> None:
+        names = get_stub_names("ifmypy", search_context=get_context((3, 11)))
+        assert names is not None
+        self.assertEqual(set(names.keys()), {"MYPY", "we_are_not_mypy"})
+
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", search_context=get_context((3, 5)))
         assert names is not None
