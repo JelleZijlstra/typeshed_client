@@ -115,6 +115,34 @@ def parse_ast(
     return name_dict
 
 
+def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
+    if isinstance(info.ast, OverloadedName):
+        names = []
+        for defn in info.ast.definitions:
+            subnames = _get_dunder_all_from_ast(defn)
+            if subnames is None:
+                raise InvalidStub(f"Invalid __all__: {info}")
+            names += subnames
+        return names
+    if isinstance(info.ast, ImportedName):
+        raise InvalidStub(f"Invalid __all__: {info}")
+    return _get_dunder_all_from_ast(info.ast)
+
+
+def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
+    if not isinstance(node, (ast.Assign, ast.AugAssign)):
+        return None
+    rhs = node.value
+    if not isinstance(rhs, ast.List):
+        return None
+    names = []
+    for elt in rhs.elts:
+        if not isinstance(elt, ast.Str):
+            return None
+        names.append(elt.s)
+    return names
+
+
 _CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
     ast.Eq: lambda x, y: x == y,
     ast.NotEq: lambda x, y: x != y,
