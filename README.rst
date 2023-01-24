@@ -81,7 +81,7 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.2.0 (January 24, 2023)
 
 - Update bundled typeshed
 - Fix crash on stubs that use ``if MYPY``
