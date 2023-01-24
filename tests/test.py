@@ -74,7 +74,7 @@ class TestParser(unittest.TestCase):
         names = get_stub_names("simple", search_context=ctx)
         assert names is not None
         self.assertEqual(
-            set(names.keys()),
+            set(names),
             {
                 "var",
                 "old_var",
@@ -135,7 +135,7 @@ class TestParser(unittest.TestCase):
         self.check_nameinfo(names, "Cls", ast.ClassDef, has_child_nodes=True)
         cls_names = names["Cls"].child_nodes
         assert cls_names is not None
-        self.assertEqual(set(cls_names.keys()), {"attr", "method"})
+        self.assertEqual(set(cls_names), {"attr", "method"})
         self.check_nameinfo(cls_names, "attr", ast.AnnAssign)
         self.check_nameinfo(cls_names, "method", ast.FunctionDef)
 
@@ -143,12 +143,33 @@ class TestParser(unittest.TestCase):
         ctx = get_context((3, 5))
         names = get_stub_names("starimport", search_context=ctx)
         assert names is not None
-        self.assertEqual(set(names.keys()), {"public"})
+        self.assertEqual(set(names), {"public"})
         self.check_nameinfo(names, "public", typeshed_client.ImportedName)
         path = typeshed_client.ModulePath(("imported",))
         self.assertEqual(
             names["public"].ast, typeshed_client.ImportedName(path, "public")
         )
+
+    def test_starimport_all(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("starimportall", search_context=ctx)
+        assert names is not None
+        expected = {"a", "b", "c", "n"}
+        self.assertEqual(set(names), expected)
+        for name in expected:
+            self.check_nameinfo(names, name, typeshed_client.ImportedName)
+            module = "tupleall" if name == "n" else "dunder_all"
+            path = typeshed_client.ModulePath((module,))
+            self.assertEqual(names[name].ast, typeshed_client.ImportedName(path, name))
+
+    def test_starimport_no_dunders(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("importabout", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names), {"x"})
+        self.check_nameinfo(names, "x", typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(("about",))
+        self.assertEqual(names["x"].ast, typeshed_client.ImportedName(path, "x"))
 
     def test_dot_import(self) -> None:
         ctx = get_context((3, 5))
@@ -161,7 +182,7 @@ class TestParser(unittest.TestCase):
             with self.subTest(mod):
                 names = get_stub_names(mod, search_context=ctx)
                 assert names is not None
-                self.assertEqual(set(names.keys()), {"f", "overloads"})
+                self.assertEqual(set(names), {"f", "overloads"})
                 self.check_nameinfo(names, "f", typeshed_client.ImportedName)
                 path = typeshed_client.ModulePath(("subdir", "overloads"))
                 self.assertEqual(
@@ -220,27 +241,27 @@ class TestParser(unittest.TestCase):
         ctx = get_context(version, platform)
         info = get_stub_names("conditions", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), names | {"sys"})
+        self.assertEqual(set(info), names | {"sys"})
 
     def test_top_level_assert(self) -> None:
         ctx = get_context((3, 6), "flat")
         info = get_stub_names("top_level_assert", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), set())
+        self.assertEqual(set(info), set())
         ctx = get_context((3, 6), "linux")
         info = get_stub_names("top_level_assert", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), {"x", "sys"})
+        self.assertEqual(set(info), {"x", "sys"})
 
     def test_ifmypy(self) -> None:
         names = get_stub_names("ifmypy", search_context=get_context((3, 11)))
         assert names is not None
-        self.assertEqual(set(names.keys()), {"MYPY", "we_are_not_mypy"})
+        self.assertEqual(set(names), {"MYPY", "we_are_not_mypy"})
 
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", search_context=get_context((3, 5)))
         assert names is not None
-        self.assertEqual(set(names.keys()), {"overload", "overloaded", "OverloadClass"})
+        self.assertEqual(set(names), {"overload", "overloaded", "OverloadClass"})
         self.check_nameinfo(names, "overloaded", typeshed_client.OverloadedName)
         assert isinstance(names["overloaded"].ast, typeshed_client.OverloadedName)
         definitions = names["overloaded"].ast.definitions
@@ -252,7 +273,7 @@ class TestParser(unittest.TestCase):
         self.assertIsInstance(classdef.ast, ast.ClassDef)
         children = classdef.child_nodes
         assert children is not None
-        self.assertEqual(set(children.keys()), {"overloaded"})
+        self.assertEqual(set(children), {"overloaded"})
         definitions = children["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:

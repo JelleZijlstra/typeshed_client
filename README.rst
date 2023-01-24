@@ -84,7 +84,8 @@ Changelog
 Unreleased
 
 - Fix crash on stubs that use ``if MYPY``
-- Drop support for Python 3.6
+- Fix incorrect handling of ``import *`` in stubs
+- Drop support for Python 3.6 (thanks to Alex Waygood)
 
 Version 2.1.0 (November 5, 2022)
 

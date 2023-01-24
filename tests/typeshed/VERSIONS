@@ -13,3 +13,7 @@ subdir: 2.7
 starimport: 3.5
 imported: 3.5
 dunder_all: 3.5-
+about: 3.5-
+importabout: 3.5-
+tupleall: 3.5-
+starimportall: 3.5-
