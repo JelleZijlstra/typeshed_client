@@ -1,9 +1,10 @@
+import _ast
 import sys
 import types
-from _ast import AST
 from _collections_abc import dict_items, dict_keys, dict_values
 from _typeshed import (
     AnyStr_co,
+    FileDescriptorOrPath,
     OpenBinaryMode,
     OpenBinaryModeReading,
     OpenBinaryModeUpdating,
@@ -11,7 +12,6 @@ from _typeshed import (
     OpenTextMode,
     ReadableBuffer,
     Self,
-    StrOrBytesPath,
     SupportsAdd,
     SupportsAiter,
     SupportsAnext,
@@ -32,7 +32,7 @@ from io import BufferedRandom, BufferedReader, BufferedWriter, FileIO, TextIOWra
 from types import CodeType, TracebackType, _Cell
 
 # mypy crashes if any of {ByteString, Sequence, MutableSequence, Mapping, MutableMapping} are imported from collections.abc in builtins.pyi
-from typing import (  # noqa: Y027
+from typing import (  # noqa: Y022
     IO,
     Any,
     BinaryIO,
@@ -50,7 +50,6 @@ from typing import (  # noqa: Y027
     SupportsComplex,
     SupportsFloat,
     SupportsInt,
-    SupportsRound,
     TypeVar,
     overload,
     type_check_only,
@@ -218,15 +217,15 @@ class int:
 
     if sys.version_info >= (3, 11):
         def to_bytes(
-            self, length: SupportsIndex = ..., byteorder: Literal["little", "big"] = ..., *, signed: bool = ...
+            self, length: SupportsIndex = 1, byteorder: Literal["little", "big"] = "big", *, signed: bool = False
         ) -> bytes: ...
         @classmethod
         def from_bytes(
             cls: type[Self],
             bytes: Iterable[SupportsIndex] | SupportsBytes | ReadableBuffer,
-            byteorder: Literal["little", "big"] = ...,
+            byteorder: Literal["little", "big"] = "big",
             *,
-            signed: bool = ...,
+            signed: bool = False,
         ) -> Self: ...
     else:
         def to_bytes(self, length: SupportsIndex, byteorder: Literal["little", "big"], *, signed: bool = ...) -> bytes: ...
@@ -427,7 +426,7 @@ class str(Sequence[str]):
     @overload
     def center(self, __width: SupportsIndex, __fillchar: str = ...) -> str: ...  # type: ignore[misc]
     def count(self, x: str, __start: SupportsIndex | None = ..., __end: SupportsIndex | None = ...) -> int: ...
-    def encode(self, encoding: str = ..., errors: str = ...) -> bytes: ...
+    def encode(self, encoding: str = "utf-8", errors: str = "strict") -> bytes: ...
     def endswith(
         self, __suffix: str | tuple[str, ...], __start: SupportsIndex | None = ..., __end: SupportsIndex | None = ...
     ) -> bool: ...
@@ -597,7 +596,7 @@ class bytes(ByteString):
     def count(
         self, __sub: ReadableBuffer | SupportsIndex, __start: SupportsIndex | None = ..., __end: SupportsIndex | None = ...
     ) -> int: ...
-    def decode(self, encoding: str = ..., errors: str = ...) -> str: ...
+    def decode(self, encoding: str = "utf-8", errors: str = "strict") -> str: ...
     def endswith(
         self,
         __suffix: ReadableBuffer | tuple[ReadableBuffer, ...],
@@ -605,7 +604,7 @@ class bytes(ByteString):
         __end: SupportsIndex | None = ...,
     ) -> bool: ...
     if sys.version_info >= (3, 8):
-        def expandtabs(self, tabsize: SupportsIndex = ...) -> bytes: ...
+        def expandtabs(self, tabsize: SupportsIndex = 8) -> bytes: ...
     else:
         def expandtabs(self, tabsize: int = ...) -> bytes: ...
 
@@ -646,10 +645,10 @@ class bytes(ByteString):
     ) -> int: ...
     def rjust(self, __width: SupportsIndex, __fillchar: bytes | bytearray = ...) -> bytes: ...
     def rpartition(self, __sep: ReadableBuffer) -> tuple[bytes, bytes, bytes]: ...
-    def rsplit(self, sep: ReadableBuffer | None = ..., maxsplit: SupportsIndex = ...) -> list[bytes]: ...
+    def rsplit(self, sep: ReadableBuffer | None = None, maxsplit: SupportsIndex = -1) -> list[bytes]: ...
     def rstrip(self, __bytes: ReadableBuffer | None = ...) -> bytes: ...
-    def split(self, sep: ReadableBuffer | None = ..., maxsplit: SupportsIndex = ...) -> list[bytes]: ...
-    def splitlines(self, keepends: bool = ...) -> list[bytes]: ...
+    def split(self, sep: ReadableBuffer | None = None, maxsplit: SupportsIndex = -1) -> list[bytes]: ...
+    def splitlines(self, keepends: bool = False) -> list[bytes]: ...
     def startswith(
         self,
         __prefix: ReadableBuffer | tuple[ReadableBuffer, ...],
@@ -702,7 +701,7 @@ class bytearray(MutableSequence[int], ByteString):
         self, __sub: ReadableBuffer | SupportsIndex, __start: SupportsIndex | None = ..., __end: SupportsIndex | None = ...
     ) -> int: ...
     def copy(self) -> bytearray: ...
-    def decode(self, encoding: str = ..., errors: str = ...) -> str: ...
+    def decode(self, encoding: str = "utf-8", errors: str = "strict") -> str: ...
     def endswith(
         self,
         __suffix: ReadableBuffer | tuple[ReadableBuffer, ...],
@@ -710,7 +709,7 @@ class bytearray(MutableSequence[int], ByteString):
         __end: SupportsIndex | None = ...,
     ) -> bool: ...
     if sys.version_info >= (3, 8):
-        def expandtabs(self, tabsize: SupportsIndex = ...) -> bytearray: ...
+        def expandtabs(self, tabsize: SupportsIndex = 8) -> bytearray: ...
     else:
         def expandtabs(self, tabsize: int = ...) -> bytearray: ...
 
@@ -755,10 +754,10 @@ class bytearray(MutableSequence[int], ByteString):
     ) -> int: ...
     def rjust(self, __width: SupportsIndex, __fillchar: bytes | bytearray = ...) -> bytearray: ...
     def rpartition(self, __sep: ReadableBuffer) -> tuple[bytearray, bytearray, bytearray]: ...
-    def rsplit(self, sep: ReadableBuffer | None = ..., maxsplit: SupportsIndex = ...) -> list[bytearray]: ...
+    def rsplit(self, sep: ReadableBuffer | None = None, maxsplit: SupportsIndex = -1) -> list[bytearray]: ...
     def rstrip(self, __bytes: ReadableBuffer | None = ...) -> bytearray: ...
-    def split(self, sep: ReadableBuffer | None = ..., maxsplit: SupportsIndex = ...) -> list[bytearray]: ...
-    def splitlines(self, keepends: bool = ...) -> list[bytearray]: ...
+    def split(self, sep: ReadableBuffer | None = None, maxsplit: SupportsIndex = -1) -> list[bytearray]: ...
+    def splitlines(self, keepends: bool = False) -> list[bytearray]: ...
     def startswith(
         self,
         __prefix: ReadableBuffer | tuple[ReadableBuffer, ...],
@@ -848,7 +847,7 @@ class memoryview(Sequence[int]):
     @overload
     def __setitem__(self, __i: SupportsIndex, __o: SupportsIndex) -> None: ...
     if sys.version_info >= (3, 8):
-        def tobytes(self, order: Literal["C", "F", "A"] | None = ...) -> bytes: ...
+        def tobytes(self, order: Literal["C", "F", "A"] | None = "C") -> bytes: ...
     else:
         def tobytes(self) -> bytes: ...
 
@@ -954,7 +953,7 @@ class function:
 
     __module__: str
     # mypy uses `builtins.function.__get__` to represent methods, properties, and getset_descriptors so we type the return as Any.
-    def __get__(self, obj: object | None, type: type | None = ...) -> Any: ...
+    def __get__(self, obj: object, type: type | None = ...) -> Any: ...
 
 class list(MutableSequence[_T], Generic[_T]):
     @overload
@@ -1189,7 +1188,7 @@ class property:
 class _NotImplementedType(Any):  # type: ignore[misc]
     # A little weird, but typing the __call__ as NotImplemented makes the error message
     # for NotImplemented() much better
-    __call__: NotImplemented  # type: ignore[valid-type]
+    __call__: NotImplemented  # type: ignore[valid-type]  # pyright: ignore[reportGeneralTypeIssues]
 
 NotImplemented: _NotImplementedType
 
@@ -1221,27 +1220,90 @@ if sys.version_info >= (3, 10):
     @overload
     async def anext(__i: SupportsAnext[_T], default: _VT) -> _T | _VT: ...
 
-# TODO: `compile` has a more precise return type in reality; work on a way of expressing that?
+# compile() returns a CodeType, unless the flags argument includes PyCF_ONLY_AST (=1024),
+# in which case it returns ast.AST. We have overloads for flag 0 (the default) and for
+# explicitly passing PyCF_ONLY_AST. We fall back to Any for other values of flags.
 if sys.version_info >= (3, 8):
+    @overload
     def compile(
-        source: str | ReadableBuffer | AST,
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
         filename: str | ReadableBuffer | _PathLike[Any],
         mode: str,
-        flags: int = ...,
-        dont_inherit: int = ...,
-        optimize: int = ...,
+        flags: Literal[0],
+        dont_inherit: int = False,
+        optimize: int = -1,
         *,
-        _feature_version: int = ...,
+        _feature_version: int = -1,
+    ) -> CodeType: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        *,
+        dont_inherit: int = False,
+        optimize: int = -1,
+        _feature_version: int = -1,
+    ) -> CodeType: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        flags: Literal[1024],
+        dont_inherit: int = False,
+        optimize: int = -1,
+        *,
+        _feature_version: int = -1,
+    ) -> _ast.AST: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        flags: int,
+        dont_inherit: int = False,
+        optimize: int = -1,
+        *,
+        _feature_version: int = -1,
     ) -> Any: ...
 
 else:
+    @overload
     def compile(
-        source: str | ReadableBuffer | AST,
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
         filename: str | ReadableBuffer | _PathLike[Any],
         mode: str,
-        flags: int = ...,
-        dont_inherit: int = ...,
-        optimize: int = ...,
+        flags: Literal[0],
+        dont_inherit: int = False,
+        optimize: int = -1,
+    ) -> CodeType: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        *,
+        dont_inherit: int = False,
+        optimize: int = -1,
+    ) -> CodeType: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        flags: Literal[1024],
+        dont_inherit: int = False,
+        optimize: int = -1,
+    ) -> _ast.AST: ...
+    @overload
+    def compile(
+        source: str | ReadableBuffer | _ast.Module | _ast.Expression | _ast.Interactive,
+        filename: str | ReadableBuffer | _PathLike[Any],
+        mode: str,
+        flags: int,
+        dont_inherit: int = False,
+        optimize: int = -1,
     ) -> Any: ...
 
 def copyright() -> None: ...
@@ -1266,7 +1328,7 @@ if sys.version_info >= (3, 11):
         __globals: dict[str, Any] | None = ...,
         __locals: Mapping[str, object] | None = ...,
         *,
-        closure: tuple[_Cell, ...] | None = ...,
+        closure: tuple[_Cell, ...] | None = None,
     ) -> None: ...
 
 else:
@@ -1276,7 +1338,7 @@ else:
         __locals: Mapping[str, object] | None = ...,
     ) -> None: ...
 
-def exit(code: sys._ExitCode = ...) -> NoReturn: ...
+def exit(code: sys._ExitCode = None) -> NoReturn: ...
 
 class filter(Iterator[_T], Generic[_T]):
     @overload
@@ -1325,19 +1387,13 @@ def iter(__function: Callable[[], _T | None], __sentinel: None) -> Iterator[_T]:
 @overload
 def iter(__function: Callable[[], _T], __sentinel: object) -> Iterator[_T]: ...
 
-# We need recursive types to express the type of the second argument to `isinstance` properly, hence the use of `Any`
 if sys.version_info >= (3, 10):
-    def isinstance(
-        __obj: object, __class_or_tuple: type | types.UnionType | tuple[type | types.UnionType | tuple[Any, ...], ...]
-    ) -> bool: ...
-    def issubclass(
-        __cls: type, __class_or_tuple: type | types.UnionType | tuple[type | types.UnionType | tuple[Any, ...], ...]
-    ) -> bool: ...
-
+    _ClassInfo: TypeAlias = type | types.UnionType | tuple[_ClassInfo, ...]
 else:
-    def isinstance(__obj: object, __class_or_tuple: type | tuple[type | tuple[Any, ...], ...]) -> bool: ...
-    def issubclass(__cls: type, __class_or_tuple: type | tuple[type | tuple[Any, ...], ...]) -> bool: ...
+    _ClassInfo: TypeAlias = type | tuple[_ClassInfo, ...]
 
+def isinstance(__obj: object, __class_or_tuple: _ClassInfo) -> bool: ...
+def issubclass(__cls: type, __class_or_tuple: _ClassInfo) -> bool: ...
 def len(__obj: Sized) -> int: ...
 def license() -> None: ...
 def locals() -> dict[str, Any]: ...
@@ -1419,13 +1475,12 @@ def next(__i: SupportsNext[_T]) -> _T: ...
 def next(__i: SupportsNext[_T], __default: _VT) -> _T | _VT: ...
 def oct(__number: int | SupportsIndex) -> str: ...
 
-_OpenFile = StrOrBytesPath | int  # noqa: Y026  # TODO: Use TypeAlias once mypy bugs are fixed
 _Opener: TypeAlias = Callable[[str, int], int]
 
 # Text mode: always returns a TextIOWrapper
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenTextMode = ...,
     buffering: int = ...,
     encoding: str | None = ...,
@@ -1438,7 +1493,7 @@ def open(
 # Unbuffered binary mode: returns a FileIO
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenBinaryMode,
     buffering: Literal[0],
     encoding: None = ...,
@@ -1451,7 +1506,7 @@ def open(
 # Buffering is on: return BufferedRandom, BufferedReader, or BufferedWriter
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenBinaryModeUpdating,
     buffering: Literal[-1, 1] = ...,
     encoding: None = ...,
@@ -1462,7 +1517,7 @@ def open(
 ) -> BufferedRandom: ...
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenBinaryModeWriting,
     buffering: Literal[-1, 1] = ...,
     encoding: None = ...,
@@ -1473,7 +1528,7 @@ def open(
 ) -> BufferedWriter: ...
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenBinaryModeReading,
     buffering: Literal[-1, 1] = ...,
     encoding: None = ...,
@@ -1486,7 +1541,7 @@ def open(
 # Buffering cannot be determined: fall back to BinaryIO
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: OpenBinaryMode,
     buffering: int = ...,
     encoding: None = ...,
@@ -1499,7 +1554,7 @@ def open(
 # Fallback if mode is not specified
 @overload
 def open(
-    file: _OpenFile,
+    file: FileDescriptorOrPath,
     mode: str,
     buffering: int = ...,
     encoding: str | None = ...,
@@ -1613,7 +1668,7 @@ else:
     @overload
     def pow(__base: _SupportsSomeKindOfPow, __exp: complex, __mod: None = ...) -> complex: ...
 
-def quit(code: sys._ExitCode = ...) -> NoReturn: ...
+def quit(code: sys._ExitCode = None) -> NoReturn: ...
 
 class reversed(Iterator[_T], Generic[_T]):
     @overload
@@ -1625,12 +1680,21 @@ class reversed(Iterator[_T], Generic[_T]):
     def __length_hint__(self) -> int: ...
 
 def repr(__obj: object) -> str: ...
+
+# See https://github.com/python/typeshed/pull/9141
+# and https://github.com/python/typeshed/pull/9151
+# on why we don't use `SupportsRound` from `typing.pyi`
+
+class _SupportsRound1(Protocol[_T_co]):
+    def __round__(self) -> _T_co: ...
+
+class _SupportsRound2(Protocol[_T_co]):
+    def __round__(self, __ndigits: int) -> _T_co: ...
+
 @overload
-def round(number: SupportsRound[Any]) -> int: ...
+def round(number: _SupportsRound1[_T], ndigits: None = ...) -> _T: ...
 @overload
-def round(number: SupportsRound[Any], ndigits: None) -> int: ...
-@overload
-def round(number: SupportsRound[_T], ndigits: SupportsIndex) -> _T: ...
+def round(number: _SupportsRound2[_T], ndigits: SupportsIndex) -> _T: ...
 
 # See https://github.com/python/typeshed/pull/6292#discussion_r748875189
 # for why arg 3 of `setattr` should be annotated with `Any` and not `object`
@@ -1672,8 +1736,12 @@ else:
     @overload
     def sum(__iterable: Iterable[_AddableT1], __start: _AddableT2) -> _AddableT1 | _AddableT2: ...
 
-# The argument to `vars()` has to have a `__dict__` attribute, so can't be annotated with `object`
+# The argument to `vars()` has to have a `__dict__` attribute, so the second overload can't be annotated with `object`
 # (A "SupportsDunderDict" protocol doesn't work)
+# Use a type: ignore to make complaints about overlapping overloads go away
+@overload
+def vars(__object: type) -> types.MappingProxyType[str, Any]: ...  # type: ignore[misc]
+@overload
 def vars(__object: Any = ...) -> dict[str, Any]: ...
 
 class zip(Iterator[_T_co], Generic[_T_co]):
@@ -1758,10 +1826,10 @@ class zip(Iterator[_T_co], Generic[_T_co]):
 # Return type of `__import__` should be kept the same as return type of `importlib.import_module`
 def __import__(
     name: str,
-    globals: Mapping[str, object] | None = ...,
-    locals: Mapping[str, object] | None = ...,
+    globals: Mapping[str, object] | None = None,
+    locals: Mapping[str, object] | None = None,
     fromlist: Sequence[str] = ...,
-    level: int = ...,
+    level: int = 0,
 ) -> types.ModuleType: ...
 def __build_class__(__func: Callable[[], _Cell | Any], __name: str, *bases: Any, metaclass: Any = ..., **kwds: Any) -> Any: ...
 
@@ -1932,6 +2000,7 @@ if sys.version_info >= (3, 11):
     _ExceptionT_co = TypeVar("_ExceptionT_co", bound=Exception, covariant=True)
     _ExceptionT = TypeVar("_ExceptionT", bound=Exception)
 
+    # See `check_exception_group.py` for use-cases and comments.
     class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         def __new__(cls: type[Self], __message: str, __exceptions: Sequence[_BaseExceptionT_co]) -> Self: ...
         @property
@@ -1940,17 +2009,33 @@ if sys.version_info >= (3, 11):
         def exceptions(self) -> tuple[_BaseExceptionT_co | BaseExceptionGroup[_BaseExceptionT_co], ...]: ...
         @overload
         def subgroup(
+            self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+        ) -> ExceptionGroup[_ExceptionT] | None: ...
+        @overload
+        def subgroup(
             self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
         ) -> BaseExceptionGroup[_BaseExceptionT] | None: ...
         @overload
-        def subgroup(self: Self, __condition: Callable[[_BaseExceptionT_co], bool]) -> Self | None: ...
+        def subgroup(
+            self: Self, __condition: Callable[[_BaseExceptionT_co | Self], bool]
+        ) -> BaseExceptionGroup[_BaseExceptionT_co] | None: ...
         @overload
         def split(
-            self: Self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
-        ) -> tuple[BaseExceptionGroup[_BaseExceptionT] | None, Self | None]: ...
+            self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+        ) -> tuple[ExceptionGroup[_ExceptionT] | None, BaseExceptionGroup[_BaseExceptionT_co] | None]: ...
         @overload
-        def split(self: Self, __condition: Callable[[_BaseExceptionT_co], bool]) -> tuple[Self | None, Self | None]: ...
-        def derive(self: Self, __excs: Sequence[_BaseExceptionT_co]) -> Self: ...
+        def split(
+            self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
+        ) -> tuple[BaseExceptionGroup[_BaseExceptionT] | None, BaseExceptionGroup[_BaseExceptionT_co] | None]: ...
+        @overload
+        def split(
+            self: Self, __condition: Callable[[_BaseExceptionT_co | Self], bool]
+        ) -> tuple[BaseExceptionGroup[_BaseExceptionT_co] | None, BaseExceptionGroup[_BaseExceptionT_co] | None]: ...
+        # In reality it is `NonEmptySequence`:
+        @overload
+        def derive(self, __excs: Sequence[_ExceptionT]) -> ExceptionGroup[_ExceptionT]: ...
+        @overload
+        def derive(self, __excs: Sequence[_BaseExceptionT]) -> BaseExceptionGroup[_BaseExceptionT]: ...
         def __class_getitem__(cls, __item: Any) -> GenericAlias: ...
 
     class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
@@ -1963,10 +2048,14 @@ if sys.version_info >= (3, 11):
             self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
         ) -> ExceptionGroup[_ExceptionT] | None: ...
         @overload
-        def subgroup(self: Self, __condition: Callable[[_ExceptionT_co], bool]) -> Self | None: ...
+        def subgroup(
+            self: Self, __condition: Callable[[_ExceptionT_co | Self], bool]
+        ) -> ExceptionGroup[_ExceptionT_co] | None: ...
         @overload  # type: ignore[override]
         def split(
-            self: Self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
-        ) -> tuple[ExceptionGroup[_ExceptionT] | None, Self | None]: ...
+            self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+        ) -> tuple[ExceptionGroup[_ExceptionT] | None, ExceptionGroup[_ExceptionT_co] | None]: ...
         @overload
-        def split(self: Self, __condition: Callable[[_ExceptionT_co], bool]) -> tuple[Self | None, Self | None]: ...
+        def split(
+            self: Self, __condition: Callable[[_ExceptionT_co | Self], bool]
+        ) -> tuple[ExceptionGroup[_ExceptionT_co] | None, ExceptionGroup[_ExceptionT_co] | None]: ...
