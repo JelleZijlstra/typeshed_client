@@ -355,7 +355,7 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         else:
             raise InvalidStub(f"Invalid attribute on {ast.dump(node)}")
 
-    def visit_Name(self, node: ast.Name) -> Iterable[NameInfo]:
+    def visit_Name(self, node: ast.Name) -> bool:
         # We're type checking (probably), but we're not mypy.
         if node.id == "TYPE_CHECKING":
             return True
