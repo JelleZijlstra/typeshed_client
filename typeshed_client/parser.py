@@ -143,14 +143,14 @@ def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
 
 def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
     if not isinstance(node, (ast.Assign, ast.AugAssign)):
-        return None
+        raise InvalidStub(f"Invalid __all__: {ast.dump(node)}")
     rhs = node.value
-    if not isinstance(rhs, ast.List):
-        return None
+    if not isinstance(rhs, (ast.List, ast.Tuple)):
+        raise InvalidStub(f"Invalid __all__: {ast.dump(rhs)}")
     names = []
     for elt in rhs.elts:
         if not isinstance(elt, ast.Str):
-            return None
+            raise InvalidStub(f"Invalid __all__: {ast.dump(rhs)}")
         names.append(elt.s)
     return names
 

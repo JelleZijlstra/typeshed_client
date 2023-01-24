@@ -154,11 +154,12 @@ class TestParser(unittest.TestCase):
         ctx = get_context((3, 10))
         names = get_stub_names("starimportall", search_context=ctx)
         assert names is not None
-        expected = {"a", "b", "c"}
+        expected = {"a", "b", "c", "n"}
         self.assertEqual(set(names), expected)
         for name in expected:
             self.check_nameinfo(names, name, typeshed_client.ImportedName)
-            path = typeshed_client.ModulePath(("dunder_all",))
+            module = "tupleall" if name == "n" else "dunder_all"
+            path = typeshed_client.ModulePath((module,))
             self.assertEqual(names[name].ast, typeshed_client.ImportedName(path, name))
 
     def test_starimport_no_dunders(self) -> None:
