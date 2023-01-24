@@ -36,6 +36,7 @@ class SearchContext(NamedTuple):
     search_path: Sequence[Path]
     version: PythonVersion
     platform: str
+    raise_on_warnings: bool = False
 
     def is_python2(self) -> bool:
         return self.version[0] == 2
@@ -48,6 +49,7 @@ def get_search_context(
     python_executable: Optional[str] = None,
     version: Optional[PythonVersion] = None,
     platform: str = sys.platform,
+    raise_on_warnings: bool = False,
 ) -> SearchContext:
     """Return a context for finding stubs. This context can be passed to other
     functions in this file.
@@ -62,6 +64,7 @@ def get_search_context(
     - version: Version of Python to use, as a two-tuple like (3, 9).
     - platform: Value to use for sys.platform in stubs, defaulting to the current
       process's value.
+    - raise_on_warnings: Raise an error for any warnings encountered by the parser.
 
     """
     if version is None:
@@ -79,7 +82,11 @@ def get_search_context(
     if typeshed is None:
         typeshed = find_typeshed()
     return SearchContext(
-        typeshed=typeshed, search_path=search_path, version=version, platform=platform
+        typeshed=typeshed,
+        search_path=search_path,
+        version=version,
+        platform=platform,
+        raise_on_warnings=raise_on_warnings,
     )
 
 
