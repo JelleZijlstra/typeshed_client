@@ -6,6 +6,7 @@ from typeshed_client.finder import (
     PythonVersion,
     get_stub_file,
     SearchContext,
+    ModulePath,
 )
 from typeshed_client.parser import get_stub_names
 from typing import Any, Set, Type, Optional
@@ -337,7 +338,7 @@ class IntegrationTest(unittest.TestCase):
                 assert ast is not None
                 is_init = module_path.name == "__init__.pyi"
                 typeshed_client.parser.parse_ast(
-                    ast, ctx, tuple(module_name.split(".")), is_init=is_init
+                    ast, ctx, ModulePath(tuple(module_name.split("."))), is_init=is_init
                 )
 
 
