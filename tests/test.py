@@ -6,6 +6,7 @@ from typeshed_client.finder import (
     PythonVersion,
     get_stub_file,
     SearchContext,
+    ModulePath,
 )
 from typeshed_client.parser import get_stub_names
 from typing import Any, Set, Type, Optional
@@ -330,12 +331,15 @@ class IntegrationTest(unittest.TestCase):
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
     def test(self) -> None:
-        ctx = get_search_context()
+        ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(path=module_name):
                 ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
                 assert ast is not None
-                typeshed_client.parser.parse_ast(ast, ctx, self.fake_path)
+                is_init = module_path.name == "__init__.pyi"
+                typeshed_client.parser.parse_ast(
+                    ast, ctx, ModulePath(tuple(module_name.split("."))), is_init=is_init
+                )
 
 
 if __name__ == "__main__":

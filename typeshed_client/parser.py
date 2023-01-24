@@ -79,8 +79,9 @@ def parse_ast(
     for info in names:
         if info.name in name_dict:
             if info.child_nodes:
-                log.warning(
-                    "Name is already present in %s: %s", ".".join(module_name), info
+                _warn(
+                    f"Name is already present in {', '.join(module_name)}: {info}",
+                    search_context,
                 )
                 continue
             existing = name_dict[info.name]
@@ -92,14 +93,14 @@ def parse_ast(
                 continue
 
             if isinstance(existing.ast, ImportedName):
-                log.warning(
-                    "Name is already imported in %s: %s",
-                    ".".join(module_name),
-                    existing,
+                _warn(
+                    f"Name is already imported in {', '.join(module_name)}: {existing}",
+                    search_context,
                 )
             elif existing.child_nodes:
-                log.warning(
-                    "Name is already present in %s: %s", ".".join(module_name), existing
+                _warn(
+                    f"Name is already present in {', '.join(module_name)}: {existing}",
+                    search_context,
                 )
             elif isinstance(existing.ast, OverloadedName):
                 existing.ast.definitions.append(info.ast)
@@ -298,9 +299,12 @@ class _NameExtractor(ast.NodeVisitor):
                     ".".join(source_module), search_context=self.ctx
                 )
                 if names is None:
-                    log.warning(
-                        f"could not import {source_module} in {self.module_name} with "
-                        f"{self.ctx}"
+                    _warn(
+                        (
+                            f"could not import {source_module} in"
+                            f" {self.module_name} with {self.ctx}"
+                        ),
+                        self.ctx,
                     )
                     continue
                 for name in names:
@@ -405,3 +409,10 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
 
 class _AssertFailed(Exception):
     """Raised when a top-level assert in a stub fails."""
+
+
+def _warn(message: str, ctx: SearchContext) -> None:
+    if ctx.raise_on_warnings:
+        raise InvalidStub(message)
+    else:
+        log.warning(message)
