@@ -175,7 +175,7 @@ def _get_all_stub_files_from_directory(
     directory: _DirEntry, root_directory: Path, seen: Set[str]
 ) -> Generator[Tuple[str, Path], None, Set[str]]:
     new_seen = set(seen)
-    to_do: Set[os.PathLike[str]] = {directory}
+    to_do: List[os.PathLike[str]] = [directory]
     while to_do:
         current_dir = to_do.pop()
         for dir_entry in os.scandir(current_dir):
@@ -186,7 +186,7 @@ def _get_all_stub_files_from_directory(
                 if (path / "__init__.pyi").is_file() or (
                     path / "__init__.py"
                 ).is_file():
-                    to_do.add(path)
+                    to_do.append(path)
             elif dir_entry.is_file():
                 path = Path(dir_entry)
                 if path.suffix != ".pyi":
