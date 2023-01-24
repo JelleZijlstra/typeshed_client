@@ -150,6 +150,26 @@ class TestParser(unittest.TestCase):
             names["public"].ast, typeshed_client.ImportedName(path, "public")
         )
 
+    def test_starimport_all(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("starimportall", search_context=ctx)
+        assert names is not None
+        expected = {"a", "b", "c"}
+        self.assertEqual(set(names), expected)
+        for name in expected:
+            self.check_nameinfo(names, name, typeshed_client.ImportedName)
+            path = typeshed_client.ModulePath(("dunder_all",))
+            self.assertEqual(names[name].ast, typeshed_client.ImportedName(path, name))
+
+    def test_starimport_no_dunders(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("importabout", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names.keys()), {"x"})
+        self.check_nameinfo(names, "x", typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(("about",))
+        self.assertEqual(names["x"].ast, typeshed_client.ImportedName(path, "x"))
+
     def test_dot_import(self) -> None:
         ctx = get_context((3, 5))
         for mod in (

@@ -115,6 +115,18 @@ def parse_ast(
     return name_dict
 
 
+def get_import_star_names(
+    module_name: str, *, search_context: SearchContext
+) -> Optional[List[str]]:
+    name_dict = get_stub_names(module_name, search_context=search_context)
+    if name_dict is None:
+        return None
+    if "__all__" in name_dict:
+        info = name_dict["__all__"]
+        return get_dunder_all_from_info(info)
+    return [name for name, info in name_dict.items() if info.is_exported]
+
+
 def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
     if isinstance(info.ast, OverloadedName):
         names = []
@@ -158,11 +170,7 @@ _CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
 
 
 def _name_is_exported(name: str) -> bool:
-    if not name.startswith("_"):
-        return True
-    if name.startswith("__") and name.endswith("__"):
-        return True
-    return False
+    return not name.startswith("_")
 
 
 class _NameExtractor(ast.NodeVisitor):
@@ -281,23 +289,22 @@ class _NameExtractor(ast.NodeVisitor):
                 source_module = ModulePath(self.module_name[: -node.level] + module)
         for alias in node.names:
             if alias.asname is not None:
-                is_exported = not alias.asname.startswith("_")
+                is_exported = _name_is_exported(alias.asname)
                 yield NameInfo(
                     alias.asname, is_exported, ImportedName(source_module, alias.name)
                 )
             elif alias.name == "*":
-                name_dict = get_stub_names(
+                names = get_import_star_names(
                     ".".join(source_module), search_context=self.ctx
                 )
-                if name_dict is None:
+                if names is None:
                     log.warning(
                         f"could not import {source_module} in {self.module_name} with "
                         f"{self.ctx}"
                     )
                     continue
-                for name, info in name_dict.items():
-                    if info.is_exported:
-                        yield NameInfo(name, True, ImportedName(source_module, name))
+                for name in names:
+                    yield NameInfo(name, True, ImportedName(source_module, name))
             else:
                 yield NameInfo(
                     alias.name, False, ImportedName(source_module, alias.name)
