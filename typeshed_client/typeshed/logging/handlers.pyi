@@ -25,7 +25,7 @@ class WatchedFileHandler(FileHandler):
             self, filename: StrPath, mode: str = "a", encoding: str | None = None, delay: bool = False, errors: str | None = None
         ) -> None: ...
     else:
-        def __init__(self, filename: StrPath, mode: str = ..., encoding: str | None = ..., delay: bool = ...) -> None: ...
+        def __init__(self, filename: StrPath, mode: str = "a", encoding: str | None = None, delay: bool = False) -> None: ...
 
     def _statstream(self) -> None: ...  # undocumented
     def reopenIfNeeded(self) -> None: ...
@@ -38,7 +38,7 @@ class BaseRotatingHandler(FileHandler):
             self, filename: StrPath, mode: str, encoding: str | None = None, delay: bool = False, errors: str | None = None
         ) -> None: ...
     else:
-        def __init__(self, filename: StrPath, mode: str, encoding: str | None = ..., delay: bool = ...) -> None: ...
+        def __init__(self, filename: StrPath, mode: str, encoding: str | None = None, delay: bool = False) -> None: ...
 
     def rotation_filename(self, default_name: str) -> str: ...
     def rotate(self, source: str, dest: str) -> None: ...
@@ -61,11 +61,11 @@ class RotatingFileHandler(BaseRotatingHandler):
         def __init__(
             self,
             filename: StrPath,
-            mode: str = ...,
-            maxBytes: int = ...,
-            backupCount: int = ...,
-            encoding: str | None = ...,
-            delay: bool = ...,
+            mode: str = "a",
+            maxBytes: int = 0,
+            backupCount: int = 0,
+            encoding: str | None = None,
+            delay: bool = False,
         ) -> None: ...
 
     def doRollover(self) -> None: ...
@@ -98,13 +98,13 @@ class TimedRotatingFileHandler(BaseRotatingHandler):
         def __init__(
             self,
             filename: StrPath,
-            when: str = ...,
-            interval: int = ...,
-            backupCount: int = ...,
-            encoding: str | None = ...,
-            delay: bool = ...,
-            utc: bool = ...,
-            atTime: datetime.time | None = ...,
+            when: str = "h",
+            interval: int = 1,
+            backupCount: int = 0,
+            encoding: str | None = None,
+            delay: bool = False,
+            utc: bool = False,
+            atTime: datetime.time | None = None,
         ) -> None: ...
 
     def doRollover(self) -> None: ...
@@ -177,7 +177,9 @@ class SysLogHandler(Handler):
     priority_names: ClassVar[dict[str, int]]  # undocumented
     facility_names: ClassVar[dict[str, int]]  # undocumented
     priority_map: ClassVar[dict[str, str]]  # undocumented
-    def __init__(self, address: tuple[str, int] | str = ..., facility: int = 1, socktype: SocketKind | None = None) -> None: ...
+    def __init__(
+        self, address: tuple[str, int] | str = ("localhost", 514), facility: int = 1, socktype: SocketKind | None = None
+    ) -> None: ...
     if sys.version_info >= (3, 11):
         def createSocket(self) -> None: ...
 
@@ -210,7 +212,7 @@ class SMTPHandler(Handler):
         subject: str,
         credentials: tuple[str, str] | None = None,
         secure: tuple[()] | tuple[str] | tuple[str, str] | None = None,
-        timeout: float = ...,
+        timeout: float = 5.0,
     ) -> None: ...
     def getSubject(self, record: LogRecord) -> str: ...
 

@@ -1,9 +1,10 @@
 import sys
-from _typeshed import ReadableBuffer, Self
+from _typeshed import ReadableBuffer
 from collections.abc import Mapping, MutableMapping
 from datetime import datetime
 from enum import Enum
 from typing import IO, Any
+from typing_extensions import Self
 
 if sys.version_info >= (3, 9):
     __all__ = ["InvalidFileException", "FMT_XML", "FMT_BINARY", "load", "dump", "loads", "dumps", "UID"]
@@ -56,15 +57,15 @@ else:
     def load(
         fp: IO[bytes],
         *,
-        fmt: PlistFormat | None = ...,
-        use_builtin_types: bool = ...,
+        fmt: PlistFormat | None = None,
+        use_builtin_types: bool = True,
         dict_type: type[MutableMapping[str, Any]] = ...,
     ) -> Any: ...
     def loads(
         value: ReadableBuffer,
         *,
-        fmt: PlistFormat | None = ...,
-        use_builtin_types: bool = ...,
+        fmt: PlistFormat | None = None,
+        use_builtin_types: bool = True,
         dict_type: type[MutableMapping[str, Any]] = ...,
     ) -> Any: ...
 
@@ -100,7 +101,7 @@ if sys.version_info >= (3, 8):
         data: int
         def __init__(self, data: int) -> None: ...
         def __index__(self) -> int: ...
-        def __reduce__(self: Self) -> tuple[type[Self], tuple[int]]: ...
+        def __reduce__(self) -> tuple[type[Self], tuple[int]]: ...
         def __eq__(self, other: object) -> bool: ...
 
 class InvalidFileException(ValueError):

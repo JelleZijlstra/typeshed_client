@@ -23,7 +23,6 @@ class Module:  # undocumented
     def __init__(self, name: str, file: str | None = None, path: str | None = None) -> None: ...
 
 class ModuleFinder:
-
     modules: dict[str, Module]
     path: list[str]  # undocumented
     badmodules: dict[str, dict[str, int]]  # undocumented
@@ -43,10 +42,10 @@ class ModuleFinder:
     else:
         def __init__(
             self,
-            path: list[str] | None = ...,
-            debug: int = ...,
-            excludes: Container[str] = ...,
-            replace_paths: Sequence[tuple[str, str]] = ...,
+            path: list[str] | None = None,
+            debug: int = 0,
+            excludes: Container[str] = [],
+            replace_paths: Sequence[tuple[str, str]] = [],
         ) -> None: ...
 
     def msg(self, level: int, str: str, *args: Any) -> None: ...  # undocumented
