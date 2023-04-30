@@ -112,12 +112,12 @@ from _socket import (
     setdefaulttimeout as setdefaulttimeout,
     timeout as timeout,
 )
-from _typeshed import ReadableBuffer, Self, Unused, WriteableBuffer
+from _typeshed import ReadableBuffer, Unused, WriteableBuffer
 from collections.abc import Iterable
 from enum import IntEnum, IntFlag
 from io import BufferedReader, BufferedRWPair, BufferedWriter, IOBase, RawIOBase, TextIOWrapper
 from typing import Any, Protocol, overload
-from typing_extensions import Literal
+from typing_extensions import Literal, Self
 
 if sys.platform != "darwin" or sys.version_info >= (3, 9):
     from _socket import (
@@ -657,51 +657,51 @@ class socket(_socket.socket):
     def __init__(
         self, family: AddressFamily | int = -1, type: SocketKind | int = -1, proto: int = -1, fileno: int | None = None
     ) -> None: ...
-    def __enter__(self: Self) -> Self: ...
+    def __enter__(self) -> Self: ...
     def __exit__(self, *args: Unused) -> None: ...
-    def dup(self: Self) -> Self: ...  # noqa: F811
+    def dup(self) -> Self: ...  # noqa: F811
     def accept(self) -> tuple[socket, _RetAddress]: ...
     # Note that the makefile's documented windows-specific behavior is not represented
     # mode strings with duplicates are intentionally excluded
     @overload
-    def makefile(  # type: ignore[misc]
+    def makefile(
         self,
         mode: Literal["b", "rb", "br", "wb", "bw", "rwb", "rbw", "wrb", "wbr", "brw", "bwr"],
         buffering: Literal[0],
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> SocketIO: ...
     @overload
     def makefile(
         self,
         mode: Literal["rwb", "rbw", "wrb", "wbr", "brw", "bwr"],
-        buffering: Literal[-1, 1] | None = ...,
+        buffering: Literal[-1, 1] | None = None,
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> BufferedRWPair: ...
     @overload
     def makefile(
         self,
         mode: Literal["rb", "br"],
-        buffering: Literal[-1, 1] | None = ...,
+        buffering: Literal[-1, 1] | None = None,
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> BufferedReader: ...
     @overload
     def makefile(
         self,
         mode: Literal["wb", "bw"],
-        buffering: Literal[-1, 1] | None = ...,
+        buffering: Literal[-1, 1] | None = None,
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> BufferedWriter: ...
     @overload
     def makefile(
@@ -709,25 +709,25 @@ class socket(_socket.socket):
         mode: Literal["b", "rb", "br", "wb", "bw", "rwb", "rbw", "wrb", "wbr", "brw", "bwr"],
         buffering: int,
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> IOBase: ...
     @overload
     def makefile(
         self,
-        mode: Literal["r", "w", "rw", "wr", ""] = ...,
-        buffering: int | None = ...,
+        mode: Literal["r", "w", "rw", "wr", ""] = "r",
+        buffering: int | None = None,
         *,
-        encoding: str | None = ...,
-        errors: str | None = ...,
-        newline: str | None = ...,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
     ) -> TextIOWrapper: ...
     def sendfile(self, file: _SendableFile, offset: int = 0, count: int | None = None) -> int: ...
     @property
-    def family(self) -> AddressFamily: ...  # type: ignore[override]
+    def family(self) -> AddressFamily: ...
     @property
-    def type(self) -> SocketKind: ...  # type: ignore[override]
+    def type(self) -> SocketKind: ...
     def get_inheritable(self) -> bool: ...
     def set_inheritable(self, inheritable: bool) -> None: ...
 
@@ -744,11 +744,11 @@ if sys.platform == "win32":
     def fromshare(info: bytes) -> socket: ...
 
 if sys.platform == "win32":
-    def socketpair(family: int = ..., type: int = ..., proto: int = ...) -> tuple[socket, socket]: ...
+    def socketpair(family: int = ..., type: int = ..., proto: int = 0) -> tuple[socket, socket]: ...
 
 else:
     def socketpair(
-        family: int | AddressFamily | None = None, type: SocketType | int = 1, proto: int = 0
+        family: int | AddressFamily | None = None, type: SocketType | int = ..., proto: int = 0
     ) -> tuple[socket, socket]: ...
 
 class SocketIO(RawIOBase):
@@ -773,7 +773,7 @@ if sys.version_info >= (3, 11):
 
 else:
     def create_connection(
-        address: tuple[str | None, int], timeout: float | None = ..., source_address: _Address | None = ...  # noqa: F811
+        address: tuple[str | None, int], timeout: float | None = ..., source_address: _Address | None = None  # noqa: F811
     ) -> socket: ...
 
 if sys.version_info >= (3, 8):

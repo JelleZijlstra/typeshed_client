@@ -58,7 +58,7 @@ class _ResultItem:
             self, work_id: int, exception: Exception | None = None, result: Any | None = None, exit_pid: int | None = None
         ) -> None: ...
     else:
-        def __init__(self, work_id: int, exception: Exception | None = ..., result: Any | None = ...) -> None: ...
+        def __init__(self, work_id: int, exception: Exception | None = None, result: Any | None = None) -> None: ...
 
 class _CallItem:
     work_id: int
@@ -83,7 +83,7 @@ class _SafeQueue(Queue[Future[Any]]):
         ) -> None: ...
     else:
         def __init__(
-            self, max_size: int | None = ..., *, ctx: BaseContext, pending_work_items: dict[int, _WorkItem[Any]]
+            self, max_size: int | None = 0, *, ctx: BaseContext, pending_work_items: dict[int, _WorkItem[Any]]
         ) -> None: ...
 
     def _on_queue_feeder_error(self, e: Exception, obj: _CallItem) -> None: ...
@@ -102,7 +102,7 @@ if sys.version_info >= (3, 11):
 
 else:
     def _sendback_result(
-        result_queue: SimpleQueue[_WorkItem[Any]], work_id: int, result: Any | None = ..., exception: Exception | None = ...
+        result_queue: SimpleQueue[_WorkItem[Any]], work_id: int, result: Any | None = None, exception: Exception | None = None
     ) -> None: ...
 
 if sys.version_info >= (3, 11):
@@ -153,9 +153,9 @@ def _chain_from_iterable_of_lists(iterable: Iterable[MutableSequence[Any]]) -> A
 class BrokenProcessPool(BrokenExecutor): ...
 
 class ProcessPoolExecutor(Executor):
-    _mp_context: BaseContext | None = ...
-    _initializer: Callable[..., None] | None = ...
-    _initargs: tuple[Any, ...] = ...
+    _mp_context: BaseContext | None
+    _initializer: Callable[..., None] | None
+    _initargs: tuple[Any, ...]
     _executor_manager_thread: _ThreadWakeup
     _processes: MutableMapping[int, Process]
     _shutdown_thread: bool
@@ -174,17 +174,17 @@ class ProcessPoolExecutor(Executor):
             max_workers: int | None = None,
             mp_context: BaseContext | None = None,
             initializer: Callable[..., object] | None = None,
-            initargs: tuple[Any, ...] = ...,
+            initargs: tuple[Any, ...] = (),
             *,
             max_tasks_per_child: int | None = None,
         ) -> None: ...
     else:
         def __init__(
             self,
-            max_workers: int | None = ...,
-            mp_context: BaseContext | None = ...,
-            initializer: Callable[..., object] | None = ...,
-            initargs: tuple[Any, ...] = ...,
+            max_workers: int | None = None,
+            mp_context: BaseContext | None = None,
+            initializer: Callable[..., object] | None = None,
+            initargs: tuple[Any, ...] = (),
         ) -> None: ...
     if sys.version_info >= (3, 9):
         def _start_executor_manager_thread(self) -> None: ...

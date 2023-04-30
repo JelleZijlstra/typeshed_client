@@ -1,8 +1,8 @@
 import io
-from _typeshed import ReadableBuffer, Self, StrOrBytesPath
+from _typeshed import ReadableBuffer, StrOrBytesPath
 from collections.abc import Mapping, Sequence
 from typing import IO, Any, TextIO, overload
-from typing_extensions import Literal, TypeAlias, final
+from typing_extensions import Literal, Self, TypeAlias, final
 
 __all__ = [
     "CHECK_NONE",
@@ -104,7 +104,7 @@ class LZMACompressor:
 
 class LZMAError(Exception): ...
 
-class LZMAFile(io.BufferedIOBase, IO[bytes]):
+class LZMAFile(io.BufferedIOBase, IO[bytes]):  # type: ignore[misc]  # incompatible definitions of writelines in the base classes
     def __init__(
         self,
         filename: _PathOrFile | None = None,
@@ -115,7 +115,7 @@ class LZMAFile(io.BufferedIOBase, IO[bytes]):
         preset: int | None = None,
         filters: _FilterChain | None = None,
     ) -> None: ...
-    def __enter__(self: Self) -> Self: ...
+    def __enter__(self) -> Self: ...
     def peek(self, size: int = -1) -> bytes: ...
     def read(self, size: int | None = -1) -> bytes: ...
     def read1(self, size: int = -1) -> bytes: ...
@@ -126,67 +126,67 @@ class LZMAFile(io.BufferedIOBase, IO[bytes]):
 @overload
 def open(
     filename: _PathOrFile,
-    mode: Literal["r", "rb"] = ...,
+    mode: Literal["r", "rb"] = "rb",
     *,
-    format: int | None = ...,
-    check: Literal[-1] = ...,
-    preset: None = ...,
-    filters: _FilterChain | None = ...,
-    encoding: None = ...,
-    errors: None = ...,
-    newline: None = ...,
+    format: int | None = None,
+    check: Literal[-1] = -1,
+    preset: None = None,
+    filters: _FilterChain | None = None,
+    encoding: None = None,
+    errors: None = None,
+    newline: None = None,
 ) -> LZMAFile: ...
 @overload
 def open(
     filename: _PathOrFile,
     mode: _OpenBinaryWritingMode,
     *,
-    format: int | None = ...,
-    check: int = ...,
-    preset: int | None = ...,
-    filters: _FilterChain | None = ...,
-    encoding: None = ...,
-    errors: None = ...,
-    newline: None = ...,
+    format: int | None = None,
+    check: int = -1,
+    preset: int | None = None,
+    filters: _FilterChain | None = None,
+    encoding: None = None,
+    errors: None = None,
+    newline: None = None,
 ) -> LZMAFile: ...
 @overload
 def open(
     filename: StrOrBytesPath,
     mode: Literal["rt"],
     *,
-    format: int | None = ...,
-    check: Literal[-1] = ...,
-    preset: None = ...,
-    filters: _FilterChain | None = ...,
-    encoding: str | None = ...,
-    errors: str | None = ...,
-    newline: str | None = ...,
+    format: int | None = None,
+    check: Literal[-1] = -1,
+    preset: None = None,
+    filters: _FilterChain | None = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
 ) -> TextIO: ...
 @overload
 def open(
     filename: StrOrBytesPath,
     mode: _OpenTextWritingMode,
     *,
-    format: int | None = ...,
-    check: int = ...,
-    preset: int | None = ...,
-    filters: _FilterChain | None = ...,
-    encoding: str | None = ...,
-    errors: str | None = ...,
-    newline: str | None = ...,
+    format: int | None = None,
+    check: int = -1,
+    preset: int | None = None,
+    filters: _FilterChain | None = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
 ) -> TextIO: ...
 @overload
 def open(
     filename: _PathOrFile,
     mode: str,
     *,
-    format: int | None = ...,
-    check: int = ...,
-    preset: int | None = ...,
-    filters: _FilterChain | None = ...,
-    encoding: str | None = ...,
-    errors: str | None = ...,
-    newline: str | None = ...,
+    format: int | None = None,
+    check: int = -1,
+    preset: int | None = None,
+    filters: _FilterChain | None = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
 ) -> LZMAFile | TextIO: ...
 def compress(
     data: ReadableBuffer, format: int = 1, check: int = -1, preset: int | None = None, filters: _FilterChain | None = None

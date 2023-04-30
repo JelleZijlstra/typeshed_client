@@ -135,7 +135,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             usage: str | None = None,
             description: str | None = None,
             epilog: str | None = None,
-            parents: Sequence[ArgumentParser] = ...,
+            parents: Sequence[ArgumentParser] = [],
             formatter_class: _FormatterClass = ...,
             prefix_chars: str = "-",
             fromfile_prefix_chars: str | None = None,
@@ -148,29 +148,24 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     else:
         def __init__(
             self,
-            prog: str | None = ...,
-            usage: str | None = ...,
-            description: str | None = ...,
-            epilog: str | None = ...,
-            parents: Sequence[ArgumentParser] = ...,
+            prog: str | None = None,
+            usage: str | None = None,
+            description: str | None = None,
+            epilog: str | None = None,
+            parents: Sequence[ArgumentParser] = [],
             formatter_class: _FormatterClass = ...,
-            prefix_chars: str = ...,
-            fromfile_prefix_chars: str | None = ...,
-            argument_default: Any = ...,
-            conflict_handler: str = ...,
-            add_help: bool = ...,
-            allow_abbrev: bool = ...,
+            prefix_chars: str = "-",
+            fromfile_prefix_chars: str | None = None,
+            argument_default: Any = None,
+            conflict_handler: str = "error",
+            add_help: bool = True,
+            allow_abbrev: bool = True,
         ) -> None: ...
-    # The type-ignores in these overloads should be temporary.  See:
-    # https://github.com/python/typeshed/pull/2643#issuecomment-442280277
+    # Ignore errors about overlapping overloads
     @overload
-    def parse_args(self, args: Sequence[str] | None = ...) -> Namespace: ...
-    @overload
-    def parse_args(self, args: Sequence[str] | None, namespace: None) -> Namespace: ...  # type: ignore[misc]
+    def parse_args(self, args: Sequence[str] | None = None, namespace: None = None) -> Namespace: ...  # type: ignore[misc]
     @overload
     def parse_args(self, args: Sequence[str] | None, namespace: _N) -> _N: ...
-    @overload
-    def parse_args(self, *, namespace: None) -> Namespace: ...  # type: ignore[misc]
     @overload
     def parse_args(self, *, namespace: _N) -> _N: ...
     @overload
@@ -378,10 +373,10 @@ class _StoreConstAction(Action):
             option_strings: Sequence[str],
             dest: str,
             const: Any,
-            default: Any = ...,
-            required: bool = ...,
-            help: str | None = ...,
-            metavar: str | tuple[str, ...] | None = ...,
+            default: Any = None,
+            required: bool = False,
+            help: str | None = None,
+            metavar: str | tuple[str, ...] | None = None,
         ) -> None: ...
 
 # undocumented
@@ -422,10 +417,10 @@ class _AppendConstAction(Action):
             option_strings: Sequence[str],
             dest: str,
             const: Any,
-            default: Any = ...,
-            required: bool = ...,
-            help: str | None = ...,
-            metavar: str | tuple[str, ...] | None = ...,
+            default: Any = None,
+            required: bool = False,
+            help: str | None = None,
+            metavar: str | tuple[str, ...] | None = None,
         ) -> None: ...
 
 # undocumented
