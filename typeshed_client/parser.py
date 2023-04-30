@@ -143,9 +143,12 @@ def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
 
 
 def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
-    if not isinstance(node, (ast.Assign, ast.AugAssign)):
+    if isinstance(node, (ast.List, ast.Tuple)):
+        rhs = node
+    elif isinstance(node, (ast.Assign, ast.AugAssign)):
+        rhs = node.value
+    else:
         raise InvalidStub(f"Invalid __all__: {ast.dump(node)}")
-    rhs = node.value
     if not isinstance(rhs, (ast.List, ast.Tuple)):
         raise InvalidStub(f"Invalid __all__: {ast.dump(rhs)}")
     names = []
@@ -228,7 +231,7 @@ class _NameExtractor(ast.NodeVisitor):
         if not isinstance(node.op, ast.Add):
             raise InvalidStub(f"Only += is allowed in stubs: {ast.dump(node)}")
         if not isinstance(node.target, ast.Name) or node.target.id != "__all__":
-            raise InvalidStub(f"+= is allowed for __all__: {ast.dump(node)}")
+            raise InvalidStub(f"+= is allowed only for __all__: {ast.dump(node)}")
         yield NameInfo("__all__", True, node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Iterable[NameInfo]:
@@ -315,9 +318,34 @@ class _NameExtractor(ast.NodeVisitor):
                 )
 
     def visit_Expr(self, node: ast.Expr) -> Iterable[NameInfo]:
-        if not isinstance(node.value, (ast.Ellipsis, ast.Str)):
+        if isinstance(node.value, (ast.Ellipsis, ast.Str)):
+            return
+        dunder_all = self._maybe_extract_dunder_all(node.value)
+        if dunder_all is not None:
+            yield dunder_all
+        else:
             raise InvalidStub(f"Cannot handle node {ast.dump(node)}")
-        return []
+
+    def _maybe_extract_dunder_all(self, node: ast.expr) -> Optional[NameInfo]:
+        if not isinstance(node, ast.Call):
+            return None
+        if not isinstance(node.func, ast.Attribute):
+            return None
+        if not isinstance(node.func.value, ast.Name):
+            return None
+        if node.func.value.id != "__all__":
+            return None
+        if len(node.args) != 1 or node.keywords:
+            return None
+        arg = node.args[0]
+        if isinstance(arg, ast.Starred):
+            return None
+        if node.func.attr == "extend":
+            return NameInfo("__all__", True, arg)
+        elif node.func.attr == "append":
+            return NameInfo("__all__", True, ast.List(elts=[arg], ctx=ast.Load()))
+        else:
+            return None
 
     def visit_Pass(self, node: ast.Pass) -> Iterable[NameInfo]:
         return []

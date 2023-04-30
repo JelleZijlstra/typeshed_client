@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.3.0 (April 30, 2023)
+
+- Support ``__all__.append`` and ``__all__.extend``
+
 Version 2.2.0 (January 24, 2023)
 
 - Update bundled typeshed

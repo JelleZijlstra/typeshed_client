@@ -155,7 +155,7 @@ class TestParser(unittest.TestCase):
         ctx = get_context((3, 10))
         names = get_stub_names("starimportall", search_context=ctx)
         assert names is not None
-        expected = {"a", "b", "c", "n"}
+        expected = {"a", "b", "c", "f", "h", "n"}
         self.assertEqual(set(names), expected)
         for name in expected:
             self.check_nameinfo(names, name, typeshed_client.ImportedName)
@@ -317,12 +317,12 @@ class TestResolver(unittest.TestCase):
         res = typeshed_client.Resolver(get_context((3, 5)))
         mod = res.get_module(path)
         self.assertIsNotNone(mod)
-        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "d"])
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "d", "g", "i"])
 
         res = typeshed_client.Resolver(get_context((3, 11)))
         mod = res.get_module(path)
         self.assertIsNotNone(mod)
-        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c"])
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c", "f", "h"])
 
 
 class IntegrationTest(unittest.TestCase):
