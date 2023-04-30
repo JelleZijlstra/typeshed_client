@@ -143,10 +143,10 @@ def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
 
 
 def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
-    if isinstance(node, (ast.List, ast.Tuple)):
-        rhs = node
-    elif isinstance(node, (ast.Assign, ast.AugAssign)):
+    if isinstance(node, (ast.Assign, ast.AugAssign)):
         rhs = node.value
+    elif isinstance(node, (ast.List, ast.Tuple)):
+        rhs = node
     else:
         raise InvalidStub(f"Invalid __all__: {ast.dump(node)}")
     if not isinstance(rhs, (ast.List, ast.Tuple)):
