@@ -81,8 +81,9 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.4.0 (September 29, 2023)
 
+- Update bundled typeshed
 - Declare support for Python 3.12
 
 Version 2.3.0 (April 30, 2023)
