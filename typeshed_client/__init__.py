@@ -1,4 +1,5 @@
 """Package for retrieving data from typeshed."""
+
 from . import finder
 from . import parser
 from . import resolver

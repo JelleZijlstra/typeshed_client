@@ -1,4 +1,5 @@
 """This module is responsible for finding stub files."""
+
 from functools import lru_cache
 import importlib_resources
 import json
