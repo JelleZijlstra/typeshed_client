@@ -73,9 +73,9 @@ def get_search_context(
     if search_path is None:
         if python_executable is None:
             python_executable = sys.executable
-        raw_path = subprocess.check_output(
-            [python_executable, "-c", "import sys, json; print(json.dumps(sys.path))"]
-        )
+        raw_path = subprocess.check_output([
+            python_executable, "-c", "import sys, json; print(json.dumps(sys.path))"
+        ])
         search_path = [Path(path) for path in json.loads(raw_path) if path]
     else:
         if python_executable is not None:
