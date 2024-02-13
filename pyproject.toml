@@ -61,6 +61,8 @@ exclude = [
 
 line-length = 100
 target-version = "py38"
+preview = true
+unsafe-fixes = true
 
 exclude = [
   "typeshed_client/typeshed",
@@ -81,6 +83,7 @@ select = [
   "UP",  # pyupgrade
   "PIE",
   "PERF",
+  "RUF",  # Ruff's own rules
 ]
 
 ignore = [
