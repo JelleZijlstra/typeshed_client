@@ -1,10 +1,9 @@
 """Module responsible for resolving names to the module they come from."""
 
-import ast
 from typing import Dict, List, NamedTuple, Optional, Union
 
-from .finder import SearchContext, get_search_context, ModulePath
 from . import parser
+from .finder import ModulePath, SearchContext, get_search_context
 
 
 class ImportedInfo(NamedTuple):
