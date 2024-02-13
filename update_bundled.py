@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
 
 
 def update_bundled() -> None:

@@ -1,10 +1,10 @@
 import ast
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Iterable
-from setuptools import setup
 
+from setuptools import setup
 
 current_dir = Path(__file__).parent.resolve()
 ts_client_dir = current_dir / "typeshed_client"
