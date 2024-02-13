@@ -340,7 +340,7 @@ class IntegrationTest(unittest.TestCase):
                 except SyntaxError:
                     # idlelib for some reason ships an example stub file with a syntax error.
                     # typeshed-client should also throw a SyntaxError in this case.
-                    pass
+                    continue
                 assert ast is not None
                 is_init = module_path.name == "__init__.pyi"
                 typeshed_client.parser.parse_ast(
