@@ -22,6 +22,7 @@ from typing import (
 )
 
 import importlib_resources
+from typing_extensions import deprecated
 
 PythonVersion = Tuple[int, int]
 ModulePath = NewType("ModulePath", Tuple[str, ...])
@@ -209,6 +210,10 @@ def _get_all_stub_files_from_directory(
 
 
 @lru_cache
+@deprecated(
+    "This function is not useful with the current layout of typeshed. "
+    "It may be removed from a future version of typeshed-client."
+)
 def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
     path: List[Path] = []

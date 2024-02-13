@@ -46,7 +46,7 @@ setup(
     },
     license="MIT",
     packages=["typeshed_client"],
-    install_requires=["importlib_resources >= 1.4.0"],
+    install_requires=["importlib_resources >= 1.4.0", "typing-extensions>=4.5.0"],
     package_data={"typeshed_client": list(find_bundled_files())},
     classifiers=[
         "Development Status :: 3 - Alpha",

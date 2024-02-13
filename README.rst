@@ -84,6 +84,7 @@ Changelog
 Unreleased
 
 - Drop support for Python 3.7
+- ``typeshed_client.finder.get_search_path()`` is now deprecated, as it is no longer useful
 
 Version 2.4.0 (September 29, 2023)
 
