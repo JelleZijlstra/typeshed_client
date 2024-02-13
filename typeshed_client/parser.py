@@ -353,11 +353,8 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def __init__(self, ctx: SearchContext) -> None:
         self.ctx = ctx
 
-    def visit_Num(self, node: ast.Num) -> Union[int, float, complex]:
-        return node.n
-
-    def visit_Str(self, node: ast.Str) -> str:
-        return node.s
+    def visit_Constant(self, node: ast.Constant) -> object:
+        return node.value
 
     # from version 3.9 on an index is represented as the value directly
     if sys.version_info < (3, 9):
