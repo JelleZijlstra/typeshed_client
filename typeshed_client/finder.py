@@ -1,13 +1,12 @@
 """This module is responsible for finding stub files."""
 
-from functools import lru_cache
-import importlib_resources
+import ast
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
-import ast
+from functools import lru_cache
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Dict,
@@ -21,6 +20,9 @@ from typing import (
     Set,
     Tuple,
 )
+
+import importlib_resources
+from typing_extensions import deprecated
 
 PythonVersion = Tuple[int, int]
 ModulePath = NewType("ModulePath", Tuple[str, ...])
@@ -207,7 +209,11 @@ def _get_all_stub_files_from_directory(
     return new_seen
 
 
-@lru_cache()
+@lru_cache
+@deprecated(
+    "This function is not useful with the current layout of typeshed. "
+    "It may be removed from a future version of typeshed-client."
+)
 def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
     path: List[Path] = []
@@ -216,7 +222,7 @@ def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Pat
         f"{pyversion[0]}.{minor}" for minor in reversed(range(pyversion[1] + 1))
     ]
     # E.g. for Python 3.2, try 3.2/, 3.1/, 3.0/, 3/, 2and3/.
-    for version in versions + [str(pyversion[0]), "2and3"]:
+    for version in [*versions, str(pyversion[0]), "2and3"]:
         for lib_type in ("stdlib", "third_party"):
             stubdir = typeshed_dir / lib_type / version
             if stubdir.is_dir():
@@ -275,7 +281,7 @@ class _VersionData(NamedTuple):
     in_python2: bool
 
 
-@lru_cache()
+@lru_cache
 def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
     versions = {}
     try:
@@ -293,10 +299,7 @@ def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
             else:
                 min_version_str = version
                 max_version_str = None
-            if max_version_str:
-                max_version = _parse_version(max_version_str)
-            else:
-                max_version = None
+            max_version = _parse_version(max_version_str) if max_version_str else None
             min_version = _parse_version(min_version_str)
             python2_only = module in python2_files or module + ".pyi" in python2_files
             versions[module] = _VersionData(min_version, max_version, python2_only)

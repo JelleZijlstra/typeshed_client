@@ -1,7 +1,7 @@
 """This module is responsible for parsing a stub AST into a dictionary of names."""
 
-import logging
 import ast
+import logging
 import sys
 from typing import (
     Any,
@@ -18,7 +18,7 @@ from typing import (
 )
 
 from . import finder
-from .finder import get_search_context, SearchContext, ModulePath, parse_stub_file
+from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
 
 log = logging.getLogger(__name__)
 
@@ -275,10 +275,7 @@ class _NameExtractor(ast.NodeVisitor):
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Iterable[NameInfo]:
         module: Tuple[str, ...]
-        if node.module is None:
-            module = ()
-        else:
-            module = tuple(node.module.split("."))
+        module = () if node.module is None else tuple(node.module.split("."))
         if node.level == 0:
             source_module = ModulePath(module)
         elif node.level == 1:
@@ -356,19 +353,8 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def __init__(self, ctx: SearchContext) -> None:
         self.ctx = ctx
 
-    # from version 3.8 on all constants are represented as ast.Constant
-    if sys.version_info < (3, 8):
-
-        def visit_Num(self, node: ast.Num) -> Union[int, float, complex]:
-            return node.n
-
-        def visit_Str(self, node: ast.Str) -> str:
-            return node.s
-
-    else:
-
-        def visit_Constant(self, node: ast.Constant) -> Any:
-            return node.value
+    def visit_Constant(self, node: ast.Constant) -> object:
+        return node.value
 
     # from version 3.9 on an index is represented as the value directly
     if sys.version_info < (3, 9):
@@ -376,10 +362,10 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         def visit_Index(self, node: ast.Index) -> int:
             return self.visit(node.value)
 
-    def visit_Tuple(self, node: ast.Tuple) -> Tuple[Any, ...]:
+    def visit_Tuple(self, node: ast.Tuple) -> Tuple[object, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 
-    def visit_Subscript(self, node: ast.Subscript) -> Any:
+    def visit_Subscript(self, node: ast.Subscript) -> object:
         value = self.visit(node.value)
         slc = self.visit(node.slice)
         return value[slc]
@@ -405,7 +391,7 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         step = self.visit(node.step) if node.step is not None else None
         return slice(lower, upper, step)
 
-    def visit_Attribute(self, node: ast.Attribute) -> Any:
+    def visit_Attribute(self, node: ast.Attribute) -> object:
         val = node.value
         if not isinstance(val, ast.Name):
             raise InvalidStub(f"Invalid code in stub: {ast.dump(node)}")

@@ -1,17 +1,18 @@
-from pathlib import Path
 import ast
+import unittest
+from pathlib import Path
+from typing import Any, Optional, Set, Type
+from unittest import mock
+
 import typeshed_client
 from typeshed_client.finder import (
-    get_search_context,
-    PythonVersion,
-    get_stub_file,
-    SearchContext,
     ModulePath,
+    PythonVersion,
+    SearchContext,
+    get_search_context,
+    get_stub_file,
 )
 from typeshed_client.parser import get_stub_names
-from typing import Any, Set, Type, Optional
-from unittest import mock
-import unittest
 
 TEST_TYPESHED = Path(__file__).parent / "typeshed"
 PACKAGES = Path(__file__).parent / "site-packages"
@@ -334,7 +335,12 @@ class IntegrationTest(unittest.TestCase):
         ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(path=module_name):
-                ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+                try:
+                    ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+                except SyntaxError:
+                    # idlelib for some reason ships an example stub file with a syntax error.
+                    # typeshed-client should also throw a SyntaxError in this case.
+                    continue
                 assert ast is not None
                 is_init = module_path.name == "__init__.pyi"
                 typeshed_client.parser.parse_ast(
