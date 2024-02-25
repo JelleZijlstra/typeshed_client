@@ -81,8 +81,9 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.5.0 (February 25, 2024)
 
+- Update bundled typeshed
 - Drop support for Python 3.7
 - ``typeshed_client.finder.get_search_path()`` is now deprecated, as it is no longer useful
 
