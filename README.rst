@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.5.1 (February 25, 2024)
+
+- Fix packaging metadata that still incorrectly declared support for Python 3.7
+
 Version 2.5.0 (February 25, 2024)
 
 - Update bundled typeshed
