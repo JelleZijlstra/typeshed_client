@@ -30,3 +30,10 @@ repos:
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
+
+ci:
+  autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"
+  autofix_prs: true
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: quarterly
+  submodules: false
