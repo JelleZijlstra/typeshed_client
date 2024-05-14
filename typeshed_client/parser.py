@@ -153,9 +153,9 @@ def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
         raise InvalidStub(f"Invalid __all__: {ast.dump(rhs)}")
     names = []
     for elt in rhs.elts:
-        if not isinstance(elt, ast.Str):
+        if not isinstance(elt, ast.Constant) or not isinstance(elt.value, str):
             raise InvalidStub(f"Invalid __all__: {ast.dump(rhs)}")
-        names.append(elt.s)
+        names.append(elt.value)
     return names
 
 
@@ -313,7 +313,9 @@ class _NameExtractor(ast.NodeVisitor):
                 )
 
     def visit_Expr(self, node: ast.Expr) -> Iterable[NameInfo]:
-        if isinstance(node.value, (ast.Ellipsis, ast.Str)):
+        if isinstance(node.value, ast.Constant) and (
+            node.value.value is Ellipsis or isinstance(node.value.value, str)
+        ):
             return
         dunder_all = self._maybe_extract_dunder_all(node.value)
         if dunder_all is not None:

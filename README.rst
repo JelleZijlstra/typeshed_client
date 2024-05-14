@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Unreleased
+
+- Fix warnings due to use of deprecated AST classes
+
 Version 2.5.0 (February 25, 2024)
 
 - Update bundled typeshed

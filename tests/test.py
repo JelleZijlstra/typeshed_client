@@ -334,7 +334,7 @@ class IntegrationTest(unittest.TestCase):
     def test(self) -> None:
         ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
-            with self.subTest(path=module_name):
+            with self.subTest(name=module_name, path=module_path):
                 try:
                     ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
                 except SyntaxError:
