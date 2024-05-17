@@ -21,6 +21,7 @@ def update_bundled() -> None:
             cwd=temp_dir,
         )
         shutil.copytree(temp_dir / "typeshed" / "stdlib", bundled_ts_dir)
+    shutil.rmtree(bundled_ts_dir / "@tests")
     subprocess.check_call(["git", "add", str(bundled_ts_dir)])
 
 
