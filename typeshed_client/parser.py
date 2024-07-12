@@ -252,6 +252,14 @@ class _NameExtractor(ast.NodeVisitor):
             for stmt in node.orelse:
                 yield from self.visit(stmt)
 
+    def visit_Try(self, node: ast.Try) -> Iterable[NameInfo]:
+        # try-except sometimes gets used with conditional imports. We assume
+        # the try block is always executed.
+        for stmt in node.body:
+            yield from self.visit(stmt)
+        for stmt in node.finalbody:
+            yield from self.visit(stmt)
+
     def visit_Assert(self, node: ast.Assert) -> Iterable[NameInfo]:
         visitor = _LiteralEvalVisitor(self.ctx)
         value = visitor.visit(node.test)

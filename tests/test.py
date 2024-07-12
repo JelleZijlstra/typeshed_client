@@ -191,6 +191,15 @@ class TestParser(unittest.TestCase):
                     names["f"].ast, typeshed_client.ImportedName(path, "f")
                 )
 
+    def test_try(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("tryexcept", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names), {"np", "f", "x"})
+        self.check_nameinfo(names, "np", typeshed_client.ImportedName)
+        self.check_nameinfo(names, "f", ast.FunctionDef)
+        self.check_nameinfo(names, "x", ast.AnnAssign)
+
     def check_nameinfo(
         self,
         names: typeshed_client.NameDict,
