@@ -19,6 +19,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Union,
 )
 
 import importlib_resources
@@ -127,10 +128,10 @@ def get_all_stub_files(
     # third-party packages
     for stub_packages in (True, False):
         for search_path_entry in search_context.search_path:
-            if not search_path_entry.exists():
+            if not safe_exists(search_path_entry):
                 continue
-            for directory in os.scandir(search_path_entry):
-                if not directory.is_dir():
+            for directory in safe_scandir(search_path_entry):
+                if not safe_is_dir(directory):
                     continue
                 condition = (
                     directory.name.endswith("-stubs")
@@ -150,10 +151,10 @@ def get_all_stub_files(
         typeshed_dirs.insert(0, search_context.typeshed / "@python2")
 
     for typeshed_dir in typeshed_dirs:
-        for entry in os.scandir(typeshed_dir):
-            if entry.is_dir() and entry.name.isidentifier():
+        for entry in safe_scandir(typeshed_dir):
+            if safe_is_dir(entry) and entry.name.isidentifier():
                 module_name = entry.name
-            elif entry.is_file() and entry.name.endswith(".pyi"):
+            elif safe_is_file(entry) and entry.name.endswith(".pyi"):
                 module_name = entry.name[: -len(".pyi")]
             else:
                 continue
@@ -168,7 +169,7 @@ def get_all_stub_files(
                 and version.in_python2
             ):
                 continue
-            if entry.is_dir():
+            if safe_is_dir(entry):
                 seen = yield from _get_all_stub_files_from_directory(
                     entry, typeshed_dir, seen
                 )
@@ -188,16 +189,16 @@ def _get_all_stub_files_from_directory(
     to_do: List[os.PathLike[str]] = [directory]
     while to_do:
         current_dir = to_do.pop()
-        for dir_entry in os.scandir(current_dir):
-            if dir_entry.is_dir():
+        for dir_entry in safe_scandir(current_dir):
+            if safe_is_dir(dir_entry):
                 if not dir_entry.name.isidentifier():
                     continue
                 path = Path(dir_entry)
-                if (path / "__init__.pyi").is_file() or (
+                if safe_is_file(path / "__init__.pyi") or safe_is_file(
                     path / "__init__.py"
-                ).is_file():
+                ):
                     to_do.append(path)
-            elif dir_entry.is_file():
+            elif safe_is_file(dir_entry):
                 path = Path(dir_entry)
                 if path.suffix != ".pyi":
                     continue
@@ -225,9 +226,42 @@ def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Pat
     for version in [*versions, str(pyversion[0]), "2and3"]:
         for lib_type in ("stdlib", "third_party"):
             stubdir = typeshed_dir / lib_type / version
-            if stubdir.is_dir():
+            if safe_is_dir(stubdir):
                 path.append(stubdir)
     return tuple(path)
+
+
+def safe_exists(path: Path) -> bool:
+    """Return whether a path exists, assuming it doesn't if we get an error."""
+    try:
+        return path.exists()
+    except OSError:
+        return False
+
+
+def safe_is_dir(path: Union[Path, _DirEntry]) -> bool:
+    """Return whether a path is a directory, assuming it isn't if we get an error."""
+    try:
+        return path.is_dir()
+    except OSError:
+        return False
+
+
+def safe_is_file(path: Union[Path, _DirEntry]) -> bool:
+    """Return whether a path is a file, assuming it isn't if we get an error."""
+    try:
+        return path.is_file()
+    except OSError:
+        return False
+
+
+def safe_scandir(path: "os.PathLike[str]") -> Iterable[_DirEntry]:
+    """Return an iterator over the entries in a directory, or no entries if we get an error."""
+    try:
+        with os.scandir(path) as sd:
+            yield from sd
+    except OSError:
+        pass
 
 
 def get_stub_file_name(
@@ -242,7 +276,7 @@ def get_stub_file_name(
     stubs_package = f"{top_level_name}-stubs"
     for path in search_context.search_path:
         stubdir = path / stubs_package
-        if stubdir.exists():
+        if safe_exists(stubdir):
             stub = _find_stub_in_dir(stubdir, rest_module_path)
             if stub is not None:
                 return stub
@@ -250,7 +284,7 @@ def get_stub_file_name(
     # 4. stubs in normal packages
     for path in search_context.search_path:
         stubdir = path / top_level_name
-        if stubdir.exists():
+        if safe_exists(stubdir):
             stub = _find_stub_in_dir(stubdir, rest_module_path)
             if stub is not None:
                 return stub
@@ -314,16 +348,16 @@ def _parse_version(version: str) -> PythonVersion:
 def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Optional[Path]:
     if not module:
         init_name = stubdir / "__init__.pyi"
-        if init_name.exists():
+        if safe_exists(init_name):
             return init_name
         return None
     if len(module) == 1:
         stub_name = stubdir / f"{module[0]}.pyi"
-        if stub_name.exists():
+        if safe_exists(stub_name):
             return stub_name
     next_name, *rest = module
     next_dir = stubdir / next_name
-    if next_dir.exists():
+    if safe_exists(next_dir):
         return _find_stub_in_dir(next_dir, ModulePath(tuple(rest)))
     return None
 
