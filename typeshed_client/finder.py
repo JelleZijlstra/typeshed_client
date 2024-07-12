@@ -255,12 +255,13 @@ def safe_is_file(path: Union[Path, _DirEntry]) -> bool:
         return False
 
 
-def safe_scandir(path: os.PathLike[str]) -> Iterable[_DirEntry]:
+def safe_scandir(path: "os.PathLike[str]") -> Iterable[_DirEntry]:
     """Return an iterator over the entries in a directory, or no entries if we get an error."""
     try:
-        return os.scandir(path)
+        with os.scandir(path) as sd:
+            yield from sd
     except OSError:
-        return iter([])
+        pass
 
 
 def get_stub_file_name(
