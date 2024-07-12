@@ -81,7 +81,7 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.6.0 (July 12, 2024)
 
 - Update bundled typeshed
 - Support ``try`` blocks in stubs
