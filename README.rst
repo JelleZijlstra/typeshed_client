@@ -83,6 +83,8 @@ Changelog
 
 Unreleased
 
+- Update bundled typeshed
+- Support ``try`` blocks in stubs
 - Declare support for Python 3.13
 - Handle situations where an entry on the module search path is not
   accessible or does not exist
