@@ -83,6 +83,9 @@ Changelog
 
 Unreleased
 
+- Declare support for Python 3.13
+- Handle situations where an entry on the module search path is not
+  accessible or does not exist
 - Fix warnings due to use of deprecated AST classes
 
 Version 2.5.1 (February 25, 2024)
