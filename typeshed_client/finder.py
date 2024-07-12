@@ -198,7 +198,7 @@ def _get_all_stub_files_from_directory(
                     path / "__init__.py"
                 ):
                     to_do.append(path)
-            elif safe_is_dir(dir_entry):
+            elif safe_is_file(dir_entry):
                 path = Path(dir_entry)
                 if path.suffix != ".pyi":
                     continue
