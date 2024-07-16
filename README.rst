@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.7.0 (July 16, 2024)
+
+- Update bundled typeshed
+
 Version 2.6.0 (July 12, 2024)
 
 - Update bundled typeshed
