@@ -105,7 +105,7 @@ def get_stub_file(
 
 def get_stub_ast(
     module_name: str, *, search_context: Optional[SearchContext] = None
-) -> Optional[ast.AST]:
+) -> Optional[ast.Module]:
     """Return the AST for the stub for the given module name."""
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
@@ -366,7 +366,7 @@ def find_typeshed() -> Path:
     return importlib_resources.files("typeshed_client") / "typeshed"
 
 
-def parse_stub_file(path: Path) -> ast.AST:
+def parse_stub_file(path: Path) -> ast.Module:
     text = path.read_text()
     return ast.parse(text, filename=str(path))
 
