@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 from functools import lru_cache
+from importlib.util import find_spec
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -103,6 +104,12 @@ def get_stub_file(
     return get_stub_file_name(ModulePath(tuple(module_name.split("."))), search_context)
 
 
+def get_py_module_file(module_name: ModulePath) -> Optional[Path]:
+    """Return the path to the python file for this module, if any."""
+    spec = find_spec(".".join(module_name))
+    return Path(spec.origin) if spec and spec.origin else None
+
+
 def get_stub_ast(
     module_name: str, *, search_context: Optional[SearchContext] = None
 ) -> Optional[ast.Module]:
@@ -110,7 +117,7 @@ def get_stub_ast(
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
         return None
-    return parse_stub_file(path)
+    return ast_parse_file(path)
 
 
 def get_all_stub_files(
@@ -366,7 +373,7 @@ def find_typeshed() -> Path:
     return importlib_resources.files("typeshed_client") / "typeshed"
 
 
-def parse_stub_file(path: Path) -> ast.Module:
+def ast_parse_file(path: Path) -> ast.Module:
     text = path.read_text()
     return ast.parse(text, filename=str(path))
 

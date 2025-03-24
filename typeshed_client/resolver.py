@@ -34,7 +34,32 @@ class Resolver:
 
     def get_name(self, module_name: ModulePath, name: str) -> ResolvedName:
         module = self.get_module(module_name)
-        return module.get_name(name, self)
+        resolved_name = module.get_name(name, self)
+        if resolved_name is None:
+            resolved_name = self._get_py_imported_name(module_name, name)
+        return resolved_name
+
+    def _get_py_imported_name(self, module_name: ModulePath, name: str) -> ResolvedName:
+        resolved_name = None
+        try:
+            named_imports, star_imports = parser.get_py_imported_name_sources(
+                module_name
+            )
+            for star_import in star_imports:
+                import_source = ModulePath(tuple(star_import.split(".")))
+                if import_source != module_name:
+                    # Try to resolve stub from star import
+                    resolved_name = self.get_name(import_source, name)
+                if resolved_name is not None:
+                    break
+            if resolved_name is None and name in named_imports:
+                import_source = ModulePath(tuple(named_imports[name].split(".")))
+                if import_source != module_name:
+                    # Try to resolve stub from named import
+                    resolved_name = self.get_name(import_source, name)
+        except Exception:
+            pass
+        return resolved_name
 
     def get_fully_qualified_name(self, name: str) -> ResolvedName:
         """Public API."""

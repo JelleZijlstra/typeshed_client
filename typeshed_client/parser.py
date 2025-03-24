@@ -12,13 +12,14 @@ from typing import (
     NamedTuple,
     NoReturn,
     Optional,
+    Set,
     Tuple,
     Type,
     Union,
 )
 
 from . import finder
-from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
+from .finder import ModulePath, SearchContext, ast_parse_file, get_search_context
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ def get_stub_names(
     if path is None:
         return None
     is_init = path.name == "__init__.pyi"
-    ast = parse_stub_file(path)
+    ast = ast_parse_file(path)
     return parse_ast(
         ast, search_context, ModulePath(tuple(module_name.split("."))), is_init=is_init
     )
@@ -438,3 +439,56 @@ def _warn(message: str, ctx: SearchContext) -> None:
         raise InvalidStub(message)
     else:
         log.warning(message)
+
+
+def get_py_imported_name_sources(
+    module_name: ModulePath,
+) -> Tuple[Dict[str, str], Set[str]]:
+    """Given a python module path, return named and star import sources."""
+    path = finder.get_py_module_file(module_name)
+    if path is None:
+        return {}, set()
+    ast = ast_parse_file(path)
+    visitor = _PyImportedSourcesExtractor(module_name)
+    visitor.visit(ast)
+    return visitor.named_imports, visitor.star_imports
+
+
+class _PyImportedSourcesExtractor(ast.NodeVisitor):
+    """Extract imported sources from a normal python module."""
+
+    def __init__(self, module_path: ModulePath) -> None:
+        self.module_path = module_path
+        self.named_imports: Dict[str, str] = {}
+        self.star_imports: Set[str] = set()
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+        if node.level:
+            # Relative import
+            module_path = self.module_path[: len(self.module_path) - node.level + 1]
+            if node.module:
+                module_path = module_path + tuple(node.module.split("."))
+            import_module_path: str = ".".join(module_path)
+        else:
+            # Absolute import
+            import_module_path = node.module  # type: ignore[assignment]  # always str when level=0
+
+        if len(node.names) == 1 and node.names[0].name == "*":
+            # Star import
+            self.star_imports.add(import_module_path)
+        else:
+            # Named import
+            for alias in node.names:
+                self.named_imports[alias.asname or alias.name] = import_module_path
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        # Skip visiting function definitions
+        pass
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        # Skip visiting async function definitions
+        pass
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        # Skip visiting class definitions
+        pass
