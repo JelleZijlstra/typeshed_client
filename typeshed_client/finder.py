@@ -117,7 +117,7 @@ def get_stub_ast(
     path = get_stub_file(module_name, search_context=search_context)
     if path is None:
         return None
-    return ast_parse_file(path)
+    return parse_stub_file(path)
 
 
 def get_all_stub_files(
@@ -373,7 +373,7 @@ def find_typeshed() -> Path:
     return importlib_resources.files("typeshed_client") / "typeshed"
 
 
-def ast_parse_file(path: Path) -> ast.Module:
+def parse_stub_file(path: Path) -> ast.Module:
     text = path.read_text()
     return ast.parse(text, filename=str(path))
 

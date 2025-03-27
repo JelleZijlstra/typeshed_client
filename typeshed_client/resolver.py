@@ -15,10 +15,15 @@ ResolvedName = Union[None, ModulePath, ImportedInfo, parser.NameInfo]
 
 
 class Resolver:
-    def __init__(self, search_context: Optional[SearchContext] = None) -> None:
+    def __init__(
+        self,
+        search_context: Optional[SearchContext] = None,
+        search_py_files: bool = False,
+    ) -> None:
         if search_context is None:
             search_context = get_search_context()
         self.ctx = search_context
+        self.search_py_files = search_py_files
         self._module_cache: Dict[ModulePath, Module] = {}
 
     def get_module(self, module_name: ModulePath) -> "Module":
@@ -35,7 +40,7 @@ class Resolver:
     def get_name(self, module_name: ModulePath, name: str) -> ResolvedName:
         module = self.get_module(module_name)
         resolved_name = module.get_name(name, self)
-        if resolved_name is None:
+        if resolved_name is None and self.search_py_files:
             resolved_name = self._get_py_imported_name(module_name, name)
         return resolved_name
 

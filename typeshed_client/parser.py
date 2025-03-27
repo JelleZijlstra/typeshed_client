@@ -19,7 +19,7 @@ from typing import (
 )
 
 from . import finder
-from .finder import ModulePath, SearchContext, ast_parse_file, get_search_context
+from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def get_stub_names(
     if path is None:
         return None
     is_init = path.name == "__init__.pyi"
-    ast = ast_parse_file(path)
+    ast = parse_stub_file(path)
     return parse_ast(
         ast, search_context, ModulePath(tuple(module_name.split("."))), is_init=is_init
     )
@@ -448,7 +448,7 @@ def get_py_imported_name_sources(
     path = finder.get_py_module_file(module_name)
     if path is None:
         return {}, set()
-    ast = ast_parse_file(path)
+    ast = parse_stub_file(path)
     visitor = _PyImportedSourcesExtractor(module_name)
     visitor.visit(ast)
     return visitor.named_imports, visitor.star_imports
