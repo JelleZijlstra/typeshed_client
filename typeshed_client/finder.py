@@ -377,5 +377,5 @@ def _path_to_module(path: Path) -> str:
     if parts[-1] == "__init__.pyi":
         parts = parts[:-1]
     if parts[-1].endswith(".pyi"):
-        parts = parts[:-1] + (parts[-1][: -len(".pyi")],)
+        parts = (*parts[:-1], parts[-1][: -len(".pyi")])
     return ".".join(parts).replace("-stubs", "")
