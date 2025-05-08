@@ -364,7 +364,6 @@ class IntegrationTest(unittest.TestCase):
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
     def test(self) -> None:
-        return
         ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(name=module_name, path=module_path):
