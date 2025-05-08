@@ -2,7 +2,6 @@
 
 import ast
 import logging
-from operator import is_
 import sys
 from typing import (
     Any,
@@ -17,8 +16,6 @@ from typing import (
     Type,
     Union,
 )
-
-from networkx import is_path
 
 from . import finder
 from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
