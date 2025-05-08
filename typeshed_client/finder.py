@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 from functools import lru_cache
-from importlib.util import find_spec
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -29,6 +28,9 @@ from typing_extensions import deprecated
 PythonVersion = Tuple[int, int]
 ModulePath = NewType("ModulePath", Tuple[str, ...])
 
+_INIT_NAMES = ("__init__.pyi", "__init__.py")
+_EXTENSIONS = (".pyi", ".py")
+
 
 if TYPE_CHECKING:
     _DirEntry = os.DirEntry[str]
@@ -42,6 +44,7 @@ class SearchContext(NamedTuple):
     version: PythonVersion
     platform: str
     raise_on_warnings: bool = False
+    allow_py_files: bool = True
 
     def is_python2(self) -> bool:
         return self.version[0] == 2
@@ -55,6 +58,7 @@ def get_search_context(
     version: Optional[PythonVersion] = None,
     platform: str = sys.platform,
     raise_on_warnings: bool = False,
+    allow_py_files: bool = True,
 ) -> SearchContext:
     """Return a context for finding stubs. This context can be passed to other
     functions in this file.
@@ -70,6 +74,7 @@ def get_search_context(
     - platform: Value to use for sys.platform in stubs, defaulting to the current
       process's value.
     - raise_on_warnings: Raise an error for any warnings encountered by the parser.
+    - allow_py_files: Search for names in .py files on the path.
 
     """
     if version is None:
@@ -92,6 +97,7 @@ def get_search_context(
         version=version,
         platform=platform,
         raise_on_warnings=raise_on_warnings,
+        allow_py_files=allow_py_files,
     )
 
 
@@ -102,12 +108,6 @@ def get_stub_file(
     if search_context is None:
         search_context = get_search_context()
     return get_stub_file_name(ModulePath(tuple(module_name.split("."))), search_context)
-
-
-def get_py_module_file(module_name: ModulePath) -> Optional[Path]:
-    """Return the path to the python file for this module, if any."""
-    spec = find_spec(".".join(module_name))
-    return Path(spec.origin) if spec and spec.origin else None
 
 
 def get_stub_ast(
@@ -201,9 +201,7 @@ def _get_all_stub_files_from_directory(
                 if not dir_entry.name.isidentifier():
                     continue
                 path = Path(dir_entry)
-                if safe_is_file(path / "__init__.pyi") or safe_is_file(
-                    path / "__init__.py"
-                ):
+                if any(safe_is_file(path / init) for init in _INIT_NAMES):
                     to_do.append(path)
             elif safe_is_file(dir_entry):
                 path = Path(dir_entry)
@@ -274,30 +272,45 @@ def safe_scandir(path: "os.PathLike[str]") -> Iterable[_DirEntry]:
 def get_stub_file_name(
     module_name: ModulePath, search_context: SearchContext
 ) -> Optional[Path]:
-    # https://www.python.org/dev/peps/pep-0561/#type-checker-module-resolution-order
+    # https://typing.python.org/en/latest/spec/distributing.html#import-resolution-ordering
     # typeshed_client doesn't support 1 (MYPYPATH equivalent) and 2 (user code)
     top_level_name, *rest = module_name
     rest_module_path = ModulePath(tuple(rest))
 
-    # 3. stub packages
+    # 3. typeshed
+    stub = _find_stub_in_typeshed(module_name, search_context)
+    if stub is not None:
+        return stub
+
+    # 4. stub packages
     stubs_package = f"{top_level_name}-stubs"
     for path in search_context.search_path:
         stubdir = path / stubs_package
         if safe_exists(stubdir):
-            stub = _find_stub_in_dir(stubdir, rest_module_path)
+            stub = _find_file_in_dir(stubdir, rest_module_path, "pyi")
             if stub is not None:
                 return stub
 
-    # 4. stubs in normal packages
+    # 5. stubs or .py files in normal packages
     for path in search_context.search_path:
         stubdir = path / top_level_name
         if safe_exists(stubdir):
-            stub = _find_stub_in_dir(stubdir, rest_module_path)
+            stub = _find_file_in_dir(stubdir, rest_module_path, "pyi")
             if stub is not None:
                 return stub
+            if search_context.allow_py_files:
+                py_file = _find_file_in_dir(stubdir, rest_module_path, "py")
+                if py_file is not None:
+                    return py_file
 
-    # 5. typeshed
+    return None
+
+
+def _find_stub_in_typeshed(
+    module_name: ModulePath, search_context: SearchContext
+) -> Optional[Path]:
     versions = get_typeshed_versions(search_context.typeshed)
+    top_level_name = module_name[0]
     if top_level_name not in versions:
         return None
     version = versions[top_level_name]
@@ -308,11 +321,11 @@ def get_stub_file_name(
 
     if search_context.version[0] == 2:
         python2_dir = search_context.typeshed / "@python2"
-        stub = _find_stub_in_dir(python2_dir, module_name)
+        stub = _find_file_in_dir(python2_dir, module_name, "pyi")
         if stub is not None or version.in_python2:
             return stub
 
-    return _find_stub_in_dir(search_context.typeshed, module_name)
+    return _find_file_in_dir(search_context.typeshed, module_name, "pyi")
 
 
 class _VersionData(NamedTuple):
@@ -352,20 +365,22 @@ def _parse_version(version: str) -> PythonVersion:
     return (int(major), int(minor))
 
 
-def _find_stub_in_dir(stubdir: Path, module: ModulePath) -> Optional[Path]:
+def _find_file_in_dir(
+    stubdir: Path, module: ModulePath, extension: str
+) -> Optional[Path]:
     if not module:
-        init_name = stubdir / "__init__.pyi"
+        init_name = stubdir / f"__init__.{extension}"
         if safe_exists(init_name):
             return init_name
         return None
     if len(module) == 1:
-        stub_name = stubdir / f"{module[0]}.pyi"
+        stub_name = stubdir / f"{module[0]}.{extension}"
         if safe_exists(stub_name):
             return stub_name
     next_name, *rest = module
     next_dir = stubdir / next_name
     if safe_exists(next_dir):
-        return _find_stub_in_dir(next_dir, ModulePath(tuple(rest)))
+        return _find_file_in_dir(next_dir, ModulePath(tuple(rest)), extension)
     return None
 
 
@@ -381,8 +396,10 @@ def parse_stub_file(path: Path) -> ast.Module:
 def _path_to_module(path: Path) -> str:
     """Returns the module name corresponding to a file path."""
     parts = path.parts
-    if parts[-1] == "__init__.pyi":
+    if parts[-1] in _INIT_NAMES:
         parts = parts[:-1]
-    if parts[-1].endswith(".pyi"):
-        parts = parts[:-1] + (parts[-1][: -len(".pyi")],)
+    for suffix in _EXTENSIONS:
+        if parts[-1].endswith(suffix):
+            parts = parts[:-1] + (parts[-1][: -len(suffix)],)
+            break
     return ".".join(parts).replace("-stubs", "")

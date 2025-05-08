@@ -81,6 +81,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Unreleased
+
+- Search for names and imports in ``.py`` files in addition to ``.pyi`` files
+
 Version 2.7.0 (July 16, 2024)
 
 - Update bundled typeshed

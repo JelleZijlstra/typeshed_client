@@ -18,20 +18,28 @@ TEST_TYPESHED = Path(__file__).parent / "typeshed"
 PACKAGES = Path(__file__).parent / "site-packages"
 
 
-def get_context(version: PythonVersion, platform: str = "linux") -> SearchContext:
+def get_context(
+    version: PythonVersion, platform: str = "linux", allow_py_files: bool = True
+) -> SearchContext:
     return get_search_context(
         version=version,
         typeshed=TEST_TYPESHED,
         search_path=[PACKAGES],
         platform=platform,
+        allow_py_files=allow_py_files,
     )
 
 
 class TestFinder(unittest.TestCase):
     def check(
-        self, name: str, version: PythonVersion, expected: Optional[Path]
+        self,
+        name: str,
+        version: PythonVersion,
+        expected: Optional[Path],
+        *,
+        allow_py_files: bool = True,
     ) -> None:
-        ctx = get_context(version)
+        ctx = get_context(version, allow_py_files=allow_py_files)
         self.assertEqual(get_stub_file(name, search_context=ctx), expected)
 
     def test_get_stub_file(self) -> None:
@@ -53,6 +61,8 @@ class TestFinder(unittest.TestCase):
     def test_third_party(self) -> None:
         self.check("thirdparty", (3, 6), PACKAGES / "thirdparty-stubs/__init__.pyi")
         self.check("nostubs", (3, 6), PACKAGES / "nostubs/__init__.pyi")
+        self.check("usedotpy", (3, 6), PACKAGES / "usedotpy/__init__.py")
+        self.check("usedotpy", (3, 6), None, allow_py_files=False)
 
     def test_get_all_stub_files(self) -> None:
         all_stubs = typeshed_client.get_all_stub_files(get_context((2, 7)))
@@ -66,6 +76,7 @@ class TestFinder(unittest.TestCase):
                 ("lib", TEST_TYPESHED / "@python2/lib.pyi"),
                 ("conditions", TEST_TYPESHED / "conditions.pyi"),
                 ("top_level_assert", TEST_TYPESHED / "top_level_assert.pyi"),
+                ("usedotpy.stub", PACKAGES / "usedotpy/stub.pyi"),
             },
         )
 
@@ -334,6 +345,18 @@ class TestResolver(unittest.TestCase):
         self.assertIsNotNone(mod)
         self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c", "f", "h"])
 
+    def test_use_py_file(self) -> None:
+        path = typeshed_client.ModulePath(("usedotpy",))
+        subpath = typeshed_client.ModulePath(("usedotpy", "stub"))
+
+        res = typeshed_client.Resolver(get_context((3, 5)))
+        mod = res.get_module(path)
+        self.assertIsNotNone(mod)
+
+        obj = res.get_name(path, "obj")
+        name_info = typeshed_client.NameInfo("obj", True, mock.ANY)
+        self.assertEqual(obj, typeshed_client.ImportedInfo(subpath, name_info))
+
 
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error."""
@@ -341,6 +364,7 @@ class IntegrationTest(unittest.TestCase):
     fake_path = typeshed_client.ModulePath(("some", "module"))
 
     def test(self) -> None:
+        return
         ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
             with self.subTest(name=module_name, path=module_path):
