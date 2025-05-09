@@ -1,5 +1,5 @@
 [tool.black]
-target_version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target_version = ['py39', 'py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 skip-magic-trailing-comma = true
 preview = true
@@ -59,7 +59,7 @@ exclude = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py39"
 preview = true
 unsafe-fixes = true
 
@@ -90,4 +90,5 @@ ignore = [
   "ANN102",  # missing type annotation for cls in classmethod
   "SIM105",  # I don't like contextlib.suppress
   "UP038",  # astral-sh/ruff#7871
+  "B901",  # returning from generators is fine
 ]

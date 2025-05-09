@@ -5,28 +5,16 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Generator, Iterable, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Dict,
-    Generator,
-    Iterable,
-    List,
-    NamedTuple,
-    NewType,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, NamedTuple, NewType, Optional, Union
 
 import importlib_resources
 from typing_extensions import deprecated
 
-PythonVersion = Tuple[int, int]
-ModulePath = NewType("ModulePath", Tuple[str, ...])
+PythonVersion = tuple[int, int]
+ModulePath = NewType("ModulePath", tuple[str, ...])
 
 _INIT_NAMES = ("__init__.pyi", "__init__.py")
 _EXTENSIONS = (".pyi", ".py")
@@ -122,7 +110,7 @@ def get_stub_ast(
 
 def get_all_stub_files(
     search_context: Optional[SearchContext] = None,
-) -> Iterable[Tuple[str, Path]]:
+) -> Iterable[tuple[str, Path]]:
     """Return paths to all stub files for a given Python version.
 
     Return pairs of (module name, module path).
@@ -131,7 +119,7 @@ def get_all_stub_files(
     if search_context is None:
         search_context = get_search_context()
 
-    seen: Set[str] = set()
+    seen: set[str] = set()
     # third-party packages
     for stub_packages in (True, False):
         for search_path_entry in search_context.search_path:
@@ -190,10 +178,10 @@ def get_all_stub_files(
 
 
 def _get_all_stub_files_from_directory(
-    directory: _DirEntry, root_directory: Path, seen: Set[str]
-) -> Generator[Tuple[str, Path], None, Set[str]]:
+    directory: _DirEntry, root_directory: Path, seen: set[str]
+) -> Generator[tuple[str, Path], None, set[str]]:
     new_seen = set(seen)
-    to_do: List[os.PathLike[str]] = [directory]
+    to_do: list[os.PathLike[str]] = [directory]
     while to_do:
         current_dir = to_do.pop()
         for dir_entry in safe_scandir(current_dir):
@@ -220,9 +208,9 @@ def _get_all_stub_files_from_directory(
     "This function is not useful with the current layout of typeshed. "
     "It may be removed from a future version of typeshed-client."
 )
-def get_search_path(typeshed_dir: Path, pyversion: Tuple[int, int]) -> Tuple[Path, ...]:
+def get_search_path(typeshed_dir: Path, pyversion: tuple[int, int]) -> tuple[Path, ...]:
     # mirrors default_lib_path in mypy/build.py
-    path: List[Path] = []
+    path: list[Path] = []
 
     versions = [
         f"{pyversion[0]}.{minor}" for minor in reversed(range(pyversion[1] + 1))
@@ -336,7 +324,7 @@ class _VersionData(NamedTuple):
 
 
 @lru_cache
-def get_typeshed_versions(typeshed: Path) -> Dict[str, _VersionData]:
+def get_typeshed_versions(typeshed: Path) -> dict[str, _VersionData]:
     versions = {}
     try:
         python2_files = set(os.listdir(typeshed / "@python2"))
@@ -400,6 +388,6 @@ def _path_to_module(path: Path) -> str:
         parts = parts[:-1]
     for suffix in _EXTENSIONS:
         if parts[-1].endswith(suffix):
-            parts = parts[:-1] + (parts[-1][: -len(suffix)],)
+            parts = (*parts[:-1], parts[-1][: -len(suffix)])
             break
     return ".".join(parts).replace("-stubs", "")

@@ -83,6 +83,7 @@ Changelog
 
 Unreleased
 
+- Drop support for Python 3.8 and add preliminary support for Python 3.14
 - Search for names and imports in ``.py`` files in addition to ``.pyi`` files
 - Allow more redefinitions in stub files. ``OverloadedName`` objects can now
   contain ``ImportedName`` objects.
