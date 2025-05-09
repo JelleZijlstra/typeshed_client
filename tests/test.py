@@ -1,7 +1,7 @@
 import ast
 import unittest
 from pathlib import Path
-from typing import Any, Optional, Set, Type
+from typing import Any, ClassVar, Optional, Set, Type
 from unittest import mock
 
 import typeshed_client
@@ -359,13 +359,25 @@ class TestResolver(unittest.TestCase):
 
 
 class IntegrationTest(unittest.TestCase):
-    """Tests that all files in typeshed are parsed without error."""
+    """Tests that all files in typeshed are parsed without error.
+
+    This runs on all stubs found in the current virtual environment, so this may
+    find failures not seen elsewhere if run in an environment with many installed
+    packages.
+
+    """
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
+    invalid_modules: ClassVar[Set[str]] = {
+        "pytype.tools.merge_pyi.test_data.typevar",
+        "pytype.tools.merge_pyi.test_data.imports",
+    }
 
     def test(self) -> None:
         ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
+            if module_name in self.invalid_modules:
+                continue
             with self.subTest(name=module_name, path=module_path):
                 try:
                     ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
@@ -376,7 +388,11 @@ class IntegrationTest(unittest.TestCase):
                 assert ast is not None
                 is_init = module_path.name == "__init__.pyi"
                 typeshed_client.parser.parse_ast(
-                    ast, ctx, ModulePath(tuple(module_name.split("."))), is_init=is_init
+                    ast,
+                    ctx,
+                    ModulePath(tuple(module_name.split("."))),
+                    is_init=is_init,
+                    file_path=module_path,
                 )
 
 
