@@ -2,8 +2,8 @@
 
 import ast
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -17,8 +17,6 @@ from typing import (
     Type,
     Union,
 )
-
-from isort import file
 
 from . import finder
 from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
@@ -84,7 +82,11 @@ def parse_ast(
     is_py_file: bool = False,
 ) -> NameDict:
     visitor = _NameExtractor(
-        search_context, module_name, is_init=is_init, file_path=file_path, is_py_file=is_py_file
+        search_context,
+        module_name,
+        is_init=is_init,
+        file_path=file_path,
+        is_py_file=is_py_file,
     )
     name_dict: NameDict = {}
     try:
