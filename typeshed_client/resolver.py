@@ -1,6 +1,6 @@
 """Module responsible for resolving names to the module they come from."""
 
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Union
 
 from . import parser
 from .finder import ModulePath, SearchContext, get_search_context
@@ -24,7 +24,7 @@ class Resolver:
             search_context = get_search_context()
         self.ctx = search_context
         self.allow_py_files = allow_py_files
-        self._module_cache: Dict[ModulePath, Module] = {}
+        self._module_cache: dict[ModulePath, Module] = {}
 
     def get_module(self, module_name: ModulePath) -> "Module":
         if module_name not in self._module_cache:
@@ -53,7 +53,7 @@ class Module:
     ) -> None:
         self.names = names
         self.ctx = ctx
-        self._name_cache: Dict[str, ResolvedName] = {}
+        self._name_cache: dict[str, ResolvedName] = {}
         self.exists = exists
 
     def get_name(self, name: str, resolver: Resolver) -> ResolvedName:
@@ -61,7 +61,7 @@ class Module:
             self._name_cache[name] = self._uncached_get_name(name, resolver)
         return self._name_cache[name]
 
-    def get_dunder_all(self, resolver: Resolver) -> Optional[List[str]]:
+    def get_dunder_all(self, resolver: Resolver) -> Optional[list[str]]:
         """Return the contents of __all__, or None if it does not exist."""
         resolved_name = self.get_name("__all__", resolver)
         if resolved_name is None:

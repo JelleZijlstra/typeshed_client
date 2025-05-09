@@ -1,7 +1,7 @@
 import ast
 import unittest
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Set, Type
+from typing import Any, ClassVar, Optional
 from unittest import mock
 
 import typeshed_client
@@ -215,7 +215,7 @@ class TestParser(unittest.TestCase):
         self,
         names: typeshed_client.NameDict,
         name: str,
-        ast_type: Type[Any],
+        ast_type: type[Any],
         *,
         is_exported: bool = True,
         has_child_nodes: bool = False,
@@ -255,7 +255,7 @@ class TestParser(unittest.TestCase):
 
     def check_conditions(
         self,
-        names: Set[str],
+        names: set[str],
         *,
         version: PythonVersion = (3, 6),
         platform: str = "linux",
@@ -368,7 +368,7 @@ class IntegrationTest(unittest.TestCase):
     """
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
-    invalid_modules: ClassVar[Set[str]] = {
+    invalid_modules: ClassVar[set[str]] = {
         "pytype.tools.merge_pyi.test_data.typevar",
         "pytype.tools.merge_pyi.test_data.imports",
     }

@@ -2,21 +2,9 @@
 
 import ast
 import logging
-import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    NoReturn,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, NamedTuple, NoReturn, Optional, Union
 
 from . import finder
 from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
@@ -37,7 +25,7 @@ class ImportedName(NamedTuple):
 
 
 class OverloadedName(NamedTuple):
-    definitions: List[Union[ast.AST, ImportedName]]
+    definitions: list[Union[ast.AST, ImportedName]]
 
 
 class NameInfo(NamedTuple):
@@ -45,10 +33,10 @@ class NameInfo(NamedTuple):
     is_exported: bool
     ast: Union[ast.AST, ImportedName, OverloadedName]
     # should be Optional[NameDict] but that needs a recursive type
-    child_nodes: Optional[Dict[str, Any]] = None
+    child_nodes: Optional[dict[str, Any]] = None
 
 
-NameDict = Dict[str, NameInfo]
+NameDict = dict[str, NameInfo]
 
 
 def get_stub_names(
@@ -144,7 +132,7 @@ def parse_ast(
 
 def get_import_star_names(
     module_name: str, *, search_context: SearchContext, file_path: Optional[Path] = None
-) -> Optional[List[str]]:
+) -> Optional[list[str]]:
     name_dict = get_stub_names(module_name, search_context=search_context)
     if name_dict is None:
         return None
@@ -156,7 +144,7 @@ def get_import_star_names(
 
 def get_dunder_all_from_info(
     info: NameInfo, file_path: Optional[Path] = None
-) -> Optional[List[str]]:
+) -> Optional[list[str]]:
     if isinstance(info.ast, OverloadedName):
         names = []
         for defn in info.ast.definitions:
@@ -172,7 +160,7 @@ def get_dunder_all_from_info(
     return _get_dunder_all_from_ast(info.ast)
 
 
-def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
+def _get_dunder_all_from_ast(node: ast.AST) -> Optional[list[str]]:
     if isinstance(node, (ast.Assign, ast.AugAssign)):
         rhs = node.value
     elif isinstance(node, (ast.List, ast.Tuple)):
@@ -189,7 +177,7 @@ def _get_dunder_all_from_ast(node: ast.AST) -> Optional[List[str]]:
     return names
 
 
-_CMP_OP_TO_FUNCTION: Dict[Type[ast.AST], Callable[[Any, Any], bool]] = {
+_CMP_OP_TO_FUNCTION: dict[type[ast.AST], Callable[[Any, Any], bool]] = {
     ast.Eq: lambda x, y: x == y,
     ast.NotEq: lambda x, y: x != y,
     ast.Lt: lambda x, y: x < y,
@@ -225,7 +213,7 @@ class _NameExtractor(ast.NodeVisitor):
         self.file_path = file_path
         self.is_py_file = is_py_file
 
-    def visit_Module(self, node: ast.Module) -> List[NameInfo]:
+    def visit_Module(self, node: ast.Module) -> list[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Iterable[NameInfo]:
@@ -351,7 +339,7 @@ class _NameExtractor(ast.NodeVisitor):
                 yield NameInfo(name, False, ImportedName(ModulePath((name,))))
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Iterable[NameInfo]:
-        module: Tuple[str, ...]
+        module: tuple[str, ...]
         module = () if node.module is None else tuple(node.module.split("."))
         if node.level == 0:
             source_module = ModulePath(module)
@@ -446,12 +434,8 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         return node.value
 
     # from version 3.9 on an index is represented as the value directly
-    if sys.version_info < (3, 9):
 
-        def visit_Index(self, node: ast.Index) -> int:
-            return self.visit(node.value)
-
-    def visit_Tuple(self, node: ast.Tuple) -> Tuple[object, ...]:
+    def visit_Tuple(self, node: ast.Tuple) -> tuple[object, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 
     def visit_Subscript(self, node: ast.Subscript) -> object:
