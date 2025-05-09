@@ -2,6 +2,7 @@
 
 import ast
 import logging
+from pathlib import Path
 import sys
 from typing import (
     Any,
@@ -17,6 +18,8 @@ from typing import (
     Union,
 )
 
+from isort import file
+
 from . import finder
 from .finder import ModulePath, SearchContext, get_search_context, parse_stub_file
 
@@ -24,7 +27,10 @@ log = logging.getLogger(__name__)
 
 
 class InvalidStub(Exception):
-    pass
+    def __init__(self, message: str, file_path: Optional[Path] = None) -> None:
+        if file_path is not None:
+            message = f"{file_path}: {message}"
+        super().__init__(message)
 
 
 class ImportedName(NamedTuple):
@@ -33,7 +39,7 @@ class ImportedName(NamedTuple):
 
 
 class OverloadedName(NamedTuple):
-    definitions: List[ast.AST]
+    definitions: List[Union[ast.AST, ImportedName]]
 
 
 class NameInfo(NamedTuple):
@@ -59,7 +65,11 @@ def get_stub_names(
     is_init = path.name == "__init__.pyi"
     ast = parse_stub_file(path)
     return parse_ast(
-        ast, search_context, ModulePath(tuple(module_name.split("."))), is_init=is_init
+        ast,
+        search_context,
+        ModulePath(tuple(module_name.split("."))),
+        is_init=is_init,
+        file_path=path,
     )
 
 
@@ -69,11 +79,14 @@ def parse_ast(
     module_name: ModulePath,
     *,
     is_init: bool = False,
+    file_path: Optional[Path] = None,
 ) -> NameDict:
-    visitor = _NameExtractor(search_context, module_name, is_init=is_init)
+    visitor = _NameExtractor(
+        search_context, module_name, is_init=is_init, file_path=file_path
+    )
     name_dict: NameDict = {}
     try:
-        names = visitor.visit(ast)
+        names: Iterable[NameInfo] = visitor.visit(ast)
     except _AssertFailed:
         return name_dict
     for info in names:
@@ -82,32 +95,41 @@ def parse_ast(
                 _warn(
                     f"Name is already present in {', '.join(module_name)}: {info}",
                     search_context,
+                    file_path,
                 )
                 continue
             existing = name_dict[info.name]
 
             # This is common and harmless, likely from an "import *"
-            if isinstance(existing.ast, ImportedName) and isinstance(
-                info.ast, ImportedName
-            ):
+            if existing == info:
                 continue
-
-            if isinstance(existing.ast, ImportedName):
-                _warn(
-                    f"Name is already imported in {', '.join(module_name)}: {existing}",
-                    search_context,
-                )
             elif existing.child_nodes:
                 _warn(
-                    f"Name is already present in {', '.join(module_name)}: {existing}",
+                    f"Name is already present in {', '.join(module_name)}: {info}",
                     search_context,
+                    file_path,
+                )
+            elif isinstance(info.ast, OverloadedName):
+                # Should not happen
+                _warn(
+                    f"Name is already present in {', '.join(module_name)}: {info}",
+                    search_context,
+                    file_path,
                 )
             elif isinstance(existing.ast, OverloadedName):
-                existing.ast.definitions.append(info.ast)
+                if info.is_exported and not existing.is_exported:
+                    new_info = NameInfo(
+                        existing.name,
+                        True,
+                        OverloadedName([*existing.ast.definitions, info.ast]),
+                    )
+                    name_dict[info.name] = new_info
+                else:
+                    existing.ast.definitions.append(info.ast)
             else:
                 new_info = NameInfo(
                     existing.name,
-                    existing.is_exported,
+                    existing.is_exported or info.is_exported,
                     OverloadedName([existing.ast, info.ast]),
                 )
                 name_dict[info.name] = new_info
@@ -117,28 +139,32 @@ def parse_ast(
 
 
 def get_import_star_names(
-    module_name: str, *, search_context: SearchContext
+    module_name: str, *, search_context: SearchContext, file_path: Optional[Path] = None
 ) -> Optional[List[str]]:
     name_dict = get_stub_names(module_name, search_context=search_context)
     if name_dict is None:
         return None
     if "__all__" in name_dict:
         info = name_dict["__all__"]
-        return get_dunder_all_from_info(info)
+        return get_dunder_all_from_info(info, file_path)
     return [name for name, info in name_dict.items() if info.is_exported]
 
 
-def get_dunder_all_from_info(info: NameInfo) -> Optional[List[str]]:
+def get_dunder_all_from_info(
+    info: NameInfo, file_path: Optional[Path] = None
+) -> Optional[List[str]]:
     if isinstance(info.ast, OverloadedName):
         names = []
         for defn in info.ast.definitions:
+            if isinstance(defn, ImportedName):
+                raise InvalidStub(f"Invalid __all__: {info}", file_path)
             subnames = _get_dunder_all_from_ast(defn)
             if subnames is None:
-                raise InvalidStub(f"Invalid __all__: {info}")
+                raise InvalidStub(f"Invalid __all__: {info}", file_path)
             names += subnames
         return names
     if isinstance(info.ast, ImportedName):
-        raise InvalidStub(f"Invalid __all__: {info}")
+        raise InvalidStub(f"Invalid __all__: {info}", file_path)
     return _get_dunder_all_from_ast(info.ast)
 
 
@@ -181,11 +207,17 @@ class _NameExtractor(ast.NodeVisitor):
     """Extract names from a stub module."""
 
     def __init__(
-        self, ctx: SearchContext, module_name: ModulePath, *, is_init: bool = False
+        self,
+        ctx: SearchContext,
+        module_name: ModulePath,
+        *,
+        is_init: bool = False,
+        file_path: Optional[Path],
     ) -> None:
         self.ctx = ctx
         self.module_name = module_name
         self.is_init = is_init
+        self.file_path = file_path
 
     def visit_Module(self, node: ast.Module) -> List[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
@@ -223,27 +255,33 @@ class _NameExtractor(ast.NodeVisitor):
         for target in node.targets:
             if not isinstance(target, ast.Name):
                 raise InvalidStub(
-                    f"Assignment should only be to a simple name: {ast.dump(node)}"
+                    f"Assignment should only be to a simple name: {ast.dump(node)}",
+                    self.file_path,
                 )
             yield NameInfo(target.id, _name_is_exported(target.id), node)
 
     def visit_AugAssign(self, node: ast.AugAssign) -> Iterable[NameInfo]:
         if not isinstance(node.op, ast.Add):
-            raise InvalidStub(f"Only += is allowed in stubs: {ast.dump(node)}")
+            raise InvalidStub(
+                f"Only += is allowed in stubs: {ast.dump(node)}", self.file_path
+            )
         if not isinstance(node.target, ast.Name) or node.target.id != "__all__":
-            raise InvalidStub(f"+= is allowed only for __all__: {ast.dump(node)}")
+            raise InvalidStub(
+                f"+= is allowed only for __all__: {ast.dump(node)}", self.file_path
+            )
         yield NameInfo("__all__", True, node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Iterable[NameInfo]:
         target = node.target
         if not isinstance(target, ast.Name):
             raise InvalidStub(
-                f"Assignment should only be to a simple name: {ast.dump(node)}"
+                f"Assignment should only be to a simple name: {ast.dump(node)}",
+                self.file_path,
             )
         yield NameInfo(target.id, _name_is_exported(target.id), node)
 
     def visit_If(self, node: ast.If) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.ctx)
+        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
         value = visitor.visit(node.test)
         if value:
             for stmt in node.body:
@@ -261,7 +299,7 @@ class _NameExtractor(ast.NodeVisitor):
             yield from self.visit(stmt)
 
     def visit_Assert(self, node: ast.Assert) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.ctx)
+        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
         value = visitor.visit(node.test)
         if value:
             return []
@@ -304,13 +342,16 @@ class _NameExtractor(ast.NodeVisitor):
                 )
             elif alias.name == "*":
                 names = get_import_star_names(
-                    ".".join(source_module), search_context=self.ctx
+                    ".".join(source_module),
+                    search_context=self.ctx,
+                    file_path=self.file_path,
                 )
                 if names is None:
                     _warn(
                         f"could not import {source_module} in"
                         f" {self.module_name} with {self.ctx}",
                         self.ctx,
+                        self.file_path,
                     )
                     continue
                 for name in names:
@@ -329,7 +370,7 @@ class _NameExtractor(ast.NodeVisitor):
         if dunder_all is not None:
             yield dunder_all
         else:
-            raise InvalidStub(f"Cannot handle node {ast.dump(node)}")
+            raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
 
     def _maybe_extract_dunder_all(self, node: ast.expr) -> Optional[NameInfo]:
         if not isinstance(node, ast.Call):
@@ -356,12 +397,13 @@ class _NameExtractor(ast.NodeVisitor):
         return []
 
     def generic_visit(self, node: ast.AST) -> NoReturn:
-        raise InvalidStub(f"Cannot handle node {ast.dump(node)}")
+        raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
 
 
 class _LiteralEvalVisitor(ast.NodeVisitor):
-    def __init__(self, ctx: SearchContext) -> None:
+    def __init__(self, ctx: SearchContext, file_path: Optional[Path]) -> None:
         self.ctx = ctx
+        self.file_path = file_path
 
     def visit_Constant(self, node: ast.Constant) -> object:
         return node.value
@@ -382,7 +424,9 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
 
     def visit_Compare(self, node: ast.Compare) -> bool:
         if len(node.ops) != 1:
-            raise InvalidStub(f"Cannot evaluate chained comparison {ast.dump(node)}")
+            raise InvalidStub(
+                f"Cannot evaluate chained comparison {ast.dump(node)}", self.file_path
+            )
         fn = _CMP_OP_TO_FUNCTION[type(node.ops[0])]
         return fn(self.visit(node.left), self.visit(node.comparators[0]))
 
@@ -404,17 +448,18 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def visit_Attribute(self, node: ast.Attribute) -> object:
         val = node.value
         if not isinstance(val, ast.Name):
-            raise InvalidStub(f"Invalid code in stub: {ast.dump(node)}")
+            raise InvalidStub(f"Invalid code in stub: {ast.dump(node)}", self.file_path)
         if val.id != "sys":
             raise InvalidStub(
-                f"Attribute access must be on the sys module: {ast.dump(node)}"
+                f"Attribute access must be on the sys module: {ast.dump(node)}",
+                self.file_path,
             )
         if node.attr == "platform":
             return self.ctx.platform
         elif node.attr == "version_info":
             return self.ctx.version
         else:
-            raise InvalidStub(f"Invalid attribute on {ast.dump(node)}")
+            raise InvalidStub(f"Invalid attribute on {ast.dump(node)}", self.file_path)
 
     def visit_Name(self, node: ast.Name) -> bool:
         # We're type checking (probably), but we're not mypy.
@@ -423,7 +468,9 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         elif node.id == "MYPY":
             return False
         else:
-            raise InvalidStub(f"Invalid name {node.id!r} in stub condition")
+            raise InvalidStub(
+                f"Invalid name {node.id!r} in stub condition", self.file_path
+            )
 
     def generic_visit(self, node: ast.AST) -> NoReturn:
         raise InvalidStub(f"Cannot evaluate node {ast.dump(node)}")
@@ -433,8 +480,10 @@ class _AssertFailed(Exception):
     """Raised when a top-level assert in a stub fails."""
 
 
-def _warn(message: str, ctx: SearchContext) -> None:
+def _warn(message: str, ctx: SearchContext, file_path: Path | None) -> None:
     if ctx.raise_on_warnings:
-        raise InvalidStub(message)
+        raise InvalidStub(message, file_path)
     else:
+        if file_path is not None:
+            message = f"{file_path}: {message}"
         log.warning(message)
