@@ -1,7 +1,7 @@
 import ast
 import unittest
 from pathlib import Path
-from typing import Any, Optional, Set, Type
+from typing import Any, ClassVar, Optional, Set, Type
 from unittest import mock
 
 import typeshed_client
@@ -368,7 +368,7 @@ class IntegrationTest(unittest.TestCase):
     """
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
-    invalid_modules = {
+    invalid_modules: ClassVar[Set[str]] = {
         "pytype.tools.merge_pyi.test_data.typevar",
         "pytype.tools.merge_pyi.test_data.imports",
     }

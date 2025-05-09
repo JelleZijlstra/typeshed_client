@@ -517,7 +517,7 @@ class _AssertFailed(Exception):
     """Raised when a top-level assert in a stub fails."""
 
 
-def _warn(message: str, ctx: SearchContext, file_path: Path | None) -> None:
+def _warn(message: str, ctx: SearchContext, file_path: Optional[Path]) -> None:
     if ctx.raise_on_warnings:
         raise InvalidStub(message, file_path)
     else:
