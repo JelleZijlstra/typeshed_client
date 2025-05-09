@@ -84,6 +84,8 @@ Changelog
 Unreleased
 
 - Search for names and imports in ``.py`` files in addition to ``.pyi`` files
+- Allow more redefinitions in stub files. ``OverloadedName`` objects can now
+  contain ``ImportedName`` objects.
 
 Version 2.7.0 (July 16, 2024)
 
