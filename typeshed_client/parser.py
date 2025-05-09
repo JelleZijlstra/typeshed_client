@@ -62,7 +62,7 @@ def get_stub_names(
     path = finder.get_stub_file(module_name, search_context=search_context)
     if path is None:
         return None
-    is_init = path.name == "__init__.pyi"
+    is_init = path.name in ("__init__.py", "__init__.pyi")
     ast = parse_stub_file(path)
     return parse_ast(
         ast,
@@ -70,6 +70,7 @@ def get_stub_names(
         ModulePath(tuple(module_name.split("."))),
         is_init=is_init,
         file_path=path,
+        is_py_file=path.suffix == ".py",
     )
 
 
@@ -80,9 +81,10 @@ def parse_ast(
     *,
     is_init: bool = False,
     file_path: Optional[Path] = None,
+    is_py_file: bool = False,
 ) -> NameDict:
     visitor = _NameExtractor(
-        search_context, module_name, is_init=is_init, file_path=file_path
+        search_context, module_name, is_init=is_init, file_path=file_path, is_py_file=is_py_file
     )
     name_dict: NameDict = {}
     try:
@@ -213,11 +215,13 @@ class _NameExtractor(ast.NodeVisitor):
         *,
         is_init: bool = False,
         file_path: Optional[Path],
+        is_py_file: bool = False,
     ) -> None:
         self.ctx = ctx
         self.module_name = module_name
         self.is_init = is_init
         self.file_path = file_path
+        self.is_py_file = is_py_file
 
     def visit_Module(self, node: ast.Module) -> List[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
@@ -237,6 +241,8 @@ class _NameExtractor(ast.NodeVisitor):
                 if isinstance(existing.ast, OverloadedName):
                     existing.ast.definitions.append(info.ast)
                 elif isinstance(existing.ast, ImportedName):
+                    if self.is_py_file:
+                        continue
                     raise RuntimeError(
                         f"Unexpected import name in class: {existing.ast}"
                     )
@@ -254,6 +260,8 @@ class _NameExtractor(ast.NodeVisitor):
     def visit_Assign(self, node: ast.Assign) -> Iterable[NameInfo]:
         for target in node.targets:
             if not isinstance(target, ast.Name):
+                if self.is_py_file:
+                    continue
                 raise InvalidStub(
                     f"Assignment should only be to a simple name: {ast.dump(node)}",
                     self.file_path,
@@ -262,10 +270,14 @@ class _NameExtractor(ast.NodeVisitor):
 
     def visit_AugAssign(self, node: ast.AugAssign) -> Iterable[NameInfo]:
         if not isinstance(node.op, ast.Add):
+            if self.is_py_file:
+                return
             raise InvalidStub(
                 f"Only += is allowed in stubs: {ast.dump(node)}", self.file_path
             )
         if not isinstance(node.target, ast.Name) or node.target.id != "__all__":
+            if self.is_py_file:
+                return
             raise InvalidStub(
                 f"+= is allowed only for __all__: {ast.dump(node)}", self.file_path
             )
@@ -274,6 +286,8 @@ class _NameExtractor(ast.NodeVisitor):
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Iterable[NameInfo]:
         target = node.target
         if not isinstance(target, ast.Name):
+            if self.is_py_file:
+                return
             raise InvalidStub(
                 f"Assignment should only be to a simple name: {ast.dump(node)}",
                 self.file_path,
@@ -281,14 +295,30 @@ class _NameExtractor(ast.NodeVisitor):
         yield NameInfo(target.id, _name_is_exported(target.id), node)
 
     def visit_If(self, node: ast.If) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
-        value = visitor.visit(node.test)
-        if value:
+        value = self._visit_condition(node.test)
+        if value is None:
+            # We don't know which branch to take, so we assume both
+            for stmt in node.body:
+                yield from self.visit(stmt)
+            for stmt in node.orelse:
+                yield from self.visit(stmt)
+        elif value:
             for stmt in node.body:
                 yield from self.visit(stmt)
         else:
             for stmt in node.orelse:
                 yield from self.visit(stmt)
+
+    def _visit_condition(self, expr: ast.expr) -> Optional[bool]:
+        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
+        try:
+            value = visitor.visit(expr)
+        except InvalidStub:
+            if not self.is_py_file:
+                raise
+            return None
+        else:
+            return bool(value)
 
     def visit_Try(self, node: ast.Try) -> Iterable[NameInfo]:
         # try-except sometimes gets used with conditional imports. We assume
@@ -299,9 +329,8 @@ class _NameExtractor(ast.NodeVisitor):
             yield from self.visit(stmt)
 
     def visit_Assert(self, node: ast.Assert) -> Iterable[NameInfo]:
-        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
-        value = visitor.visit(node.test)
-        if value:
+        value = self._visit_condition(node.test)
+        if value is True or value is None:
             return []
         else:
             raise _AssertFailed
@@ -370,6 +399,9 @@ class _NameExtractor(ast.NodeVisitor):
         if dunder_all is not None:
             yield dunder_all
         else:
+            if self.is_py_file:
+                # We don't know what this is, so we ignore it
+                return
             raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
 
     def _maybe_extract_dunder_all(self, node: ast.expr) -> Optional[NameInfo]:
@@ -396,7 +428,10 @@ class _NameExtractor(ast.NodeVisitor):
     def visit_Pass(self, node: ast.Pass) -> Iterable[NameInfo]:
         return []
 
-    def generic_visit(self, node: ast.AST) -> NoReturn:
+    def generic_visit(self, node: ast.AST) -> Iterable[NameInfo]:
+        if self.is_py_file:
+            # We don't know what this is, so we ignore it
+            return []
         raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
 
 
