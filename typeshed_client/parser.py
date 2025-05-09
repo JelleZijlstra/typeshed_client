@@ -433,8 +433,6 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def visit_Constant(self, node: ast.Constant) -> object:
         return node.value
 
-    # from version 3.9 on an index is represented as the value directly
-
     def visit_Tuple(self, node: ast.Tuple) -> tuple[object, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 

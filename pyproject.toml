@@ -90,4 +90,5 @@ ignore = [
   "ANN102",  # missing type annotation for cls in classmethod
   "SIM105",  # I don't like contextlib.suppress
   "UP038",  # astral-sh/ruff#7871
+  "B901",  # returning from generators is fine
 ]

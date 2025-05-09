@@ -11,7 +11,7 @@ class ImportedInfo(NamedTuple):
     info: parser.NameInfo
 
 
-ResolvedName = Union[None, ModulePath, ImportedInfo, parser.NameInfo]
+ResolvedName = Union[ModulePath, ImportedInfo, parser.NameInfo, None]
 
 
 class Resolver:
