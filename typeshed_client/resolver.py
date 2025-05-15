@@ -15,10 +15,7 @@ ResolvedName = Union[ModulePath, ImportedInfo, parser.NameInfo, None]
 
 
 class Resolver:
-    def __init__(
-        self,
-        search_context: Optional[SearchContext] = None,
-    ) -> None:
+    def __init__(self, search_context: Optional[SearchContext] = None) -> None:
         if search_context is None:
             search_context = get_search_context()
         self.ctx = search_context
