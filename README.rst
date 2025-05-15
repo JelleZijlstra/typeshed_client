@@ -28,15 +28,34 @@ given a module name.
 
 Functions provided:
 
-- ``get_search_context(*, typeshed: Optional[Path] = None,
-  search_path: Optional[Sequence[Path]] = None, python_executable: Optional[str] = None,
-  version: Optional[PythonVersion] = None, platform: str = sys.platform) -> SearchContext``:
-  Returns a ``SearchContext``
+- ``get_search_context(*, typeshed: Path | None = None,
+  search_path: Sequence[Path] | None = None, python_executable: str | None = None,
+  version: PythonVersion | None = None, platform: str = sys.platform,
+  raise_on_warnings: bool = False, allow_py_files: bool = True) -> SearchContext``:
+  Returns a ``SearchContext``, which can be used with most other functions to customize
+  stub finding behavior. All arguments are optional and the rest of the package will use
+  a ``SearchContext`` created with the default values if no explicit context is provided.
+  The arguments are:
+  - ``typeshed``: The path to the typeshed directory. If not provided, the package will
+    use the bundled version of typeshed.
+  - ``search_path``: A list of directories to search for stubs. If not provided,
+    ``sys.path`` will be used.
+  - ``python_executable``: The path to the Python executable to be used for determining
+    ``search_path``.
+  - ``version``: Version of Python (as a pair, e.g., ``(3, 13)``) to be used for
+    interpreting ``sys.version_info`` checks in stubs.
+  - ``platform``: The platform to be used for interpreting ``sys.platform`` checks in
+    stubs. The default is ``sys.platform``, the platform where the library is invoked.
+  - ``raise_on_warnings``: If True, raise an exception if the parser encounters something
+    it does not understand.
+  - ``allow_py_files``: If True, allow searching for ``.py`` files in addition to
+    ``.pyi`` files. This is useful for typed packages that contain both stub files and
+    regular Python files. The default is True.
 - ``typeshed_client.get_stub_file(module_name: str, *,
-  search_context: Optional[SearchContext] = None) -> Optional[Path]``: Returns
-  the path to a module's stub in typeshed. For example,
-  ``get_stub_file('typing', search_context=get_search_context(version=(2, 7)))`` may return
-  ``Path('/path/to/typeshed/stdlib/@python2/typing.pyi')``. If there is no stub for the
+  search_context: SearchContext | None = None) -> Path | None``: Returns
+  the path to a module's stub file. For example,
+  ``get_stub_file('typing')`` may return
+  ``Path('/path/to/typeshed/stdlib/typing.pyi')``. If there is no stub for the
   module, returns None.
 - ``typeshed_client.get_stub_ast`` has the same interface, but returns an AST
   object (parsed using the standard library ``ast`` module).
@@ -47,7 +66,7 @@ Collecting names from stubs
 ``typeshed_client.parser`` collects the names defined in a stub. It provides:
 
 - ``typeshed_client.get_stub_names(module_name: str, *,
-  search_context: Optional[SearchContext] = None) -> Optional[NameDict]`` collects the names
+  search_context: SearchContext | None = None) -> NameDict | None`` collects the names
   defined in a module, using the given Python version and platform. It
   returns a ``NameDict``, a dictionary mapping object names defined in the module
   to ``NameInfo`` records.
@@ -58,8 +77,8 @@ Collecting names from stubs
       class NameInfo(NamedTuple):
         name: str
         is_exported: bool
-        ast: Union[ast3.AST, ImportedName, OverloadedName]
-        child_nodes: Optional[NameDict] = None
+        ast: ast.AST | ImportedName | OverloadedName
+        child_nodes: NameDict | None = None
 
   ``name`` is the object's name. ``is_exported`` indicates whether the name is a
   part of the stub's public interface. ``ast`` is the AST node defining the name,
@@ -73,7 +92,7 @@ Resolving names to their definitions
 The third component of this package, ``typeshed_client.resolver``, maps names to
 their definitions, even if those names are defined in other stubs.
 
-To use the resolver, you need to instantiate the ``typeshed_client.Resolver``
+To use the resolver, instantiate the ``typeshed_client.Resolver``
 class. For example, given a ``resolver = typeshed_client.Resolver()``, you can
 call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 ``NameInfo`` containing the AST node defining ``collections.Set`` in typeshed.
