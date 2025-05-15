@@ -357,6 +357,10 @@ class TestResolver(unittest.TestCase):
         name_info = typeshed_client.NameInfo("obj", True, mock.ANY)
         self.assertEqual(obj, typeshed_client.ImportedInfo(subpath, name_info))
 
+        res2 = typeshed_client.Resolver(get_context((3, 5), allow_py_files=False))
+        obj = res2.get_name(path, "obj")
+        self.assertIsNone(obj)
+
 
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error.

@@ -15,15 +15,10 @@ ResolvedName = Union[ModulePath, ImportedInfo, parser.NameInfo, None]
 
 
 class Resolver:
-    def __init__(
-        self,
-        search_context: Optional[SearchContext] = None,
-        allow_py_files: bool = False,
-    ) -> None:
+    def __init__(self, search_context: Optional[SearchContext] = None) -> None:
         if search_context is None:
             search_context = get_search_context()
         self.ctx = search_context
-        self.allow_py_files = allow_py_files
         self._module_cache: dict[ModulePath, Module] = {}
 
     def get_module(self, module_name: ModulePath) -> "Module":
