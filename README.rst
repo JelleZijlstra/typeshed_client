@@ -31,7 +31,7 @@ Functions provided:
 - ``get_search_context(*, typeshed: Path | None = None,
   search_path: Sequence[Path] | None = None, python_executable: str | None = None,
   version: PythonVersion | None = None, platform: str = sys.platform,
-  raise_on_warnings: bool = False, allow_py_files: bool = True) -> SearchContext``:
+  raise_on_warnings: bool = False, allow_py_files: bool = False) -> SearchContext``:
   Returns a ``SearchContext``, which can be used with most other functions to customize
   stub finding behavior. All arguments are optional and the rest of the package will use
   a ``SearchContext`` created with the default values if no explicit context is provided.
@@ -50,7 +50,7 @@ Functions provided:
     it does not understand.
   - ``allow_py_files``: If True, allow searching for ``.py`` files in addition to
     ``.pyi`` files. This is useful for typed packages that contain both stub files and
-    regular Python files. The default is True.
+    regular Python files. The default is False.
 - ``typeshed_client.get_stub_file(module_name: str, *,
   search_context: SearchContext | None = None) -> Path | None``: Returns
   the path to a module's stub file. For example,

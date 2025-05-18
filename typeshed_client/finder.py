@@ -32,7 +32,7 @@ class SearchContext(NamedTuple):
     version: PythonVersion
     platform: str
     raise_on_warnings: bool = False
-    allow_py_files: bool = True
+    allow_py_files: bool = False
 
     def is_python2(self) -> bool:
         return self.version[0] == 2
@@ -46,7 +46,7 @@ def get_search_context(
     version: Optional[PythonVersion] = None,
     platform: str = sys.platform,
     raise_on_warnings: bool = False,
-    allow_py_files: bool = True,
+    allow_py_files: bool = False,
 ) -> SearchContext:
     """Return a context for finding stubs. This context can be passed to other
     functions in this file.
