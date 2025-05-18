@@ -1,5 +1,5 @@
 [tool.black]
-target_version = ['py39', 'py310', 'py311', 'py312', 'py313']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 skip-magic-trailing-comma = true
 preview = true
@@ -86,8 +86,6 @@ select = [
 ]
 
 ignore = [
-  "ANN101",  # missing type annotation for self in method
-  "ANN102",  # missing type annotation for cls in classmethod
   "SIM105",  # I don't like contextlib.suppress
   "UP038",  # astral-sh/ruff#7871
   "B901",  # returning from generators is fine

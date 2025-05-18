@@ -5,12 +5,11 @@ on:
   - pull_request
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # no 3.14 yet because of https://github.com/tox-dev/tox/issues/3523
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev"]
 
     steps:
       - uses: actions/checkout@v3
@@ -20,8 +19,37 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
       - name: Install dependencies
+        run: python -m pip install -e .
+      - name: Test
+        run: python tests/test.py
+
+  precommit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up latest Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.0
+
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+          allow-prereleases: true
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install tox tox-gh-actions
-      - name: Test with tox
-        run: tox
+          python -m pip install mypy==1.15.0
+          python -m pip install -e .
+      - name: Run mypy
+        run: python -m mypy .
