@@ -4,7 +4,7 @@ import re
 from collections.abc import Iterable
 from pathlib import Path
 
-from setuptools import setup
+from setuptools import setup  # type: ignore[import-untyped]
 
 current_dir = Path(__file__).parent.resolve()
 ts_client_dir = current_dir / "typeshed_client"
