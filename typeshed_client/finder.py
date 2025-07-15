@@ -322,7 +322,7 @@ def find_typeshed() -> Path:
 
 
 def parse_stub_file(path: Path) -> ast.AST:
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     return ast.parse(text, filename=str(path))
 
 
