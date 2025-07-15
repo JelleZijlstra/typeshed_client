@@ -100,12 +100,13 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.8.0 (July 15, 2025)
 
 - Drop support for Python 3.8 and add preliminary support for Python 3.14
 - Search for names and imports in ``.py`` files in addition to ``.pyi`` files
 - Allow more redefinitions in stub files. ``OverloadedName`` objects can now
   contain ``ImportedName`` objects.
+- Explicitly set encoding to UTF-8, fixing crashes on Windows in some cases.
 
 Version 2.7.0 (July 16, 2024)
 
