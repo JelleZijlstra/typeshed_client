@@ -1,35 +1,45 @@
-from pathlib import Path
 import ast
+import unittest
+from pathlib import Path
+from typing import Any, ClassVar, Optional
+from unittest import mock
+
 import typeshed_client
 from typeshed_client.finder import (
-    get_search_context,
+    ModulePath,
     PythonVersion,
-    get_stub_file,
     SearchContext,
+    get_search_context,
+    get_stub_file,
 )
 from typeshed_client.parser import get_stub_names
-from typing import Any, Set, Type, Optional
-from unittest import mock
-import unittest
 
 TEST_TYPESHED = Path(__file__).parent / "typeshed"
 PACKAGES = Path(__file__).parent / "site-packages"
 
 
-def get_context(version: PythonVersion, platform: str = "linux") -> SearchContext:
+def get_context(
+    version: PythonVersion, platform: str = "linux", allow_py_files: bool = True
+) -> SearchContext:
     return get_search_context(
         version=version,
         typeshed=TEST_TYPESHED,
         search_path=[PACKAGES],
         platform=platform,
+        allow_py_files=allow_py_files,
     )
 
 
 class TestFinder(unittest.TestCase):
     def check(
-        self, name: str, version: PythonVersion, expected: Optional[Path]
+        self,
+        name: str,
+        version: PythonVersion,
+        expected: Optional[Path],
+        *,
+        allow_py_files: bool = True,
     ) -> None:
-        ctx = get_context(version)
+        ctx = get_context(version, allow_py_files=allow_py_files)
         self.assertEqual(get_stub_file(name, search_context=ctx), expected)
 
     def test_get_stub_file(self) -> None:
@@ -51,6 +61,8 @@ class TestFinder(unittest.TestCase):
     def test_third_party(self) -> None:
         self.check("thirdparty", (3, 6), PACKAGES / "thirdparty-stubs/__init__.pyi")
         self.check("nostubs", (3, 6), PACKAGES / "nostubs/__init__.pyi")
+        self.check("usedotpy", (3, 6), PACKAGES / "usedotpy/__init__.py")
+        self.check("usedotpy", (3, 6), None, allow_py_files=False)
 
     def test_get_all_stub_files(self) -> None:
         all_stubs = typeshed_client.get_all_stub_files(get_context((2, 7)))
@@ -64,6 +76,7 @@ class TestFinder(unittest.TestCase):
                 ("lib", TEST_TYPESHED / "@python2/lib.pyi"),
                 ("conditions", TEST_TYPESHED / "conditions.pyi"),
                 ("top_level_assert", TEST_TYPESHED / "top_level_assert.pyi"),
+                ("usedotpy.stub", PACKAGES / "usedotpy/stub.pyi"),
             },
         )
 
@@ -74,7 +87,7 @@ class TestParser(unittest.TestCase):
         names = get_stub_names("simple", search_context=ctx)
         assert names is not None
         self.assertEqual(
-            set(names.keys()),
+            set(names),
             {
                 "var",
                 "old_var",
@@ -135,7 +148,7 @@ class TestParser(unittest.TestCase):
         self.check_nameinfo(names, "Cls", ast.ClassDef, has_child_nodes=True)
         cls_names = names["Cls"].child_nodes
         assert cls_names is not None
-        self.assertEqual(set(cls_names.keys()), {"attr", "method"})
+        self.assertEqual(set(cls_names), {"attr", "method"})
         self.check_nameinfo(cls_names, "attr", ast.AnnAssign)
         self.check_nameinfo(cls_names, "method", ast.FunctionDef)
 
@@ -143,12 +156,33 @@ class TestParser(unittest.TestCase):
         ctx = get_context((3, 5))
         names = get_stub_names("starimport", search_context=ctx)
         assert names is not None
-        self.assertEqual(set(names.keys()), {"public"})
+        self.assertEqual(set(names), {"public"})
         self.check_nameinfo(names, "public", typeshed_client.ImportedName)
         path = typeshed_client.ModulePath(("imported",))
         self.assertEqual(
             names["public"].ast, typeshed_client.ImportedName(path, "public")
         )
+
+    def test_starimport_all(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("starimportall", search_context=ctx)
+        assert names is not None
+        expected = {"a", "b", "c", "f", "h", "n"}
+        self.assertEqual(set(names), expected)
+        for name in expected:
+            self.check_nameinfo(names, name, typeshed_client.ImportedName)
+            module = "tupleall" if name == "n" else "dunder_all"
+            path = typeshed_client.ModulePath((module,))
+            self.assertEqual(names[name].ast, typeshed_client.ImportedName(path, name))
+
+    def test_starimport_no_dunders(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("importabout", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names), {"x"})
+        self.check_nameinfo(names, "x", typeshed_client.ImportedName)
+        path = typeshed_client.ModulePath(("about",))
+        self.assertEqual(names["x"].ast, typeshed_client.ImportedName(path, "x"))
 
     def test_dot_import(self) -> None:
         ctx = get_context((3, 5))
@@ -161,18 +195,27 @@ class TestParser(unittest.TestCase):
             with self.subTest(mod):
                 names = get_stub_names(mod, search_context=ctx)
                 assert names is not None
-                self.assertEqual(set(names.keys()), {"f", "overloads"})
+                self.assertEqual(set(names), {"f", "overloads"})
                 self.check_nameinfo(names, "f", typeshed_client.ImportedName)
                 path = typeshed_client.ModulePath(("subdir", "overloads"))
                 self.assertEqual(
                     names["f"].ast, typeshed_client.ImportedName(path, "f")
                 )
 
+    def test_try(self) -> None:
+        ctx = get_context((3, 10))
+        names = get_stub_names("tryexcept", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names), {"np", "f", "x"})
+        self.check_nameinfo(names, "np", typeshed_client.ImportedName)
+        self.check_nameinfo(names, "f", ast.FunctionDef)
+        self.check_nameinfo(names, "x", ast.AnnAssign)
+
     def check_nameinfo(
         self,
         names: typeshed_client.NameDict,
         name: str,
-        ast_type: Type[Any],
+        ast_type: type[Any],
         *,
         is_exported: bool = True,
         has_child_nodes: bool = False,
@@ -212,7 +255,7 @@ class TestParser(unittest.TestCase):
 
     def check_conditions(
         self,
-        names: Set[str],
+        names: set[str],
         *,
         version: PythonVersion = (3, 6),
         platform: str = "linux",
@@ -220,22 +263,27 @@ class TestParser(unittest.TestCase):
         ctx = get_context(version, platform)
         info = get_stub_names("conditions", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), names | {"sys"})
+        self.assertEqual(set(info), names | {"sys"})
 
     def test_top_level_assert(self) -> None:
         ctx = get_context((3, 6), "flat")
         info = get_stub_names("top_level_assert", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), set())
+        self.assertEqual(set(info), set())
         ctx = get_context((3, 6), "linux")
         info = get_stub_names("top_level_assert", search_context=ctx)
         assert info is not None
-        self.assertEqual(set(info.keys()), {"x", "sys"})
+        self.assertEqual(set(info), {"x", "sys"})
+
+    def test_ifmypy(self) -> None:
+        names = get_stub_names("ifmypy", search_context=get_context((3, 11)))
+        assert names is not None
+        self.assertEqual(set(names), {"MYPY", "we_are_not_mypy"})
 
     def test_overloads(self) -> None:
         names = get_stub_names("overloads", search_context=get_context((3, 5)))
         assert names is not None
-        self.assertEqual(set(names.keys()), {"overload", "overloaded", "OverloadClass"})
+        self.assertEqual(set(names), {"overload", "overloaded", "OverloadClass"})
         self.check_nameinfo(names, "overloaded", typeshed_client.OverloadedName)
         assert isinstance(names["overloaded"].ast, typeshed_client.OverloadedName)
         definitions = names["overloaded"].ast.definitions
@@ -247,7 +295,7 @@ class TestParser(unittest.TestCase):
         self.assertIsInstance(classdef.ast, ast.ClassDef)
         children = classdef.child_nodes
         assert children is not None
-        self.assertEqual(set(children.keys()), {"overloaded"})
+        self.assertEqual(set(children), {"overloaded"})
         definitions = children["overloaded"].ast.definitions
         self.assertEqual(len(definitions), 2)
         for defn in definitions:
@@ -290,26 +338,66 @@ class TestResolver(unittest.TestCase):
         res = typeshed_client.Resolver(get_context((3, 5)))
         mod = res.get_module(path)
         self.assertIsNotNone(mod)
-        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "d"])
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "d", "g", "i"])
 
         res = typeshed_client.Resolver(get_context((3, 11)))
         mod = res.get_module(path)
         self.assertIsNotNone(mod)
-        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c"])
+        self.assertEqual(mod.get_dunder_all(res), ["a", "b", "c", "f", "h"])
+
+    def test_use_py_file(self) -> None:
+        path = typeshed_client.ModulePath(("usedotpy",))
+        subpath = typeshed_client.ModulePath(("usedotpy", "stub"))
+
+        res = typeshed_client.Resolver(get_context((3, 5)))
+        mod = res.get_module(path)
+        self.assertIsNotNone(mod)
+
+        obj = res.get_name(path, "obj")
+        name_info = typeshed_client.NameInfo("obj", True, mock.ANY)
+        self.assertEqual(obj, typeshed_client.ImportedInfo(subpath, name_info))
+
+        res2 = typeshed_client.Resolver(get_context((3, 5), allow_py_files=False))
+        obj = res2.get_name(path, "obj")
+        self.assertIsNone(obj)
 
 
 class IntegrationTest(unittest.TestCase):
-    """Tests that all files in typeshed are parsed without error."""
+    """Tests that all files in typeshed are parsed without error.
+
+    This runs on all stubs found in the current virtual environment, so this may
+    find failures not seen elsewhere if run in an environment with many installed
+    packages.
+
+    """
 
     fake_path = typeshed_client.ModulePath(("some", "module"))
+    invalid_modules: ClassVar[set[str]] = {
+        "pytype.tools.merge_pyi.test_data.typevar",
+        "pytype.tools.merge_pyi.test_data.imports",
+    }
 
     def test(self) -> None:
-        ctx = get_search_context()
+        ctx = get_search_context(raise_on_warnings=True)
         for module_name, module_path in typeshed_client.get_all_stub_files(ctx):
-            with self.subTest(path=module_name):
-                ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+            if module_name in self.invalid_modules:
+                continue
+            with self.subTest(name=module_name, path=module_path):
+                try:
+                    ast = typeshed_client.get_stub_ast(module_name, search_context=ctx)
+                except SyntaxError:
+                    # idlelib for some reason ships an example stub file with a syntax error.
+                    # typeshed-client should also throw a SyntaxError in this case.
+                    continue
                 assert ast is not None
-                typeshed_client.parser.parse_ast(ast, ctx, self.fake_path)
+                is_init = module_path.name == "__init__.pyi"
+                typeshed_client.parser.parse_ast(
+                    ast,
+                    ctx,
+                    ModulePath(tuple(module_name.split("."))),
+                    is_init=is_init,
+                    file_path=module_path,
+                )
 
 
 if __name__ == "__main__":

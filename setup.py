@@ -1,10 +1,10 @@
 import ast
 import os
-from pathlib import Path
 import re
-from typing import Iterable
-from setuptools import setup
+from collections.abc import Iterable
+from pathlib import Path
 
+from setuptools import setup  # type: ignore[import-untyped]
 
 current_dir = Path(__file__).parent.resolve()
 ts_client_dir = current_dir / "typeshed_client"
@@ -46,7 +46,7 @@ setup(
     },
     license="MIT",
     packages=["typeshed_client"],
-    install_requires=["importlib_resources >= 1.4.0"],
+    install_requires=["importlib_resources >= 1.4.0", "typing-extensions>=4.5.0"],
     package_data={"typeshed_client": list(find_bundled_files())},
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -55,13 +55,13 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Software Development",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.9",
 )

@@ -1,10 +1,9 @@
 """Module responsible for resolving names to the module they come from."""
 
-import ast
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Union
 
-from .finder import SearchContext, get_search_context, ModulePath
 from . import parser
+from .finder import ModulePath, SearchContext, get_search_context
 
 
 class ImportedInfo(NamedTuple):
@@ -12,7 +11,7 @@ class ImportedInfo(NamedTuple):
     info: parser.NameInfo
 
 
-ResolvedName = Union[None, ModulePath, ImportedInfo, parser.NameInfo]
+ResolvedName = Union[ModulePath, ImportedInfo, parser.NameInfo, None]
 
 
 class Resolver:
@@ -20,7 +19,7 @@ class Resolver:
         if search_context is None:
             search_context = get_search_context()
         self.ctx = search_context
-        self._module_cache: Dict[ModulePath, Module] = {}
+        self._module_cache: dict[ModulePath, Module] = {}
 
     def get_module(self, module_name: ModulePath) -> "Module":
         if module_name not in self._module_cache:
@@ -49,7 +48,7 @@ class Module:
     ) -> None:
         self.names = names
         self.ctx = ctx
-        self._name_cache: Dict[str, ResolvedName] = {}
+        self._name_cache: dict[str, ResolvedName] = {}
         self.exists = exists
 
     def get_name(self, name: str, resolver: Resolver) -> ResolvedName:
@@ -57,7 +56,7 @@ class Module:
             self._name_cache[name] = self._uncached_get_name(name, resolver)
         return self._name_cache[name]
 
-    def get_dunder_all(self, resolver: Resolver) -> Optional[List[str]]:
+    def get_dunder_all(self, resolver: Resolver) -> Optional[list[str]]:
         """Return the contents of __all__, or None if it does not exist."""
         resolved_name = self.get_name("__all__", resolver)
         if resolved_name is None:
@@ -66,30 +65,7 @@ class Module:
             resolved_name = resolved_name.info
         if not isinstance(resolved_name, parser.NameInfo):
             raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
-        if isinstance(resolved_name.ast, parser.OverloadedName):
-            names = []
-            for defn in resolved_name.ast.definitions:
-                subnames = self._get_dunder_all_from_ast(defn)
-                if subnames is None:
-                    raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
-                names += subnames
-            return names
-        if isinstance(resolved_name.ast, parser.ImportedName):
-            raise parser.InvalidStub(f"Invalid __all__: {resolved_name}")
-        return self._get_dunder_all_from_ast(resolved_name.ast)
-
-    def _get_dunder_all_from_ast(self, node: ast.AST) -> Optional[List[str]]:
-        if not isinstance(node, (ast.Assign, ast.AugAssign)):
-            return None
-        rhs = node.value
-        if not isinstance(rhs, ast.List):
-            return None
-        names = []
-        for elt in rhs.elts:
-            if not isinstance(elt, ast.Str):
-                return None
-            names.append(elt.s)
-        return names
+        return parser.get_dunder_all_from_info(resolved_name)
 
     def _uncached_get_name(self, name: str, resolver: Resolver) -> ResolvedName:
         if name not in self.names:

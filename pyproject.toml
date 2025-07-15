@@ -1,5 +1,5 @@
 [tool.black]
-target_version = ['py36', 'py37', 'py38', 'py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 skip-magic-trailing-comma = true
 preview = true
@@ -50,7 +50,43 @@ disallow_any_decorated = true
 
 exclude = [
   "typeshed_client/typeshed",
+  "tests/site-packages",
+  "tests/typeshed",
+  "build/",
+  "thirdparty",
+  ".tox/",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+preview = true
+unsafe-fixes = true
+
+exclude = [
+  "typeshed_client/typeshed",
   "tests/typeshed",
   "build/",
   ".tox/",
+]
+
+[tool.ruff.lint]
+select = [
+  "F",
+  "E",
+  "I",  # import sorting
+  "ANN",  # enforce type annotations
+  "C4",  # flake8-comprehensions
+  "B",  # bugbear
+  "SIM",  # simplify
+  "UP",  # pyupgrade
+  "PIE",
+  "PERF",
+  "RUF",  # Ruff's own rules
+]
+
+ignore = [
+  "SIM105",  # I don't like contextlib.suppress
+  "UP038",  # astral-sh/ruff#7871
+  "B901",  # returning from generators is fine
 ]

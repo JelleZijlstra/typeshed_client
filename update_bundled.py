@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
 
 
 def update_bundled() -> None:
@@ -21,6 +21,7 @@ def update_bundled() -> None:
             cwd=temp_dir,
         )
         shutil.copytree(temp_dir / "typeshed" / "stdlib", bundled_ts_dir)
+    shutil.rmtree(bundled_ts_dir / "@tests")
     subprocess.check_call(["git", "add", str(bundled_ts_dir)])
 
 
