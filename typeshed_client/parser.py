@@ -83,6 +83,12 @@ def parse_ast(
         return name_dict
     for info in names:
         if info.name in name_dict:
+            existing = name_dict[info.name]
+            if isinstance(existing.ast, ImportedName):
+                # If it's imported, allow to just overwrite it
+                name_dict[info.name] = info
+                continue
+
             if info.child_nodes:
                 _warn(
                     f"Name is already present in {', '.join(module_name)}: {info}",
@@ -90,7 +96,6 @@ def parse_ast(
                     file_path,
                 )
                 continue
-            existing = name_dict[info.name]
 
             # This is common and harmless, likely from an "import *"
             if existing == info:
