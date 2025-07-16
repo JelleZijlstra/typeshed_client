@@ -37,6 +37,7 @@ setup(
     version=version,
     description="A library for accessing stubs in typeshed.",
     long_description=Path("README.rst").read_text(),
+    long_description_content_type="text/x-rst",
     keywords="typeshed typing annotations",
     author="Jelle Zijlstra",
     author_email="jelle.zijlstra@gmail.com",
