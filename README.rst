@@ -100,6 +100,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.8.1 (July 15, 2025)
+
+- Fix package publishing pipeline
+
 Version 2.8.0 (July 15, 2025)
 
 - Update bundled typeshed
