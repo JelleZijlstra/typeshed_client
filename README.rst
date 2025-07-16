@@ -36,6 +36,7 @@ Functions provided:
   stub finding behavior. All arguments are optional and the rest of the package will use
   a ``SearchContext`` created with the default values if no explicit context is provided.
   The arguments are:
+
   - ``typeshed``: The path to the typeshed directory. If not provided, the package will
     use the bundled version of typeshed.
   - ``search_path``: A list of directories to search for stubs. If not provided,
@@ -51,6 +52,7 @@ Functions provided:
   - ``allow_py_files``: If True, allow searching for ``.py`` files in addition to
     ``.pyi`` files. This is useful for typed packages that contain both stub files and
     regular Python files. The default is False.
+
 - ``typeshed_client.get_stub_file(module_name: str, *,
   search_context: SearchContext | None = None) -> Path | None``: Returns
   the path to a module's stub file. For example,
