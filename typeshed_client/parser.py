@@ -305,15 +305,9 @@ class _NameExtractor(ast.NodeVisitor):
                 yield from self.visit(stmt)
 
     def _visit_condition(self, expr: ast.expr) -> Optional[bool]:
-        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
-        try:
-            value = visitor.visit(expr)
-        except InvalidStub:
-            if not self.is_py_file:
-                raise
-            return None
-        else:
-            return bool(value)
+        return evaluate_expression_truthiness(
+            expr, ctx=self.ctx, file_path=self.file_path, is_py_file=self.is_py_file
+        )
 
     def visit_Try(self, node: ast.Try) -> Iterable[NameInfo]:
         # try-except sometimes gets used with conditional imports. We assume
@@ -428,6 +422,39 @@ class _NameExtractor(ast.NodeVisitor):
             # We don't know what this is, so we ignore it
             return []
         raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
+
+
+def evaluate_expression_truthiness(
+    expr: ast.expr, *, ctx: SearchContext, file_path: Optional[Path], is_py_file: bool
+) -> Optional[bool]:
+    """Attempt to statically evaluate the truthiness of the expression represented by ``expr``.
+
+    This is useful for evaluating conditions that are used for branches in stubs, such as
+    ``if sys.platform == "linux": ...`` or ``if sys.version_info >= (3, 8): ...``. It is usually
+    desirable for a type checker only to consider one of these branches as reachable code for a
+    given configuration of the type checker.
+
+    Details:
+    * If the truthiness can be statically determined to always be ``True``, it returns ``True``.
+    * If the truthiness can be statically determined to always be ``False``, it returns ``False``.
+    * If the truthiness cannot be statically determined:
+      * If ``is_py_file`` is ``True``, it returns ``None``, since it is expected that ``.py`` files
+        may contain dynamic expressions in ``if`` tests that cannot be evaluated statically.
+      * If ``is_py_file`` is ``False``, however, ``InvalidStub`` is raised
+
+    For example, if passed an AST node representing the expression ``sys.platform == "linux"``,
+    it will return ``True`` if ``ctx.platform`` is equal to ``"linux"``, otherwise ``False``.
+    """
+
+    visitor = _LiteralEvalVisitor(ctx, file_path)
+    try:
+        value = visitor.visit(expr)
+    except InvalidStub:
+        if not is_py_file:
+            raise
+        return None
+    else:
+        return bool(value)
 
 
 class _LiteralEvalVisitor(ast.NodeVisitor):
