@@ -11,10 +11,11 @@ from .finder import (
 )
 from .parser import (
     ImportedName,
-    LiteralEvalVisitor,
+    InvalidStub,
     NameDict,
     NameInfo,
     OverloadedName,
+    evaluate_expression_truthiness,
     get_stub_names,
     parse_ast,
 )
@@ -26,7 +27,7 @@ __version__ = "2.8.2"
 __all__ = [
     "ImportedInfo",
     "ImportedName",
-    "LiteralEvalVisitor",
+    "InvalidStub",
     "ModulePath",
     "NameDict",
     "NameInfo",
@@ -34,6 +35,7 @@ __all__ = [
     "Resolver",
     "SearchContext",
     "__version__",
+    "evaluate_expression_truthiness",
     "get_all_stub_files",
     "get_search_context",
     "get_stub_ast",
