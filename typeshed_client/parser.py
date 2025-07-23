@@ -305,7 +305,7 @@ class _NameExtractor(ast.NodeVisitor):
                 yield from self.visit(stmt)
 
     def _visit_condition(self, expr: ast.expr) -> Optional[bool]:
-        visitor = _LiteralEvalVisitor(self.ctx, self.file_path)
+        visitor = LiteralEvalVisitor(self.ctx, self.file_path)
         try:
             value = visitor.visit(expr)
         except InvalidStub:
@@ -430,7 +430,17 @@ class _NameExtractor(ast.NodeVisitor):
         raise InvalidStub(f"Cannot handle node {ast.dump(node)}", self.file_path)
 
 
-class _LiteralEvalVisitor(ast.NodeVisitor):
+class LiteralEvalVisitor(ast.NodeVisitor):
+    """Visitor to evaluate the truthiness of a ``test`` expression in an ``ast.Compare`` node.
+
+    ``LiteralEvalVisitor(ctx, path).visit(node)`` will return ``True`` if ``node`` is an
+    expression that can be statically determined to always be ``True``, ``False`` if it can
+    be statically determined to always be ``False``, and ``None`` if its truthiness cannot
+    be determined statically. For example, if passed an AST node representing the expression
+    ``sys.platform == "linux"``, it will return ``True`` if ``ctx.platform`` is equal to
+    ``"linux"``, otherwise ``False``.
+    """
+
     def __init__(self, ctx: SearchContext, file_path: Optional[Path]) -> None:
         self.ctx = ctx
         self.file_path = file_path
