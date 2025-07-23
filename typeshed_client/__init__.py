@@ -11,7 +11,6 @@ from .finder import (
 )
 from .parser import (
     ImportedName,
-    LiteralEvalVisitor,
     NameDict,
     NameInfo,
     OverloadedName,
@@ -26,7 +25,6 @@ __version__ = "2.8.2"
 __all__ = [
     "ImportedInfo",
     "ImportedName",
-    "LiteralEvalVisitor",
     "ModulePath",
     "NameDict",
     "NameInfo",
