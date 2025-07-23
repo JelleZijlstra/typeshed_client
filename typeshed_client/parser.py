@@ -56,7 +56,6 @@ def get_stub_names(
         ModulePath(tuple(module_name.split("."))),
         is_init=is_init,
         file_path=path,
-        is_py_file=path.suffix == ".py",
     )
 
 
@@ -65,16 +64,11 @@ def parse_ast(
     search_context: SearchContext,
     module_name: ModulePath,
     *,
+    file_path: Path,
     is_init: bool = False,
-    file_path: Optional[Path] = None,
-    is_py_file: bool = False,
 ) -> NameDict:
     visitor = _NameExtractor(
-        search_context,
-        module_name,
-        is_init=is_init,
-        file_path=file_path,
-        is_py_file=is_py_file,
+        search_context, module_name, is_init=is_init, file_path=file_path
     )
     name_dict: NameDict = {}
     try:
@@ -208,15 +202,17 @@ class _NameExtractor(ast.NodeVisitor):
         ctx: SearchContext,
         module_name: ModulePath,
         *,
+        file_path: Path,
         is_init: bool = False,
-        file_path: Optional[Path],
-        is_py_file: bool = False,
     ) -> None:
         self.ctx = ctx
         self.module_name = module_name
         self.is_init = is_init
         self.file_path = file_path
-        self.is_py_file = is_py_file
+
+    @property
+    def is_py_file(self) -> bool:
+        return self.file_path.suffix == ".py"
 
     def visit_Module(self, node: ast.Module) -> list[NameInfo]:
         return [info for child in node.body for info in self.visit(child)]
@@ -306,7 +302,7 @@ class _NameExtractor(ast.NodeVisitor):
 
     def _visit_condition(self, expr: ast.expr) -> Optional[bool]:
         return evaluate_expression_truthiness(
-            expr, ctx=self.ctx, file_path=self.file_path, is_py_file=self.is_py_file
+            expr, ctx=self.ctx, file_path=self.file_path
         )
 
     def visit_Try(self, node: ast.Try) -> Iterable[NameInfo]:
@@ -425,7 +421,7 @@ class _NameExtractor(ast.NodeVisitor):
 
 
 def evaluate_expression_truthiness(
-    expr: ast.expr, *, ctx: SearchContext, file_path: Optional[Path], is_py_file: bool
+    expr: ast.expr, *, ctx: SearchContext, file_path: Path
 ) -> Optional[bool]:
     """Attempt to statically evaluate the truthiness of the expression represented by ``expr``.
 
@@ -438,9 +434,10 @@ def evaluate_expression_truthiness(
     * If the truthiness can be statically determined to always be ``True``, it returns ``True``.
     * If the truthiness can be statically determined to always be ``False``, it returns ``False``.
     * If the truthiness cannot be statically determined:
-      * If ``is_py_file`` is ``True``, it returns ``None``, since it is expected that ``.py`` files
-        may contain dynamic expressions in ``if`` tests that cannot be evaluated statically.
-      * If ``is_py_file`` is ``False``, however, ``InvalidStub`` is raised
+      * If ``file_path`` has a ``.pyi`` extension, ``InvalidStub`` is raised
+      * If ``file_path`` has a any other extension, however, it returns ``None``, since it is
+        expected that non-stub Python source files may contain dynamic expressions in ``if`` tests
+        that cannot be evaluated statically.
 
     For example, if passed an AST node representing the expression ``sys.platform == "linux"``,
     it will return ``True`` if ``ctx.platform`` is equal to ``"linux"``, otherwise ``False``.
@@ -450,7 +447,7 @@ def evaluate_expression_truthiness(
     try:
         value = visitor.visit(expr)
     except InvalidStub:
-        if not is_py_file:
+        if file_path.suffix == ".pyi":
             raise
         return None
     else:
