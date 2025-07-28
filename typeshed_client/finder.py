@@ -127,13 +127,13 @@ def get_all_stub_files(
                 continue
             for entry in safe_scandir(search_path_entry):
                 if not safe_is_dir(entry):
+                    path = Path(entry)
                     if (
                         not stub_packages
                         and safe_is_file(entry)
-                        and entry.name.endswith(".pyi")
+                        and path.suffix == ".pyi"
                     ):
-                        path = Path(entry)
-                        module_name = entry.name.removesuffix(".pyi")
+                        module_name = path.stem
                         if module_name in seen:
                             continue
                         yield (module_name, path)
