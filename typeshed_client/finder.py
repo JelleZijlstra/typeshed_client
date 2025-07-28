@@ -197,11 +197,8 @@ def _get_all_stub_files_from_directory(
         current_dir = to_do.pop()
         for dir_entry in safe_scandir(current_dir):
             if safe_is_dir(dir_entry):
-                if not dir_entry.name.isidentifier():
-                    continue
-                path = Path(dir_entry)
-                if any(safe_is_file(path / init) for init in _INIT_NAMES):
-                    to_do.append(path)
+                if dir_entry.name.isidentifier():
+                    to_do.append(Path(dir_entry))
             elif safe_is_file(dir_entry):
                 path = Path(dir_entry)
                 if path.suffix != ".pyi":
