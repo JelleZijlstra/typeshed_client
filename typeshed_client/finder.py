@@ -127,7 +127,11 @@ def get_all_stub_files(
                 continue
             for entry in safe_scandir(search_path_entry):
                 if not safe_is_dir(entry):
-                    if not stub_packages and safe_is_file(entry) and entry.name.endswith(".pyi"):
+                    if (
+                        not stub_packages
+                        and safe_is_file(entry)
+                        and entry.name.endswith(".pyi")
+                    ):
                         path = Path(entry)
                         module_name = entry.name.removesuffix(".pyi")
                         if module_name in seen:
