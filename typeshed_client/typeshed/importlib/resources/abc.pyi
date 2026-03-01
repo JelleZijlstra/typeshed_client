@@ -1,22 +1,20 @@
 import sys
+from _typeshed import StrPath
 from abc import ABCMeta, abstractmethod
 from collections.abc import Iterator
 from io import BufferedReader
 from typing import IO, Any, Literal, Protocol, overload, runtime_checkable
+from typing_extensions import deprecated
 
 if sys.version_info >= (3, 11):
+    @deprecated("Deprecated since Python 3.12. Use `importlib.resources.abc.TraversableResources` instead.")
     class ResourceReader(metaclass=ABCMeta):
         @abstractmethod
         def open_resource(self, resource: str) -> IO[bytes]: ...
         @abstractmethod
         def resource_path(self, resource: str) -> str: ...
-        if sys.version_info >= (3, 10):
-            @abstractmethod
-            def is_resource(self, path: str) -> bool: ...
-        else:
-            @abstractmethod
-            def is_resource(self, name: str) -> bool: ...
-
+        @abstractmethod
+        def is_resource(self, path: str) -> bool: ...
         @abstractmethod
         def contents(self) -> Iterator[str]: ...
 
@@ -28,12 +26,8 @@ if sys.version_info >= (3, 11):
         def is_file(self) -> bool: ...
         @abstractmethod
         def iterdir(self) -> Iterator[Traversable]: ...
-        if sys.version_info >= (3, 11):
-            @abstractmethod
-            def joinpath(self, *descendants: str) -> Traversable: ...
-        else:
-            @abstractmethod
-            def joinpath(self, child: str, /) -> Traversable: ...
+        @abstractmethod
+        def joinpath(self, *descendants: StrPath) -> Traversable: ...
 
         # The documentation and runtime protocol allows *args, **kwargs arguments,
         # but this would mean that all implementers would have to support them,
@@ -47,12 +41,7 @@ if sys.version_info >= (3, 11):
         @property
         @abstractmethod
         def name(self) -> str: ...
-        if sys.version_info >= (3, 10):
-            def __truediv__(self, child: str, /) -> Traversable: ...
-        else:
-            @abstractmethod
-            def __truediv__(self, child: str, /) -> Traversable: ...
-
+        def __truediv__(self, child: StrPath, /) -> Traversable: ...
         @abstractmethod
         def read_bytes(self) -> bytes: ...
         @abstractmethod
