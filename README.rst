@@ -102,6 +102,17 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.9.0 (March 1, 2026)
+
+- Update bundled typeshed
+- Add new public function ``evaluate_expression_truthiness``
+- Support single-file stub packages
+- Support namespace packages
+
+Version 2.8.2 (July 15, 2025)
+
+- Fix package publishing pipeline
+
 Version 2.8.1 (July 15, 2025)
 
 - Fix package publishing pipeline
