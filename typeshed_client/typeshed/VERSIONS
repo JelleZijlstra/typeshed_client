@@ -124,6 +124,7 @@ compileall: 3.0-
 compression: 3.14-
 concurrent: 3.2-
 concurrent.futures.interpreter: 3.14-
+concurrent.interpreters: 3.14-
 configparser: 3.0-
 contextlib: 3.0-
 contextvars: 3.7-
@@ -252,6 +253,7 @@ py_compile: 3.0-
 pyclbr: 3.0-
 pydoc: 3.0-
 pydoc_data: 3.0-
+pydoc_data.module_docs: 3.13-
 pyexpat: 3.0-
 queue: 3.0-
 quopri: 3.0-
