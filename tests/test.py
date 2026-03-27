@@ -16,6 +16,7 @@ from typeshed_client.parser import get_stub_names
 
 TEST_TYPESHED = Path(__file__).parent / "typeshed"
 PACKAGES = Path(__file__).parent / "site-packages"
+HAS_TEST_FIXTURES = TEST_TYPESHED.exists() and PACKAGES.exists()
 
 
 def get_context(
@@ -30,6 +31,7 @@ def get_context(
     )
 
 
+@unittest.skipUnless(HAS_TEST_FIXTURES, "test fixtures are not shipped in the sdist")
 class TestFinder(unittest.TestCase):
     def check(
         self,
@@ -81,6 +83,7 @@ class TestFinder(unittest.TestCase):
         )
 
 
+@unittest.skipUnless(HAS_TEST_FIXTURES, "test fixtures are not shipped in the sdist")
 class TestParser(unittest.TestCase):
     def test_get_stub_names(self) -> None:
         ctx = get_context((3, 5))
@@ -302,6 +305,7 @@ class TestParser(unittest.TestCase):
             self.assertIsInstance(defn, ast.FunctionDef)
 
 
+@unittest.skipUnless(HAS_TEST_FIXTURES, "test fixtures are not shipped in the sdist")
 class TestResolver(unittest.TestCase):
     def test_simple(self) -> None:
         res = typeshed_client.Resolver(get_context((3, 5)))
@@ -362,6 +366,7 @@ class TestResolver(unittest.TestCase):
         self.assertIsNone(obj)
 
 
+@unittest.skip("integration test depends on ambient site-packages in the build root")
 class IntegrationTest(unittest.TestCase):
     """Tests that all files in typeshed are parsed without error.
 
