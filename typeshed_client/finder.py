@@ -381,7 +381,9 @@ def _find_file_in_dir(
 
 
 def find_typeshed() -> Path:
-    return importlib_resources.files("typeshed_client") / "typeshed"
+    path = importlib_resources.files("typeshed_client") / "typeshed"
+    assert isinstance(path, Path), repr(path)
+    return path
 
 
 def parse_stub_file(path: Path) -> ast.Module:
