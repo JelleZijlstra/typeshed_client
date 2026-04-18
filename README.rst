@@ -102,6 +102,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.10.0 (April 17, 2026)
+
+- Update bundled typeshed
+- Make tests pass with the typeshed in the PyPI tarball
+
 Version 2.9.0 (March 1, 2026)
 
 - Update bundled typeshed
