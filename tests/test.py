@@ -1,4 +1,5 @@
 import ast
+import sys
 import unittest
 from pathlib import Path
 from typing import Any, ClassVar, Optional
@@ -213,6 +214,18 @@ class TestParser(unittest.TestCase):
         self.check_nameinfo(names, "np", typeshed_client.ImportedName)
         self.check_nameinfo(names, "f", ast.FunctionDef)
         self.check_nameinfo(names, "x", ast.AnnAssign)
+
+    @unittest.skipUnless(
+        sys.version_info >= (3, 12), "PEP 695 `type` syntax requires Python 3.12+"
+    )
+    def test_type_alias(self) -> None:
+        ctx = get_context((3, 12))
+        names = get_stub_names("typealias", search_context=ctx)
+        assert names is not None
+        self.assertEqual(set(names), {"Alias", "Generic", "_Private"})
+        self.check_nameinfo(names, "Alias", ast.TypeAlias)
+        self.check_nameinfo(names, "Generic", ast.TypeAlias)
+        self.check_nameinfo(names, "_Private", ast.TypeAlias, is_exported=False)
 
     def check_nameinfo(
         self,
