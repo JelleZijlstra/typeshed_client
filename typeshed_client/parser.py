@@ -2,6 +2,7 @@
 
 import ast
 import logging
+import sys
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Callable, NamedTuple, NoReturn, Optional, Union
@@ -284,6 +285,12 @@ class _NameExtractor(ast.NodeVisitor):
                 self.file_path,
             )
         yield NameInfo(target.id, _name_is_exported(target.id), node)
+
+    if sys.version_info >= (3, 12):
+
+        def visit_TypeAlias(self, node: ast.TypeAlias) -> Iterable[NameInfo]:
+            name = node.name.id
+            yield NameInfo(name, _name_is_exported(name), node)
 
     def visit_If(self, node: ast.If) -> Iterable[NameInfo]:
         value = self._visit_condition(node.test)
