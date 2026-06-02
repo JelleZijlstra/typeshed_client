@@ -102,8 +102,9 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.12.0 (June 1, 2026)
 
+- Update bundled typeshed
 - Support for Python 3.12+ ``type`` alias statements
 
 Version 2.11.0 (May 1, 2026)
