@@ -21,7 +21,7 @@ from .parser import (
 )
 from .resolver import ImportedInfo, Resolver
 
-__version__ = "2.11.0"
+__version__ = "2.12.0"
 
 
 __all__ = [
