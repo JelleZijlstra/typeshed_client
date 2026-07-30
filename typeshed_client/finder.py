@@ -1,6 +1,7 @@
 """This module is responsible for finding stub files."""
 
 import ast
+import importlib.resources
 import json
 import os
 import subprocess
@@ -10,7 +11,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple, NewType, Optional, Union
 
-import importlib_resources
 from typing_extensions import deprecated
 
 PythonVersion = tuple[int, int]
@@ -381,7 +381,7 @@ def _find_file_in_dir(
 
 
 def find_typeshed() -> Path:
-    path = importlib_resources.files("typeshed_client") / "typeshed"
+    path = importlib.resources.files("typeshed_client") / "typeshed"
     assert isinstance(path, Path), repr(path)
     return path
 
