@@ -102,6 +102,12 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
+Version 2.13.0 (August 1, 2026)
+
+- Update bundled typeshed
+- Drop dependency on ``importlib_resources``
+- Fix license classifier
+
 Version 2.12.0 (June 1, 2026)
 
 - Update bundled typeshed
