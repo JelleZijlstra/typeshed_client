@@ -3,6 +3,7 @@
 top_level_assert: 2.7  # inline comment: 3.6
 lib: 2.7
 conditions: 2.7
+implementation_conditions: 3.5
 new37: 3.7
 py2only: 2.7
 simple: 3.5

@@ -472,6 +472,36 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
     def visit_Tuple(self, node: ast.Tuple) -> tuple[object, ...]:
         return tuple(self.visit(elt) for elt in node.elts)
 
+    def visit_List(self, node: ast.List) -> list[object]:
+        return [self.visit(elt) for elt in node.elts]
+
+    def visit_Set(self, node: ast.Set) -> set[object]:
+        return {self.visit(elt) for elt in node.elts}
+
+    def visit_Call(self, node: ast.Call) -> object:
+        if (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr == "startswith"
+            and _is_sys_attribute(node.func.value, "platform")
+            and len(node.args) == 1
+            and not node.keywords
+        ):
+            prefix = self.visit(node.args[0])
+            if not isinstance(prefix, str):
+                raise InvalidStub(
+                    "sys.platform.startswith() requires a string literal",
+                    self.file_path,
+                )
+            return self.ctx.platform.startswith(prefix)
+        raise InvalidStub(f"Invalid call in stub: {ast.dump(node)}", self.file_path)
+
+    def visit_UnaryOp(self, node: ast.UnaryOp) -> object:
+        if isinstance(node.op, ast.Not):
+            return not self.visit(node.operand)
+        raise InvalidStub(
+            f"Invalid unary operation in stub: {ast.dump(node)}", self.file_path
+        )
+
     def visit_Subscript(self, node: ast.Subscript) -> object:
         value = self.visit(node.value)
         slc = self.visit(node.slice)
@@ -501,6 +531,10 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
         return slice(lower, upper, step)
 
     def visit_Attribute(self, node: ast.Attribute) -> object:
+        if _is_sys_implementation_attribute(node, "name"):
+            return self.ctx.implementation_name
+        if _is_sys_implementation_attribute(node, "version"):
+            return self.ctx.implementation_version
         val = node.value
         if not isinstance(val, ast.Name):
             raise InvalidStub(f"Invalid code in stub: {ast.dump(node)}", self.file_path)
@@ -529,6 +563,23 @@ class _LiteralEvalVisitor(ast.NodeVisitor):
 
     def generic_visit(self, node: ast.AST) -> NoReturn:
         raise InvalidStub(f"Cannot evaluate node {ast.dump(node)}")
+
+
+def _is_sys_attribute(node: ast.expr, attribute: str) -> bool:
+    return (
+        isinstance(node, ast.Attribute)
+        and node.attr == attribute
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "sys"
+    )
+
+
+def _is_sys_implementation_attribute(node: ast.Attribute, attribute: str) -> bool:
+    return (
+        node.attr == attribute
+        and isinstance(node.value, ast.Attribute)
+        and _is_sys_attribute(node.value, "implementation")
+    )
 
 
 class _AssertFailed(Exception):
