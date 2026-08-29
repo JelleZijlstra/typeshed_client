@@ -21,7 +21,12 @@ HAS_TEST_FIXTURES = TEST_TYPESHED.exists() and PACKAGES.exists()
 
 
 def get_context(
-    version: PythonVersion, platform: str = "linux", allow_py_files: bool = True
+    version: PythonVersion,
+    platform: str = "linux",
+    allow_py_files: bool = True,
+    *,
+    implementation_name: str = "cpython",
+    implementation_version: PythonVersion = (3, 11),
 ) -> SearchContext:
     return get_search_context(
         version=version,
@@ -29,7 +34,67 @@ def get_context(
         search_path=[PACKAGES],
         platform=platform,
         allow_py_files=allow_py_files,
+        implementation_name=implementation_name,
+        implementation_version=implementation_version,
     )
+
+
+class TestConditionEvaluation(unittest.TestCase):
+    def evaluate(self, expression: str, ctx: SearchContext) -> bool:
+        node = ast.parse(expression, mode="eval").body
+        result = typeshed_client.evaluate_expression_truthiness(
+            node, ctx=ctx, file_path=Path("condition.pyi")
+        )
+        assert result is not None
+        return result
+
+    def test_implementation_and_platform_conditions(self) -> None:
+        ctx = get_context(
+            (3, 11),
+            platform="freebsd13",
+            implementation_name="pypy",
+            implementation_version=(7, 3),
+        )
+        true_expressions = [
+            'sys.platform.startswith("freebsd")',
+            'sys.platform in ("linux", "freebsd13")',
+            'sys.platform in {"linux", "freebsd13"}',
+            'sys.platform in ["linux", "freebsd13"]',
+            'sys.platform not in {"linux", "darwin"}',
+            'sys.implementation.name == "pypy"',
+            'sys.implementation.name in {"pypy", "graalpy"}',
+            "sys.implementation.version >= (7, 3)",
+            'not sys.platform == "win32"',
+            'sys.implementation.name == "pypy" and sys.implementation.version >= (7, 3)',
+        ]
+        false_expressions = [
+            'sys.platform.startswith("linux")',
+            'sys.platform in ("linux", "darwin")',
+            'sys.platform not in ["freebsd13", "darwin"]',
+            'sys.implementation.name != "pypy"',
+            'sys.implementation.name in ("cpython", "graalpy")',
+            "sys.implementation.version < (7, 3)",
+            'not sys.implementation.name == "pypy"',
+            'sys.platform == "win32" or sys.implementation.name == "cpython"',
+        ]
+        for expression in true_expressions:
+            with self.subTest(expression=expression):
+                self.assertTrue(self.evaluate(expression, ctx))
+        for expression in false_expressions:
+            with self.subTest(expression=expression):
+                self.assertFalse(self.evaluate(expression, ctx))
+
+    def test_invalid_startswith_argument(self) -> None:
+        ctx = get_context((3, 11))
+        with self.assertRaisesRegex(
+            typeshed_client.InvalidStub, "requires a string literal"
+        ):
+            self.evaluate("sys.platform.startswith(1)", ctx)
+
+    def test_implementation_defaults_match_runtime(self) -> None:
+        ctx = get_search_context(typeshed=TEST_TYPESHED, search_path=[PACKAGES])
+        self.assertEqual(ctx.implementation_name, sys.implementation.name)
+        self.assertEqual(ctx.implementation_version, sys.implementation.version[:2])
 
 
 @unittest.skipUnless(HAS_TEST_FIXTURES, "test fixtures are not shipped in the sdist")
@@ -267,6 +332,27 @@ class TestParser(unittest.TestCase):
         self.check_conditions(
             {"penguins", "ages_long_past", "old_stuff", "more_old_stuff"},
             version=(2, 7),
+        )
+
+    def test_implementation_conditions(self) -> None:
+        ctx = get_context(
+            (3, 11),
+            platform="freebsd13",
+            implementation_name="pypy",
+            implementation_version=(7, 3),
+        )
+        info = get_stub_names("implementation_conditions", search_context=ctx)
+        assert info is not None
+        self.assertEqual(
+            set(info),
+            {
+                "sys",
+                "pypy_name",
+                "recent_implementation",
+                "freebsd_platform",
+                "selected_platform",
+                "non_windows_platform",
+            },
         )
 
     def check_conditions(

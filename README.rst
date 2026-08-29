@@ -31,7 +31,9 @@ Functions provided:
 - ``get_search_context(*, typeshed: Path | None = None,
   search_path: Sequence[Path] | None = None, python_executable: str | None = None,
   version: PythonVersion | None = None, platform: str = sys.platform,
-  raise_on_warnings: bool = False, allow_py_files: bool = False) -> SearchContext``:
+  raise_on_warnings: bool = False, allow_py_files: bool = False,
+  implementation_name: str = sys.implementation.name,
+  implementation_version: PythonVersion = sys.implementation.version[:2]) -> SearchContext``:
   Returns a ``SearchContext``, which can be used with most other functions to customize
   stub finding behavior. All arguments are optional and the rest of the package will use
   a ``SearchContext`` created with the default values if no explicit context is provided.
@@ -47,6 +49,12 @@ Functions provided:
     interpreting ``sys.version_info`` checks in stubs.
   - ``platform``: The platform to be used for interpreting ``sys.platform`` checks in
     stubs. The default is ``sys.platform``, the platform where the library is invoked.
+  - ``implementation_name``: The implementation name to be used for interpreting
+    ``sys.implementation.name`` checks in stubs. The default is the value from the
+    Python interpreter where the library is invoked.
+  - ``implementation_version``: The implementation version to be used for interpreting
+    ``sys.implementation.version`` checks in stubs. The default is the major and minor
+    version from the Python interpreter where the library is invoked.
   - ``raise_on_warnings``: If True, raise an exception if the parser encounters something
     it does not understand.
   - ``allow_py_files``: If True, allow searching for ``.py`` files in addition to
@@ -101,6 +109,10 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 
 Changelog
 ---------
+
+Unreleased
+
+- Support more ``sys.platform`` and ``sys.implementation`` conditions
 
 Version 2.13.0 (August 1, 2026)
 
