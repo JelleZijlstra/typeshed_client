@@ -110,9 +110,11 @@ call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 Changelog
 ---------
 
-Unreleased
+Version 2.14.0 (October 12, 2026)
 
+- Update bundled typeshed
 - Support more ``sys.platform`` and ``sys.implementation`` conditions
+- Publish packages with attestations using PyPI Trusted Publishing
 
 Version 2.13.0 (August 1, 2026)
 
