@@ -107,6 +107,36 @@ class. For example, given a ``resolver = typeshed_client.Resolver()``, you can
 call ``resolver.get_fully_qualified_name('collections.Set')`` to retrieve the
 ``NameInfo`` containing the AST node defining ``collections.Set`` in typeshed.
 
+Releasing
+---------
+
+Before tagging a release:
+
+1. Update the bundled stubs with ``python update_bundled.py`` if needed, update
+   ``typeshed_client.__version__``, and add a changelog entry below.
+2. Run the tests and pre-commit hooks, and ensure CI passes.
+3. Install ``uv`` and Git, then run ``python check_pycroscope.py``. This builds a
+   wheel from the current checkout, clones the latest pycroscope ``main``, and
+   runs its test suite on Python 3.10 through 3.14 with that wheel overriding the
+   locked typeshed-client dependency. Each interpreter gets a temporary virtual
+   environment; pycroscope's lockfile and any existing virtual environment are
+   left unchanged. The script prints the pycroscope commit and returns nonzero
+   if any interpreter fails. Fix or coordinate downstream compatibility failures
+   before proceeding.
+4. Commit and merge the release changes. Tag the release as ``vX.Y.Z`` and push
+   the tag. The tag publishing workflow repeats the pycroscope compatibility
+   matrix and requires every job to pass before uploading to PyPI.
+
+For a focused investigation, select interpreters with repeated ``--python``
+options, use ``--pycroscope /path/to/checkout`` to test a local fix, and pass pytest
+arguments after ``--``. For example::
+
+    python check_pycroscope.py --python 3.11 --pycroscope ../pycroscope -- -q pycroscope/test_type_object.py
+
+Use the default full matrix against latest pycroscope before releasing; a focused
+run does not replace that check. Optional pycroscope dependency extras beyond
+``tests`` are not installed, matching the typing-extensions downstream test job.
+
 Changelog
 ---------
 
