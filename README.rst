@@ -121,11 +121,14 @@ Before tagging a release:
    locked typeshed-client dependency. Each interpreter gets a temporary virtual
    environment; pycroscope's lockfile and any existing virtual environment are
    left unchanged. The script prints the pycroscope commit and returns nonzero
-   if any interpreter fails. Fix or coordinate downstream compatibility failures
-   before proceeding.
+   if any interpreter fails. Investigate failures before proceeding with the
+   release: the fix may belong in pycroscope, typeshed-client, or typeshed, but
+   most often it will require a pycroscope fix. Submit the necessary fix to
+   pycroscope before proceeding with the release, and rerun this check once the
+   fix is available. Resolve compatibility failures before tagging.
 4. Commit and merge the release changes. Tag the release as ``vX.Y.Z`` and push
-   the tag. The tag publishing workflow repeats the pycroscope compatibility
-   matrix and requires every job to pass before uploading to PyPI.
+   the tag to publish to PyPI. The compatibility check is a manual pre-release
+   step only; it does not run in regular PR CI or gate an already-tagged release.
 
 For a focused investigation, select interpreters with repeated ``--python``
 options, use ``--pycroscope /path/to/checkout`` to test a local fix, and pass pytest
