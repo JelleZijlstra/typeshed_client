@@ -63,5 +63,5 @@ setup(
         "Programming Language :: Python :: 3.15",
         "Topic :: Software Development",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
 )
